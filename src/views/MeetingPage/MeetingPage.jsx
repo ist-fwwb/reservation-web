@@ -1,14 +1,75 @@
 import React from "react";
 import GridItem from "components/Grid/GridItem.jsx";
 import GridContainer from "components/Grid/GridContainer.jsx";
-import Tasks from "components/Tasks/Tasks.jsx";
 import CustomTabs from "components/CustomTabs/CustomTabs.jsx";
-import BugReport from "@material-ui/icons/BugReport";
-import Code from "@material-ui/icons/Code";
-import Cloud from "@material-ui/icons/Cloud";
+import Assignment from "@material-ui/icons/Assignment";
+import History from "@material-ui/icons/History";
+import Table from "components/Table/Table.jsx";
+import Button from '@material-ui/core/Button';
 
-import { bugs, website, server } from "variables/general.jsx";
+const historyMeetings = [{
+  id: 0,
+  leader: "Sth else",
+  location: "501",
+  date: "2019-01-01",
+  start: "10:00",
+  end: "12:00"
+},{
+  id: 1,
+  leader: "Whoever",
+  location: "501",
+  date: "2019-01-02",
+  start: "13:00",
+  end: "14:00"
+},]
+const meetings = [{
+  id: 2,
+  leader: "Whatever",
+  location: "501",
+  date: "2019-02-01",
+  start: "10:00",
+  end: "12:00"
+},{
+  id: 3,
+  leader: "Somebody",
+  location: "501",
+  date: "2019-02-02",
+  start: "13:00",
+  end: "14:00"
+},]
 
+const exitButton = <Button variant="contained" color="secondary">退出会议</Button>;
+
+function JSONToArray(jsonArray){
+  let re = [];
+  for (let i in jsonArray){
+    let ele = jsonArray[i];
+    let temp_ele = [];
+    temp_ele.push(ele.id);
+    temp_ele.push(ele.leader);
+    temp_ele.push(ele.location);
+    temp_ele.push(ele.date);
+    temp_ele.push(ele.start + "~" + ele.end);
+    re.push(temp_ele);
+  }
+  return re;
+}
+
+function JSONToArrayWithButton(jsonArray){
+  let re = [];
+  for (let i in jsonArray){
+    let ele = jsonArray[i];
+    let temp_ele = [];
+    temp_ele.push(ele.id);
+    temp_ele.push(ele.leader);
+    temp_ele.push(ele.location);
+    temp_ele.push(ele.date);
+    temp_ele.push(ele.start + "~" + ele.end);
+    temp_ele.push(exitButton);
+    re.push(temp_ele);
+  }
+  return re;
+}
 
 class MeetingPage extends React.Component {
   render() {
@@ -21,35 +82,24 @@ class MeetingPage extends React.Component {
               headerColor="primary"
               tabs={[
                 {
-                  tabName: "Bugs",
-                  tabIcon: BugReport,
+                  tabName: "待办会议",
+                  tabIcon: Assignment,
                   tabContent: (
-                    <Tasks
-                      checkedIndexes={[0, 3]}
-                      tasksIndexes={[0, 1, 2, 3]}
-                      tasks={bugs}
+                    <Table
+                      tableHeaderColor="primary"
+                      tableHead={["ID", "发起人", "会议室", "日期", "时间", "操作"]}
+                      tableData={JSONToArrayWithButton(meetings)}
                     />
                   )
                 },
                 {
-                  tabName: "Website",
-                  tabIcon: Code,
+                  tabName: "历史会议",
+                  tabIcon: History,
                   tabContent: (
-                    <Tasks
-                      checkedIndexes={[0]}
-                      tasksIndexes={[0, 1]}
-                      tasks={website}
-                    />
-                  )
-                },
-                {
-                  tabName: "Server",
-                  tabIcon: Cloud,
-                  tabContent: (
-                    <Tasks
-                      checkedIndexes={[1]}
-                      tasksIndexes={[0, 1, 2]}
-                      tasks={server}
+                    <Table
+                      tableHeaderColor="primary"
+                      tableHead={["ID", "发起人", "会议室", "日期", "时间"]}
+                      tableData={JSONToArray(historyMeetings)}
                     />
                   )
                 }
@@ -60,4 +110,6 @@ class MeetingPage extends React.Component {
       </div>
     )
   }
-}export default MeetingPage
+}
+
+export default MeetingPage;

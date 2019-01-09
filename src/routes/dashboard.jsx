@@ -16,8 +16,9 @@ import Icons from "views/Icons/Icons.jsx";
 import Maps from "views/Maps/Maps.jsx";
 import NotificationsPage from "views/Notifications/Notifications.jsx";
 import UpgradeToPro from "views/UpgradeToPro/UpgradeToPro.jsx";
+import RoomDetail from "views/RoomDetail/RoomDetail.jsx";
 
-const dashboardRoutes = [
+export const dashboardRoutes = [
   {
     path: "/room",
     sidebarName: "查看会议室",
@@ -74,7 +75,14 @@ const dashboardRoutes = [
     icon: Unarchive,
     component: UpgradeToPro
   },
-  { redirect: true, path: "/", to: "/dashboard", navbarName: "Redirect" }
+  { redirect: true, path: "/", to: "/room", navbarName: "Redirect" }
 ];
 
-export default dashboardRoutes;
+let routesNotInSideBar = [
+  {
+    path: "/room/:roomid",
+    component: RoomDetail
+  }
+];
+
+export const deepRoutes = routesNotInSideBar.concat(dashboardRoutes);
