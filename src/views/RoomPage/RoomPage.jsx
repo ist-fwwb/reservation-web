@@ -6,7 +6,7 @@ import Icon from "@material-ui/core/Icon";
 // @material-ui/icons
 
 import Update from "@material-ui/icons/Update";
-
+import { Link } from "react-router-dom";
 // core components
 import GridItem from "components/Grid/GridItem.jsx";
 import GridContainer from "components/Grid/GridContainer.jsx";
@@ -24,37 +24,37 @@ let rooms = [{location: '410',capacity: 10, status: 0},
 
 function roomCategory(capacity){
   if (capacity <= 5)
-    return "小会议室"
+    return "小会议室";
   else if (capacity > 10)
-    return "大会议室"
-  return "中会议室"
+    return "大会议室";
+  return "中会议室";
 }
 
 function roomStatus(status){
   if (status === 0)
-    return "空闲"
+    return "空闲";
   else if (status === 1)
-    return "已预定"
+    return "已预定";
   else if (status === 2)
-    return "开会中"
+    return "开会中";
 }
 
 function roomCardColor(status){
   if (status === 0)
-    return "success"
+    return "success";
   else if (status === 1)
-    return "warning"
+    return "warning";
   else if (status === 2)
-    return "danger"
+    return "danger";
 }
 
 function roomCardIcon(status){
   if (status === 0)
-    return "sentiment_very_satisfied"
+    return "sentiment_very_satisfied";
   else if (status === 1)
-    return "sentiment_dissatisfied"
+    return "sentiment_dissatisfied";
   else if (status === 2)
-    return "sentiment_very_dissatisfied"
+    return "sentiment_very_dissatisfied";
 }
 
 class Dashboard extends React.Component {
@@ -81,7 +81,7 @@ class Dashboard extends React.Component {
                       </CardIcon>
                       <p className={classes.cardCategory}>{roomStatus(room.status)}</p>
                       <h3 className={classes.cardTitle}>
-                      {roomCategory(room.capacity) + " " + room.location} <br/> <small>{"容量:"+room.capacity}</small>
+                      <Link to={"/room/"+room.location}>{roomCategory(room.capacity) + " " + room.location}</Link> <br/> <small>{"容量:"+room.capacity}</small>
                       </h3>
                     </CardHeader>
                     <CardFooter stats>
