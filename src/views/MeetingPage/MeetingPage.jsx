@@ -7,6 +7,8 @@ import LibraryAdd from "@material-ui/icons/LibraryAdd";
 import History from "@material-ui/icons/History";
 import Table from "components/Table/Table.jsx";
 import Button from "components/CustomButtons/Button.jsx";
+import { Link } from "react-router-dom";
+
 
 const historyMeetings = [{
   id: 0,
@@ -81,7 +83,7 @@ function JSONToArray(jsonArray, type){
     let temp_ele = [];
     temp_ele.push(ele.id);
     temp_ele.push(ele.leader);
-    temp_ele.push(ele.location);
+    temp_ele.push(<Link to={"/room/"+ele.location+"/profile"}>{ele.location}</Link>);
     temp_ele.push(ele.date);
     temp_ele.push(ele.start + "~" + ele.end);
     if (type === "meeting")

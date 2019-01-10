@@ -16,7 +16,8 @@ import Icons from "views/Icons/Icons.jsx";
 import Maps from "views/Maps/Maps.jsx";
 import NotificationsPage from "views/Notifications/Notifications.jsx";
 import UpgradeToPro from "views/UpgradeToPro/UpgradeToPro.jsx";
-import RoomDetail from "views/RoomDetail/RoomDetail.jsx";
+import RoomSchedule from "views/RoomSchedule/RoomSchedule.jsx";
+import RoomProfile from "views/RoomProfile/RoomProfile.jsx";
 
 export const dashboardRoutes = [
   {
@@ -80,8 +81,12 @@ export const dashboardRoutes = [
 
 let routesNotInSideBar = [
   {
-    path: "/room/:roomid",
-    component: RoomDetail
+    path: "/room/:roomid/schedule",
+    component: RoomSchedule
+  },
+  {
+    path: "/room/:roomid/profile",
+    component: RoomProfile
   }
 ];
 

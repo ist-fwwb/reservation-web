@@ -58,13 +58,7 @@ function roomCardIcon(status){
 }
 
 class Dashboard extends React.Component {
-  state = {
-    value: 0
-  };
 
-  handleChangeIndex = index => {
-    this.setState({ value: index });
-  };
   render() {
     const { classes } = this.props;
     return (
@@ -81,7 +75,7 @@ class Dashboard extends React.Component {
                       </CardIcon>
                       <p className={classes.cardCategory}>{roomStatus(room.status)}</p>
                       <h3 className={classes.cardTitle}>
-                      <Link to={"/room/"+room.location}>{roomCategory(room.capacity) + " " + room.location}</Link> <br/> <small>{"容量:"+room.capacity}</small>
+                      <Link to={"/room/"+room.location+"/schedule"}>{roomCategory(room.capacity) + " " + room.location}</Link> <br/> <small>{"容量:"+room.capacity}</small>
                       </h3>
                     </CardHeader>
                     <CardFooter stats>
