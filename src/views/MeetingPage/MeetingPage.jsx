@@ -3,9 +3,10 @@ import GridItem from "components/Grid/GridItem.jsx";
 import GridContainer from "components/Grid/GridContainer.jsx";
 import CustomTabs from "components/CustomTabs/CustomTabs.jsx";
 import Assignment from "@material-ui/icons/Assignment";
+import LibraryAdd from "@material-ui/icons/LibraryAdd";
 import History from "@material-ui/icons/History";
 import Table from "components/Table/Table.jsx";
-import Button from '@material-ui/core/Button';
+import Button from "components/CustomButtons/Button.jsx";
 
 const historyMeetings = [{
   id: 0,
@@ -21,7 +22,22 @@ const historyMeetings = [{
   date: "2019-01-02",
   start: "13:00",
   end: "14:00"
-},]
+},];
+const attendMeetings = [{
+  id: 4,
+  leader: "Wha",
+  location: "501",
+  date: "2019-02-02",
+  start: "10:00",
+  end: "12:00"
+},{
+  id: 5,
+  leader: "Som",
+  location: "502",
+  date: "2019-02-03",
+  start: "13:00",
+  end: "14:00"
+},];
 const meetings = [{
   id: 2,
   leader: "Whatever",
@@ -36,26 +52,29 @@ const meetings = [{
   date: "2019-02-02",
   start: "13:00",
   end: "14:00"
-},]
+},];
 
-const exitButton = <Button variant="contained" color="secondary">退出会议</Button>;
+const exitButton = (id) => {
+  return <Button color="danger" size="sm">退出会议 {id}</Button>;
+} 
 
-function JSONToArray(jsonArray){
-  let re = [];
-  for (let i in jsonArray){
-    let ele = jsonArray[i];
-    let temp_ele = [];
-    temp_ele.push(ele.id);
-    temp_ele.push(ele.leader);
-    temp_ele.push(ele.location);
-    temp_ele.push(ele.date);
-    temp_ele.push(ele.start + "~" + ele.end);
-    re.push(temp_ele);
-  }
-  return re;
+const manageButton = (id) => {
+  return <Button color="success" size="sm">管理会议 {id}</Button>
 }
 
-function JSONToArrayWithButton(jsonArray){
+const checkButtons = (id) => {
+  return <Button color="info" size="sm">查看会议 {id}</Button>
+}
+
+const joinButton = (id) => {
+  return <Button color="success" size="sm">加入会议 {id}</Button>
+}
+
+function handleExit(id) {
+  return;
+}
+
+function JSONToArray(jsonArray, type){
   let re = [];
   for (let i in jsonArray){
     let ele = jsonArray[i];
@@ -65,7 +84,12 @@ function JSONToArrayWithButton(jsonArray){
     temp_ele.push(ele.location);
     temp_ele.push(ele.date);
     temp_ele.push(ele.start + "~" + ele.end);
-    temp_ele.push(exitButton);
+    if (type === "meeting")
+      temp_ele.push([manageButton(ele.id), "\t", exitButton(ele.id)]);
+    else if (type === "history")
+      temp_ele.push([checkButtons(ele.id)])
+    else if (type === "attend")
+      temp_ele.push([checkButtons(ele.id), "\t", joinButton(ele.id)])
     re.push(temp_ele);
   }
   return re;
@@ -88,7 +112,18 @@ class MeetingPage extends React.Component {
                     <Table
                       tableHeaderColor="primary"
                       tableHead={["ID", "发起人", "会议室", "日期", "时间", "操作"]}
-                      tableData={JSONToArrayWithButton(meetings)}
+                      tableData={JSONToArray(meetings, "meeting")}
+                    />
+                  )
+                },
+                {
+                  tabName: "加入会议",
+                  tabIcon: LibraryAdd,
+                  tabContent: (
+                    <Table
+                      tableHeaderColor="primary"
+                      tableHead={["ID", "发起人", "会议室", "日期", "时间", "操作"]}
+                      tableData={JSONToArray(attendMeetings, "attend")}
                     />
                   )
                 },
@@ -98,8 +133,8 @@ class MeetingPage extends React.Component {
                   tabContent: (
                     <Table
                       tableHeaderColor="primary"
-                      tableHead={["ID", "发起人", "会议室", "日期", "时间"]}
-                      tableData={JSONToArray(historyMeetings)}
+                      tableHead={["ID", "发起人", "会议室", "日期", "时间", "操作"]}
+                      tableData={JSONToArray(historyMeetings, "history")}
                     />
                   )
                 }
