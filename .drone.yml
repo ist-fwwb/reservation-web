@@ -1,0 +1,27 @@
+pipeline:
+  build: 
+    image: registry.cn-shenzhen.aliyuncs.com/pipipan/node:1.0
+    commands:
+      - npm install
+      - CI=false npm run-script build
+  publish:
+    image: docker
+    secrets: [docker_username,docker_password]
+    commands:
+        - docker login --username=$DOCKER_USERNAME --password=$DOCKER_PASSWORD registry.cn-shenzhen.aliyuncs.com/pipipan/frontend
+        - docker build -t registry.cn-shenzhen.aliyuncs.com/pipipan/meetingroom-reserve-frontend:master -f Dockerfile .
+        - docker push registry.cn-shenzhen.aliyuncs.com/pipipan/meetingroom-reserve-frontend:master
+    volumes:
+        - /var/run/docker.sock:/var/run/docker.sock
+    when:
+        branch: master
+        status: success
+
+  deploy:
+    image: appleboy/drone-ssh
+    host: 129.211.119.51
+    secrets: [ssh_username, ssh_password]
+    port: 22
+    script:
+      - /root/shell/frontend-deployment.sh
+
