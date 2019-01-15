@@ -11,50 +11,91 @@ import { Link } from "react-router-dom";
 
 
 const historyMeetings = [{
-  id: 0,
-  leader: "Sth else",
-  location: "501",
-  date: "2019-01-01",
-  start: "10:00",
-  end: "12:00"
-},{
-  id: 1,
-  leader: "Whoever",
-  location: "501",
-  date: "2019-01-02",
-  start: "13:00",
-  end: "14:00"
-},];
-const attendMeetings = [{
-  id: 4,
-  leader: "Wha",
-  location: "501",
-  date: "2019-02-02",
-  start: "10:00",
-  end: "12:00"
-},{
-  id: 5,
-  leader: "Som",
-  location: "502",
-  date: "2019-02-03",
-  start: "13:00",
-  end: "14:00"
-},];
-const meetings = [{
-  id: 2,
-  leader: "Whatever",
-  location: "501",
-  date: "2019-02-01",
-  start: "10:00",
-  end: "12:00"
-},{
-  id: 3,
-  leader: "Somebody",
-  location: "501",
-  date: "2019-02-02",
-  start: "13:00",
-  end: "14:00"
-},];
+  id: "0",
+  attendantNum: "7",
+  attendants: {},
+  date: "2018-01-10",
+  description: "whatever",
+  endTime: "10:00",
+  heading: "Meeting 1",
+  hostId: "0",
+  location: "508",
+  needSignIn: false,
+  roomId: "string",
+  startTime: "10:30",
+  status: "Cancelled",
+  type: "COMMON"
+  },
+];
+const attendMeetings = [
+  {
+    id: "4",
+    attendantNum: "4",
+    attendants: {},
+    date: "2018-02-01",
+    description: "whatever",
+    endTime: "14:00",
+    heading: "Meeting b",
+    hostId: "1",
+    location: "501",
+    needSignIn: false,
+    roomId: "string",
+    startTime: "14:30",
+    status: "Pending",
+    type: "COMMON"
+  },
+  {
+    id: "6",
+    attendantNum: "3",
+    attendants: {},
+    date: "2018-02-03",
+    description: "whatever description",
+    endTime: "16:00",
+    heading: "Meeting a",
+    hostId: "2",
+    location: "504",
+    needSignIn: false,
+    roomId: "string",
+    startTime: "16:30",
+    status: "Pending",
+    type: "COMMON"
+    }
+];
+
+const meetings = [
+  {
+    id: "7",
+    attendantNum: "5",
+    attendants: {},
+    date: "2018-02-01",
+    description: "whatever",
+    endTime: "10:00",
+    heading: "Meeting 1",
+    hostId: "1",
+    location: "501",
+    needSignIn: false,
+    roomId: "string",
+    startTime: "10:30",
+    status: "Pending",
+    type: "COMMON"
+  },
+  {
+    id: "8",
+    attendantNum: "6",
+    attendants: {},
+    date: "2018-02-02",
+    description: "whatever description",
+    endTime: "11:30",
+    heading: "Meeting 2",
+    hostId: "2",
+    location: "502",
+    needSignIn: false,
+    roomId: "string",
+    startTime: "12:30",
+    status: "Pending",
+    type: "COMMON"
+    }
+];
 
 const exitButton = (id) => {
   return <Button color="danger" size="sm">退出会议 {id}</Button>;
@@ -81,11 +122,13 @@ function JSONToArray(jsonArray, type){
   for (let i in jsonArray){
     let ele = jsonArray[i];
     let temp_ele = [];
-    temp_ele.push(ele.id);
-    temp_ele.push(ele.leader);
+    temp_ele.push(<Link to={"/meeting/"+ele.id+"/profile"}>{ele.heading}</Link>)
+    temp_ele.push(ele.hostId);
     temp_ele.push(<Link to={"/room/"+ele.location+"/profile"}>{ele.location}</Link>);
     temp_ele.push(ele.date);
-    temp_ele.push(ele.start + "~" + ele.end);
+    temp_ele.push(ele.startTime + "~" + ele.endTime);
+    if (type === "history")
+      temp_ele.push(ele.status)
     if (type === "meeting")
       temp_ele.push([manageButton(ele.id), "\t", exitButton(ele.id)]);
     else if (type === "history")
@@ -104,7 +147,7 @@ class MeetingPage extends React.Component {
         <GridContainer>
           <GridItem xs={12} sm={12} md={12}>
             <CustomTabs
-              title="Tasks:"
+              title={null}
               headerColor="rose"
               tabs={[
                 {
@@ -113,7 +156,7 @@ class MeetingPage extends React.Component {
                   tabContent: (
                     <Table
                       tableHeaderColor="primary"
-                      tableHead={["ID", "发起人", "会议室", "日期", "时间", "操作"]}
+                      tableHead={["会议名称", "发起人", "会议室", "日期", "时间", "操作"]}
                       tableData={JSONToArray(meetings, "meeting")}
                     />
                   )
@@ -124,7 +167,7 @@ class MeetingPage extends React.Component {
                   tabContent: (
                     <Table
                       tableHeaderColor="primary"
-                      tableHead={["ID", "发起人", "会议室", "日期", "时间", "操作"]}
+                      tableHead={["会议名称", "发起人", "会议室", "日期", "时间", "操作"]}
                       tableData={JSONToArray(attendMeetings, "attend")}
                     />
                   )
@@ -135,7 +178,7 @@ class MeetingPage extends React.Component {
                   tabContent: (
                     <Table
                       tableHeaderColor="primary"
-                      tableHead={["ID", "发起人", "会议室", "日期", "时间", "操作"]}
+                      tableHead={["会议名称", "发起人", "会议室", "日期", "时间", "状态", "操作"]}
                       tableData={JSONToArray(historyMeetings, "history")}
                     />
                   )
