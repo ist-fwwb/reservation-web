@@ -4,7 +4,7 @@ pipeline:
     commands:
       - npm install yarn
       - yarn install 
-      - yarn build
+      - CI=false yarn build
   publish:
     image: docker
     secrets: [docker_username,docker_password]
