@@ -2,13 +2,18 @@ import React from "react";
 import GridItem from "components/Grid/GridItem.jsx";
 import GridContainer from "components/Grid/GridContainer.jsx";
 import CustomTabs from "components/CustomTabs/CustomTabs.jsx";
+
 import Assignment from "@material-ui/icons/Assignment";
 import LibraryAdd from "@material-ui/icons/LibraryAdd";
+import FiberNew from "@material-ui/icons/FiberNew";
 import History from "@material-ui/icons/History";
+import Note from "@material-ui/icons/Note";
+
 import Table from "components/Table/Table.jsx";
 import Button from "components/CustomButtons/Button.jsx";
 import { Link } from "react-router-dom";
 
+const today = "2019-02-02";
 
 const historyMeetings = [{
   id: "0",
@@ -23,7 +28,7 @@ const historyMeetings = [{
   needSignIn: false,
   roomId: "string",
   startTime: "10:30",
-  status: "Cancelled",
+  status: "Pending",
   type: "COMMON"
   },
 ];
@@ -67,7 +72,7 @@ const meetings = [
     id: "7",
     attendantNum: "5",
     attendants: {},
-    date: "2018-02-01",
+    date: "2019-02-05",
     description: "whatever",
     endTime: "10:00",
     heading: "Meeting 1",
@@ -83,7 +88,7 @@ const meetings = [
     id: "8",
     attendantNum: "6",
     attendants: {},
-    date: "2018-02-02",
+    date: "2019-02-02",
     description: "whatever description",
     endTime: "11:30",
     heading: "Meeting 2",
@@ -97,66 +102,80 @@ const meetings = [
     }
 ];
 
-const exitButton = (id) => {
-  return <Button color="danger" size="sm">退出会议 {id}</Button>;
-} 
+const news = [
+  ["温州皮革厂倒闭了", "2018-01-20"],
+  ["温州皮革厂开业了", "2018-01-21"],
+];
 
-const manageButton = (id) => {
-  return <Button color="success" size="sm">管理会议 {id}</Button>
-}
-
-const checkButtons = (id) => {
-  return <Button color="info" size="sm">查看会议 {id}</Button>
-}
+const notes = [
+  ["Meeting a", "whatever"],
+  ["Meeting b", "whatever"]
+]
 
 const joinButton = (id) => {
   return <Button color="success" size="sm">加入会议 {id}</Button>
-}
-
-function handleExit(id) {
-  return;
 }
 
 function JSONToArray(jsonArray, type){
   let re = [];
   for (let i in jsonArray){
     let ele = jsonArray[i];
+    if (type === "meeting" && ele.date !== today)
+      continue
     let temp_ele = [];
+
     temp_ele.push(<Link to={"/meeting/"+ele.id+"/profile"}>{ele.heading}</Link>)
-    temp_ele.push(ele.hostId);
     temp_ele.push(<Link to={"/room/"+ele.location+"/profile"}>{ele.location}</Link>);
-    temp_ele.push(ele.date);
+    if (type !== "meeting")
+      temp_ele.push(ele.date);
     temp_ele.push(ele.startTime + "~" + ele.endTime);
-    if (type === "history")
-      temp_ele.push(ele.status)
     if (type === "meeting")
-      temp_ele.push([manageButton(ele.id), "\t", exitButton(ele.id)]);
-    else if (type === "history")
-      temp_ele.push([checkButtons(ele.id)])
+      temp_ele.push(ele.status);
     else if (type === "attend")
-      temp_ele.push([checkButtons(ele.id), "\t", joinButton(ele.id)])
+      temp_ele.push([joinButton(ele.id)])
     re.push(temp_ele);
   }
   return re;
 }
 
-class MeetingPage extends React.Component {
-  render() {
-    return (
+class HomePage extends React.Component{
+  state = {
+  }
+  render(){
+    return(
       <div>
         <GridContainer>
           <GridItem xs={12} sm={12} md={12}>
             <CustomTabs
               title={null}
+              headerColor="primary"
+              tabs={[
+                {
+                  tabName: "公司新闻",
+                  tabIcon: FiberNew,
+                  tabContent: (
+                    <Table
+                    tableHeaderColor="primary"
+                    tableHead={["标题", "日期"]}
+                    tableData={news}
+                  />
+                  )
+                }
+              ]}
+            />
+          </GridItem>
+          <GridItem xs={12} sm={12} md={6}>
+            <CustomTabs
+              title={null}
               headerColor="rose"
               tabs={[
                 {
-                  tabName: "待办会议",
+                  tabName: "今日会议",
                   tabIcon: Assignment,
                   tabContent: (
                     <Table
                       tableHeaderColor="primary"
-                      tableHead={["会议名称", "发起人", "会议室", "日期", "时间", "操作"]}
+                      tableHead={["会议名称", "会议室", "时间", "状态"]}
                       tableData={JSONToArray(meetings, "meeting")}
                     />
                   )
@@ -167,7 +186,7 @@ class MeetingPage extends React.Component {
                   tabContent: (
                     <Table
                       tableHeaderColor="primary"
-                      tableHead={["会议名称", "发起人", "会议室", "日期", "时间", "操作"]}
+                      tableHead={["会议名称", "会议室", "日期", "时间", "操作"]}
                       tableData={JSONToArray(attendMeetings, "attend")}
                     />
                   )
@@ -178,7 +197,7 @@ class MeetingPage extends React.Component {
                   tabContent: (
                     <Table
                       tableHeaderColor="primary"
-                      tableHead={["会议名称", "发起人", "会议室", "日期", "时间", "状态", "操作"]}
+                      tableHead={["会议名称", "会议室", "日期", "时间"]}
                       tableData={JSONToArray(historyMeetings, "history")}
                     />
                   )
@@ -186,10 +205,28 @@ class MeetingPage extends React.Component {
               ]}
             />
           </GridItem>
+          <GridItem xs={12} sm={12} md={6}>
+            <CustomTabs
+                title={null}
+                headerColor="success"
+                tabs={[
+                  {
+                    tabName: "会议笔记",
+                    tabIcon: Note,
+                    tabContent: (
+                      <Table
+                      tableHeaderColor="primary"
+                      tableHead={["会议名称", "笔记内容"]}
+                      tableData={notes}
+                    />
+                    )
+                  }
+                ]}
+              />
+          </GridItem>
         </GridContainer>
       </div>
     )
   }
 }
-
-export default MeetingPage;
+export default HomePage;

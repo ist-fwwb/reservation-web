@@ -2,10 +2,12 @@ import React from "react";
 import PropTypes from "prop-types";
 // @material-ui/core
 import withStyles from "@material-ui/core/styles/withStyles";
-import Icon from "@material-ui/core/Icon";
 // @material-ui/icons
 
 import Update from "@material-ui/icons/Update";
+import SentimentVeryDissatisfied from "@material-ui/icons/SentimentVeryDissatisfied";
+import SentimentDissatisfied from "@material-ui/icons/SentimentDissatisfied";
+import SentimentVerySatisfied from "@material-ui/icons/SentimentVerySatisfied";
 import { Link } from "react-router-dom";
 // core components
 import GridItem from "components/Grid/GridItem.jsx";
@@ -50,11 +52,11 @@ function roomCardColor(status){
 
 function roomCardIcon(status){
   if (status === 0)
-    return "sentiment_very_satisfied";
+    return <SentimentVerySatisfied/>;
   else if (status === 1)
-    return "sentiment_dissatisfied";
+    return <SentimentDissatisfied/>;
   else if (status === 2)
-    return "sentiment_very_dissatisfied";
+    return <SentimentVeryDissatisfied/>;
 }
 
 class Dashboard extends React.Component {
@@ -65,13 +67,13 @@ class Dashboard extends React.Component {
       <div>
         <GridContainer>
           {
-            rooms.map((room, key) => {
+            rooms.map((room) => {
               return (
                 <GridItem xs={12} sm={6} md={4}>
                   <Card>
                     <CardHeader color={roomCardColor(room.status)} stats icon>
                       <CardIcon color={roomCardColor(room.status)}>
-                        <Icon>{roomCardIcon(room.status)}</Icon>
+                        {roomCardIcon(room.status)}
                       </CardIcon>
                       <p className={classes.cardCategory}>{roomStatus(room.status)}</p>
                       <h3 className={classes.cardTitle}>
