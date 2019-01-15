@@ -3,7 +3,7 @@ pipeline:
     image: registry.cn-shenzhen.aliyuncs.com/pipipan/node:1.0
     commands:
       - npm install yarn
-      - CI=false npm build
+      - CI=false npm run-srcipt build
   publish:
     image: docker
     secrets: [docker_username,docker_password]
