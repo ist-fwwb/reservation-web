@@ -6,7 +6,14 @@ import Button from "components/CustomButtons/Button.jsx";
 import Card from "components/Card/Card.jsx";
 import CardHeader from "components/Card/CardHeader.jsx";
 import CardBody from "components/Card/CardBody.jsx";
-import Table from "components/Table/Table.jsx";
+
+import { withStyles } from '@material-ui/core/styles';
+import Table from '@material-ui/core/Table';
+import TableBody from '@material-ui/core/TableBody';
+import TableCell from '@material-ui/core/TableCell';
+import TableHead from '@material-ui/core/TableHead';
+import TableRow from '@material-ui/core/TableRow';
+import Paper from '@material-ui/core/Paper';
 
 function generateSchedule(start, end){
   let result = [];
@@ -24,38 +31,449 @@ const schedule = generateSchedule(8, 18);
 
 const button = <Button color="success">预定</Button>;
 
-class RoomDetail extends React.Component{
+const CustomTableCell = withStyles(theme => ({
+  head: {
+    backgroundColor: theme.palette.common.black,
+    color: theme.palette.common.white,
+  },
+  body: {
+    fontSize: 14,
+  },
+}))(TableCell);
+
+const styles = theme => ({
+  root: {
+    width: '100%',
+    marginTop: theme.spacing.unit * 3,
+    overflowX: 'auto',
+  },
+  table: {
+    minWidth: 700,
+  },
+  row: {
+    '&:nth-of-type(odd)': {
+      backgroundColor: theme.palette.background.default,
+    },
+  },
+});
+
+const data = [
+  {
+    "id": "5c38b1cc4fc69d001339a7f2",
+    "roomId": "5c38b1cc4fc69d001339a7ec",
+    "timeSlice": [
+      "5c3dd232eb75240013cf20ee",
+      "5c3dd232eb75240013cf20ee",
+      "5c3dd232eb75240013cf20ee",
+      "5c3dd232eb75240013cf20ee",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    "date": "2019-01-16"
+  },
+  {
+    "id": "5c38b1cc4fc69d001339a7f2",
+    "roomId": "5c38b1cc4fc69d001339a7ec",
+    "timeSlice": [
+      "5c3dd232eb75240013cf20ee",
+      "5c3dd232eb75240013cf20ee",
+      "5c3dd232eb75240013cf20ee",
+      "5c3dd232eb75240013cf20ee",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    "date": "2019-01-17"
+  },
+  {
+    "id": "5c38b1cc4fc69d001339a7f2",
+    "roomId": "5c38b1cc4fc69d001339a7ec",
+    "timeSlice": [
+      "5c3dd232eb75240013cf20ee",
+      "5c3dd232eb75240013cf20ee",
+      "5c3dd232eb75240013cf20ee",
+      "5c3dd232eb75240013cf20ee",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    "date": "2019-01-18"
+  },
+  {
+    "id": "5c38b1cc4fc69d001339a7f2",
+    "roomId": "5c38b1cc4fc69d001339a7ec",
+    "timeSlice": [
+      "5c3dd232eb75240013cf20ee",
+      "5c3dd232eb75240013cf20ee",
+      "5c3dd232eb75240013cf20ee",
+      "5c3dd232eb75240013cf20ee",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    "date": "2019-01-19"
+  },
+  {
+    "id": "5c38b1cc4fc69d001339a7f2",
+    "roomId": "5c38b1cc4fc69d001339a7ec",
+    "timeSlice": [
+      "5c3dd232eb75240013cf20ee",
+      "5c3dd232eb75240013cf20ee",
+      "5c3dd232eb75240013cf20ee",
+      "5c3dd232eb75240013cf20ee",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    "date": "2019-01-20"
+  },
+  {
+    "id": "5c38b1cc4fc69d001339a7f2",
+    "roomId": "5c38b1cc4fc69d001339a7ec",
+    "timeSlice": [
+      "5c3dd232eb75240013cf20ee",
+      "5c3dd232eb75240013cf20ee",
+      "5c3dd232eb75240013cf20ee",
+      "5c3dd232eb75240013cf20ee",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    "date": "2019-01-21"
+  },
+  {
+    "id": "5c38b1cc4fc69d001339a7f2",
+    "roomId": "5c38b1cc4fc69d001339a7ec",
+    "timeSlice": [
+      "5c3dd232eb75240013cf20ee",
+      "5c3dd232eb75240013cf20ee",
+      "5c3dd232eb75240013cf20ee",
+      "5c3dd232eb75240013cf20ee",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    "date": "2019-01-22"
+  },
+]
+
+function dataToRows(data){
+  let re = [];
+  for (let i in data){
+    let ele = data[i];
+    let day = (new Date(ele.date).getDay());
+    if (day === 6 || day === 0)
+      continue
+    let timeSlice = ele.timeSlice;
+    for (let j in timeSlice){
+      if (!re[j])
+        re[j] = {}
+      if (timeSlice[j]===null)
+        re[j][day] = "False"
+      else 
+        re[j][day] = "True"
+    }
+  }
+  return re
+}
+
+class RoomSchedule extends React.Component{
   constructor(props) {
     super(props);
     this.state = {
-      tl: false,
-      tc: false,
-      tr: false,
-      bl: false,
-      bc: false,
-      br: false
     };
   }
-  // to stop the warning of calling setState of unmounted component
-  componentWillUnmount() {
-    var id = window.setTimeout(null, 0);
-    while (id--) {
-      window.clearTimeout(id);
-    }
-  }
-  showNotification(place) {
-    var x = [];
-    x[place] = true;
-    this.setState(x);
-    this.alertTimeout = setTimeout(
-      function() {
-        x[place] = false;
-        this.setState(x);
-      }.bind(this),
-      6000
-    );
-  }
+
   render(){
+    const rows = dataToRows(data);
     return(
       <div>
         <GridContainer>
@@ -68,11 +486,34 @@ class RoomDetail extends React.Component{
                 </p>
               </CardHeader>
               <CardBody>
-                <Table
-                  tableHeaderColor="primary"
-                  tableHead={["时间", "星期一", "星期二", "星期三", "星期四", "星期五"]}
-                  tableData={schedule}
-                />
+                <Paper>
+                  <Table>
+                    <TableHead>
+                      <TableRow>
+                        <CustomTableCell>时间</CustomTableCell>
+                        <CustomTableCell align="right">星期一</CustomTableCell>
+                        <CustomTableCell align="right">星期二</CustomTableCell>
+                        <CustomTableCell align="right">星期三</CustomTableCell>
+                        <CustomTableCell align="right">星期四</CustomTableCell>
+                        <CustomTableCell align="right">星期五</CustomTableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {rows.map((row, key) => (
+                        <TableRow key={key}>
+                          <CustomTableCell component="th" scope="row">
+                            {key}
+                          </CustomTableCell>
+                          <CustomTableCell align="right">{row[1]}</CustomTableCell>
+                          <CustomTableCell align="right">{row[2]}</CustomTableCell>
+                          <CustomTableCell align="right">{row[3]}</CustomTableCell>
+                          <CustomTableCell align="right">{row[4]}</CustomTableCell>
+                          <CustomTableCell align="right">{row[5]}</CustomTableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </Paper>
               </CardBody>
             </Card>
           </GridItem>
@@ -81,4 +522,4 @@ class RoomDetail extends React.Component{
     )
   }
 }
-export default RoomDetail;
+export default RoomSchedule;
