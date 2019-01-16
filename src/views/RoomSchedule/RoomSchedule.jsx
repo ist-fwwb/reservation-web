@@ -14,92 +14,52 @@ import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
-
-function generateSchedule(start, end){
-  let result = [];
-  for (let i = start; i < end; i++){
-    let t1 = i + ":00";
-    let t2 = i + ":30";
-    let t3 = (i+1) + ":00";
-    result.push([t1 + "~" + t2]);
-    result.push([t2 + "~" + t3]);
-  }
-  return result;
-}
-
-const schedule = generateSchedule(8, 18);
-
-const button = <Button color="success">预定</Button>;
-
-const CustomTableCell = withStyles(theme => ({
-  head: {
-    backgroundColor: theme.palette.common.black,
-    color: theme.palette.common.white,
-  },
-  body: {
-    fontSize: 14,
-  },
-}))(TableCell);
-
-const styles = theme => ({
-  root: {
-    width: '100%',
-    marginTop: theme.spacing.unit * 3,
-    overflowX: 'auto',
-  },
-  table: {
-    minWidth: 700,
-  },
-  row: {
-    '&:nth-of-type(odd)': {
-      backgroundColor: theme.palette.background.default,
-    },
-  },
-});
+import { time } from 'variables/time.jsx';
+import { Link } from "react-router-dom";
 
 const data = [
   {
     "id": "5c38b1cc4fc69d001339a7f2",
     "roomId": "5c38b1cc4fc69d001339a7ec",
     "timeSlice": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
       "5c3dd232eb75240013cf20ee",
+      null,
+      null,
+      null,
+      null,
       "5c3dd232eb75240013cf20ee",
+      null,
+      null,
+      null,
       "5c3dd232eb75240013cf20ee",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
       "5c3dd232eb75240013cf20ee",
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
       null,
       null,
       null,
@@ -117,10 +77,10 @@ const data = [
     "id": "5c38b1cc4fc69d001339a7f2",
     "roomId": "5c38b1cc4fc69d001339a7ec",
     "timeSlice": [
-      "5c3dd232eb75240013cf20ee",
-      "5c3dd232eb75240013cf20ee",
-      "5c3dd232eb75240013cf20ee",
-      "5c3dd232eb75240013cf20ee",
+      null,
+      null,
+      null,
+      null,
       null,
       null,
       null,
@@ -172,9 +132,33 @@ const data = [
     "id": "5c38b1cc4fc69d001339a7f2",
     "roomId": "5c38b1cc4fc69d001339a7ec",
     "timeSlice": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
       "5c3dd232eb75240013cf20ee",
       "5c3dd232eb75240013cf20ee",
       "5c3dd232eb75240013cf20ee",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
       "5c3dd232eb75240013cf20ee",
       null,
       null,
@@ -186,31 +170,7 @@ const data = [
       null,
       null,
       null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
+      "5c3dd232eb75240013cf20ee",
       null,
       null,
       null,
@@ -227,31 +187,31 @@ const data = [
     "id": "5c38b1cc4fc69d001339a7f2",
     "roomId": "5c38b1cc4fc69d001339a7ec",
     "timeSlice": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      "5c3dd232eb75240013cf20ee",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
       "5c3dd232eb75240013cf20ee",
       "5c3dd232eb75240013cf20ee",
       "5c3dd232eb75240013cf20ee",
-      "5c3dd232eb75240013cf20ee",
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
       null,
       null,
       null,
@@ -282,33 +242,31 @@ const data = [
     "id": "5c38b1cc4fc69d001339a7f2",
     "roomId": "5c38b1cc4fc69d001339a7ec",
     "timeSlice": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
       "5c3dd232eb75240013cf20ee",
       "5c3dd232eb75240013cf20ee",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
       "5c3dd232eb75240013cf20ee",
       "5c3dd232eb75240013cf20ee",
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
       null,
       null,
       null,
@@ -337,27 +295,27 @@ const data = [
     "id": "5c38b1cc4fc69d001339a7f2",
     "roomId": "5c38b1cc4fc69d001339a7ec",
     "timeSlice": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
       "5c3dd232eb75240013cf20ee",
       "5c3dd232eb75240013cf20ee",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
       "5c3dd232eb75240013cf20ee",
       "5c3dd232eb75240013cf20ee",
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
       null,
       null,
       null,
@@ -392,22 +350,22 @@ const data = [
     "id": "5c38b1cc4fc69d001339a7f2",
     "roomId": "5c38b1cc4fc69d001339a7ec",
     "timeSlice": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
       "5c3dd232eb75240013cf20ee",
       "5c3dd232eb75240013cf20ee",
       "5c3dd232eb75240013cf20ee",
       "5c3dd232eb75240013cf20ee",
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
       null,
       null,
       null,
@@ -445,30 +403,67 @@ const data = [
   },
 ]
 
+
+function generateSchedule(start, end){
+  let result = [];
+  for (let i = start; i < end; i++){
+    let t1 = i + ":00";
+    let t2 = i + ":30";
+    let t3 = (i+1) + ":00";
+    result.push([t1 + "~" + t2]);
+    result.push([t2 + "~" + t3]);
+  }
+  return result;
+}
+
+const schedule = generateSchedule(8, 18);
+
+const button = <Button color="success">预定</Button>;
+
+const CustomTableCell = withStyles(theme => ({
+  head: {
+    backgroundColor: theme.palette.common.black,
+    color: theme.palette.common.white,
+  },
+  body: {
+    fontSize: 14,
+  },
+}))(TableCell);
+
 function dataToRows(data){
   let re = [];
   for (let i in data){
     let ele = data[i];
     let day = (new Date(ele.date).getDay());
     if (day === 6 || day === 0)
-      continue
+      continue;
     let timeSlice = ele.timeSlice;
     for (let j in timeSlice){
       if (!re[j])
-        re[j] = {}
-      if (timeSlice[j]===null)
-        re[j][day] = "False"
-      else 
-        re[j][day] = "True"
+        re[j] = {};
+      if (!re[j][day])
+        re[j][day] = {};
+      if (timeSlice[j]===null){
+        re[j][day]["occupied"] = false;
+        re[j][day]["meetingid"] = null;
+      }
+      else {
+        re[j][day]["occupied"] = true;
+        re[j][day]["meetingid"] = timeSlice[j];
+      }
+      re[j][day]["date"] = ele.date;
     }
   }
-  return re
+  return re;
 }
 
 class RoomSchedule extends React.Component{
   constructor(props) {
     super(props);
     this.state = {
+      startTime: null,
+      endTime: null,
+      date: null
     };
   }
 
@@ -479,11 +474,8 @@ class RoomSchedule extends React.Component{
         <GridContainer>
           <GridItem xs={12} sm={12} md={12}>
             <Card>
-              <CardHeader color="success">
-                <h4>{"会议室 " + this.props.match.params.roomid}</h4>
-                <p>
-                  预约情况
-                </p>
+              <CardHeader>
+                <h3>{"会议室 " + this.props.match.params.roomid}</h3>
               </CardHeader>
               <CardBody>
                 <Paper>
@@ -499,18 +491,45 @@ class RoomSchedule extends React.Component{
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {rows.map((row, key) => (
-                        <TableRow key={key}>
-                          <CustomTableCell component="th" scope="row">
-                            {key}
-                          </CustomTableCell>
-                          <CustomTableCell align="right">{row[1]}</CustomTableCell>
-                          <CustomTableCell align="right">{row[2]}</CustomTableCell>
-                          <CustomTableCell align="right">{row[3]}</CustomTableCell>
-                          <CustomTableCell align="right">{row[4]}</CustomTableCell>
-                          <CustomTableCell align="right">{row[5]}</CustomTableCell>
-                        </TableRow>
-                      ))}
+                      {rows.map((row, key) => {
+                        // only display 8:00 ~ 18:00
+                        if (key < 16 || key >= 36){
+                          return null;
+                        }
+
+                        return(
+                          <TableRow key={key}>
+                            <CustomTableCell component="th" scope="row">
+                              {time(key)+"~"+time(key+1)}
+                            </CustomTableCell>
+                            <CustomTableCell align="right" bgcolor={row[1]["occupied"]?"#FF0000":null}>
+                            {
+                              row[1]["occupied"]?<Link to={"/meeting/"+row[1]["meetingid"]+"/profile"}>{row[1]["meetingid"].substring(0,5)+"..\n"}</Link>:null
+                            }
+                            </CustomTableCell>
+                            <CustomTableCell align="right" bgcolor={row[2]["occupied"]?"#FF0000":null}>
+                            {
+                              row[2]["occupied"]?<Link to={"/meeting/"+row[2]["meetingid"]+"/profile"}>{row[2]["meetingid"].substring(0,5)+"..\n"}</Link>:null
+                            }
+                            </CustomTableCell>
+                            <CustomTableCell align="right" bgcolor={row[3]["occupied"]?"#FF0000":null}>
+                            {
+                              row[3]["occupied"]?<Link to={"/meeting/"+row[3]["meetingid"]+"/profile"}>{row[3]["meetingid"].substring(0,5)+"..\n"}</Link>:null
+                            }
+                            </CustomTableCell>
+                            <CustomTableCell align="right" bgcolor={row[4]["occupied"]?"#FF0000":null}>
+                            {
+                              row[4]["occupied"]?<Link to={"/meeting/"+row[4]["meetingid"]+"/profile"}>{row[4]["meetingid"].substring(0,5)+"..\n"}</Link>:null
+                            }
+                            </CustomTableCell>
+                            <CustomTableCell align="right" bgcolor={row[5]["occupied"]?"#FF0000":null}>
+                            {
+                              row[5]["occupied"]?<Link to={"/meeting/"+row[5]["meetingid"]+"/profile"}>{row[5]["meetingid"].substring(0,5)+"..\n"}</Link>:null
+                            }
+                            </CustomTableCell>
+                          </TableRow>
+                        )
+                      })}
                     </TableBody>
                   </Table>
                 </Paper>
