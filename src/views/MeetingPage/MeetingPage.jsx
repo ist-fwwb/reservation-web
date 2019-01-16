@@ -149,7 +149,8 @@ class MeetingPage extends React.Component {
           <GridItem xs={12} sm={12} md={12}>
             <CustomTabs
               title={null}
-              headerColor="rose"
+              style={{background:"#000"}}
+              headerColor="danger"
               tabs={[
                 {
                   tabName: "待办会议",

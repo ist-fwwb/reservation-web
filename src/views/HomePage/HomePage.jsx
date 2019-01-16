@@ -149,7 +149,8 @@ class HomePage extends React.Component{
           <GridItem xs={12} sm={12} md={12}>
             <CustomTabs
               title={null}
-              headerColor="primary"
+              style={{background:"#000"}}
+              headerColor="danger"
               tabs={[
                 {
                   tabName: "公司新闻",
@@ -168,7 +169,8 @@ class HomePage extends React.Component{
           <GridItem xs={12} sm={12} md={6}>
             <CustomTabs
               title={null}
-              headerColor="rose"
+              style={{background:"#000"}}
+              headerColor="danger"
               tabs={[
                 {
                   tabName: "今日会议",
@@ -209,7 +211,8 @@ class HomePage extends React.Component{
           <GridItem xs={12} sm={12} md={6}>
             <CustomTabs
                 title={null}
-                headerColor="success"
+                style={{background:"#000"}}
+                headerColor="danger"
                 tabs={[
                   {
                     tabName: "会议笔记",

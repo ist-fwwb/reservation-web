@@ -58,9 +58,8 @@ class UserProfile extends React.Component {
         <GridContainer>
           <GridItem xs={12} sm={12} md={12}>
             <Card>
-              <CardHeader color="primary">
-                <h4 className={classes.cardTitleWhite}>个人信息</h4>
-                <p className={classes.cardCategoryWhite}>完善你的个人信息</p>
+              <CardHeader style={{background:"#000"}} color="primary">
+                <h3 className={classes.cardTitleWhite}>个人信息</h3>
               </CardHeader>
               <CardBody>
                 <GridContainer>
@@ -169,7 +168,7 @@ class UserProfile extends React.Component {
                 </GridContainer>
               </CardBody>
               <CardFooter>
-                <Button color="primary">确认修改</Button>
+                <Button color="success">确认修改</Button>
               </CardFooter>
             </Card>
           </GridItem>
