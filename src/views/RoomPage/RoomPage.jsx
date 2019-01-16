@@ -8,14 +8,19 @@ import Update from "@material-ui/icons/Update";
 import SentimentVeryDissatisfied from "@material-ui/icons/SentimentVeryDissatisfied";
 import SentimentDissatisfied from "@material-ui/icons/SentimentDissatisfied";
 import SentimentVerySatisfied from "@material-ui/icons/SentimentVerySatisfied";
+import Info from "@material-ui/icons/Info";
+import Schedule from "assets/icon/schedule.svg";
+
 import { Link } from "react-router-dom";
 // core components
 import GridItem from "components/Grid/GridItem.jsx";
 import GridContainer from "components/Grid/GridContainer.jsx";
 import Card from "components/Card/Card.jsx";
 import CardHeader from "components/Card/CardHeader.jsx";
+import CardBody from "components/Card/CardBody.jsx";
 import CardIcon from "components/Card/CardIcon.jsx";
 import CardFooter from "components/Card/CardFooter.jsx";
+import RoomLink from "components/RoomLink/RoomLink.jsx";
 
 import dashboardStyle from "assets/jss/material-dashboard-react/views/dashboardStyle.jsx";
 
@@ -59,7 +64,7 @@ function roomCardIcon(status){
     return <SentimentVeryDissatisfied/>;
 }
 
-class Dashboard extends React.Component {
+class RoomPage extends React.Component {
 
   render() {
     const { classes } = this.props;
@@ -68,6 +73,7 @@ class Dashboard extends React.Component {
         <GridContainer>
           {
             rooms.map((room) => {
+              let roomLink = <RoomLink location={room.location}/>;
               return (
                 <GridItem xs={12} sm={6} md={4}>
                   <Card>
@@ -77,9 +83,14 @@ class Dashboard extends React.Component {
                       </CardIcon>
                       <p className={classes.cardCategory}>{roomStatus(room.status)}</p>
                       <h3 className={classes.cardTitle}>
-                      <Link to={"/room/"+room.location+"/schedule"}>{roomCategory(room.capacity) + " " + room.location}</Link> <br/> <small>{"容量:"+room.capacity}</small>
+                      {roomCategory(room.capacity) + " " + room.location}<br/> <small>{"容量:"+room.capacity}</small>
                       </h3>
                     </CardHeader>
+                    <CardBody>
+                      <img src={Schedule} width="24px"/>&nbsp;&nbsp;<Link align="left" to={"/room/"+room.location+"/schedule"}>日程安排</Link>
+                      <br/>
+                      <Info/>&nbsp;&nbsp;<Link aligh="right" to={"/room/"+room.location+"/profile"}>基本信息</Link>
+                    </CardBody>
                     <CardFooter stats>
                       <div className={classes.stats}>
                         <Update />
@@ -97,8 +108,8 @@ class Dashboard extends React.Component {
   }
 }
 
-Dashboard.propTypes = {
+RoomPage.propTypes = {
   classes: PropTypes.object.isRequired
 };
 
-export default withStyles(dashboardStyle)(Dashboard);
+export default withStyles(dashboardStyle)(RoomPage);

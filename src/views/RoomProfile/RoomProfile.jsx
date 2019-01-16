@@ -37,6 +37,10 @@ class RoomProfile extends React.Component {
     blackBoard: true,
     desk: false,
     projector: true,
+    power: true,
+    wifi: false,
+    wireNetwork: false,
+    tv: true,
   }
 
   render(){
@@ -97,6 +101,42 @@ class RoomProfile extends React.Component {
                             投影仪
                           </td>
                         </tr>
+                        <tr>
+                          <td>
+                          {
+                            this.state.power?<img width={"60%"} src={power}/>:<img width={"60%"} src={power0}/>
+                          }
+                          </td>
+                          <td>
+                          {
+                            this.state.wifi?<img width={"60%"} src={wifi}/>:<img width={"60%"} src={wifi0}/>
+                          }
+                          </td>
+                          <td>
+                          {
+                            this.state.wireNetwork?<img width={"60%"} src={wireNetwork}/>:<img width={"60%"} src={wireNetwork0}/>
+                          }
+                          </td>
+                          <td>
+                          {
+                            this.state.tv?<img width={"60%"} src={tv}/>:<img width={"60%"} src={tv0}/>
+                          }
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>
+                            电源
+                          </td>
+                          <td>
+                            WiFi
+                          </td>
+                          <td>
+                            网线
+                          </td>
+                          <td>
+                            电视
+                          </td>
+                        </tr>
                       </table>
                     </CardBody>
                     <CardFooter stats>
@@ -128,7 +168,8 @@ class RoomProfile extends React.Component {
                   </Card>
                 </GridItem>
                 <GridItem xs={12} sm={6} md={4}>
-                  <img src={meetingRoomImage} width={"100%"}/>
+                  <br/>
+                  <img src={meetingRoomImage} width={"110%"}/>
                 </GridItem>
               </GridContainer>
               </CardBody>

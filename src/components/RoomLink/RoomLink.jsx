@@ -46,6 +46,7 @@ class RoomLink extends React.Component{
     return (
       <div className={classes.root}>
         <Button
+          className={classes.root}
           buttonRef={node => {
             this.anchorEl = node;
           }}
