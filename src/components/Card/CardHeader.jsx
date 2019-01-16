@@ -19,6 +19,7 @@ function CardHeader({ ...props }) {
     plain,
     stats,
     icon,
+    style,
     ...rest
   } = props;
   const cardHeaderClasses = classNames({
@@ -30,7 +31,7 @@ function CardHeader({ ...props }) {
     [className]: className !== undefined
   });
   return (
-    <div className={cardHeaderClasses} {...rest}>
+    <div className={cardHeaderClasses} style={style} {...rest}>
       {children}
     </div>
   );

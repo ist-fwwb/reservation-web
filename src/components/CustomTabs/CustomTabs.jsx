@@ -31,7 +31,8 @@ class CustomTabs extends React.Component {
       plainTabs,
       tabs,
       title,
-      rtlActive
+      rtlActive,
+      style
     } = this.props;
     const cardTitle = classNames({
       [classes.cardTitle]: true,
@@ -39,7 +40,7 @@ class CustomTabs extends React.Component {
     });
     return (
       <Card plain={plainTabs}>
-        <CardHeader color={headerColor} plain={plainTabs}>
+        <CardHeader color={headerColor} plain={plainTabs} style={style}>
           {title !== undefined ? (
             <div className={cardTitle}>{title}</div>
           ) : null}
