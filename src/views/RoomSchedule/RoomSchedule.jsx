@@ -46,20 +46,20 @@ const data = [
       null,
       null,
       null,
-      "5c3dd232eb75240013cf20ee",
+      "232eb75240013cf20ee",
       null,
       null,
       null,
-      "5c3dd232eb75240013cf20ee",
-      null,
-      null,
-      null,
-      null,
+      "2eb75240013cf20ee",
       null,
       null,
       null,
       null,
-      "5c3dd232eb75240013cf20ee",
+      null,
+      null,
+      null,
+      null,
+      "2753cf20ee",
       null,
       null,
       null,
@@ -149,9 +149,9 @@ const data = [
       null,
       null,
       null,
-      "5c3dd232eb75240013cf20ee",
-      "5c3dd232eb75240013cf20ee",
-      "5c3dd232eb75240013cf20ee",
+      "5c32eb75240013cf20ee",
+      "5c32eb75240013cf20ee",
+      "5c32eb75240013cf20ee",
       null,
       null,
       null,
@@ -159,7 +159,7 @@ const data = [
       null,
       null,
       null,
-      "5c3dd232eb75240013cf20ee",
+      "5c3dd3b752403cfee",
       null,
       null,
       null,
@@ -170,7 +170,7 @@ const data = [
       null,
       null,
       null,
-      "5c3dd232eb75240013cf20ee",
+      "c3dd32eb5240013cf20e",
       null,
       null,
       null,
@@ -195,7 +195,7 @@ const data = [
       null,
       null,
       null,
-      "5c3dd232eb75240013cf20ee",
+      "c3dd232eb75240013cf20e",
       null,
       null,
       null,
@@ -209,9 +209,9 @@ const data = [
       null,
       null,
       null,
-      "5c3dd232eb75240013cf20ee",
-      "5c3dd232eb75240013cf20ee",
-      "5c3dd232eb75240013cf20ee",
+      "5d2eb75240013cf0ee",
+      "5d2eb75240013cf0ee",
+      "5d2eb75240013cf0ee",
       null,
       null,
       null,
@@ -256,8 +256,8 @@ const data = [
       null,
       null,
       null,
-      "5c3dd232eb75240013cf20ee",
-      "5c3dd232eb75240013cf20ee",
+      "5240013cf20e",
+      "5240013cf20e",
       null,
       null,
       null,
@@ -265,8 +265,8 @@ const data = [
       null,
       null,
       null,
-      "5c3dd232eb75240013cf20ee",
-      "5c3dd232eb75240013cf20ee",
+      "0013cf20ee",
+      "0013cf20ee",
       null,
       null,
       null,
@@ -305,8 +305,8 @@ const data = [
       null,
       null,
       null,
-      "5c3dd232eb75240013cf20ee",
-      "5c3dd232eb75240013cf20ee",
+      "cf20ee",
+      "cf20ee",
       null,
       null,
       null,
@@ -314,8 +314,8 @@ const data = [
       null,
       null,
       null,
-      "5c3dd232eb75240013cf20ee",
-      "5c3dd232eb75240013cf20ee",
+      "5ee",
+      "5ee",
       null,
       null,
       null,
@@ -362,10 +362,10 @@ const data = [
       null,
       null,
       null,
-      "5c3dd232eb75240013cf20ee",
-      "5c3dd232eb75240013cf20ee",
-      "5c3dd232eb75240013cf20ee",
-      "5c3dd232eb75240013cf20ee",
+      "7524001ee",
+      "7524001ee",
+      "7524001ee",
+      "7524001ee",
       null,
       null,
       null,
@@ -403,6 +403,8 @@ const data = [
   },
 ]
 
+const colorList = ["#ff0000", "#ff8000", "#ffff00", "#40ff00", "#00ffff", "#0000ff", "#bf00ff"]
+let colorMap = {};
 
 function generateSchedule(start, end){
   let result = [];
@@ -440,18 +442,18 @@ function dataToRows(data){
     let timeSlice = ele.timeSlice;
     for (let j in timeSlice){
       if (!re[j])
-        re[j] = {};
-      if (!re[j][day])
-        re[j][day] = {};
+        re[j] = [0,0,0,0,0];
+      if (!re[j][day-1])
+        re[j][day-1] = {};
       if (timeSlice[j]===null){
-        re[j][day]["occupied"] = false;
-        re[j][day]["meetingid"] = null;
+        re[j][day-1]["occupied"] = false;
+        re[j][day-1]["meetingid"] = null;
       }
       else {
-        re[j][day]["occupied"] = true;
-        re[j][day]["meetingid"] = timeSlice[j];
+        re[j][day-1]["occupied"] = true;
+        re[j][day-1]["meetingid"] = timeSlice[j];
       }
-      re[j][day]["date"] = ele.date;
+      re[j][day-1]["date"] = ele.date;
     }
   }
   return re;
@@ -467,7 +469,13 @@ class RoomSchedule extends React.Component{
     };
   }
 
+  handleClick = () => {
+    alert('Click!');
+  }
+
   render(){
+    let colorCount = 0;
+    let lastMeetingid = 0;
     const rows = dataToRows(data);
     return(
       <div>
@@ -483,11 +491,11 @@ class RoomSchedule extends React.Component{
                     <TableHead>
                       <TableRow>
                         <CustomTableCell>时间</CustomTableCell>
-                        <CustomTableCell align="right">星期一</CustomTableCell>
-                        <CustomTableCell align="right">星期二</CustomTableCell>
-                        <CustomTableCell align="right">星期三</CustomTableCell>
-                        <CustomTableCell align="right">星期四</CustomTableCell>
-                        <CustomTableCell align="right">星期五</CustomTableCell>
+                        <CustomTableCell align="right">{rows[0][0]["date"]}<br/>星期一</CustomTableCell>
+                        <CustomTableCell align="right">{rows[0][1]["date"]}<br/>星期二</CustomTableCell>
+                        <CustomTableCell align="right">{rows[0][2]["date"]}<br/>星期三</CustomTableCell>
+                        <CustomTableCell align="right">{rows[0][3]["date"]}<br/>星期四</CustomTableCell>
+                        <CustomTableCell align="right">{rows[0][4]["date"]}<br/>星期五</CustomTableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
@@ -502,31 +510,31 @@ class RoomSchedule extends React.Component{
                             <CustomTableCell component="th" scope="row">
                               {time(key)+"~"+time(key+1)}
                             </CustomTableCell>
-                            <CustomTableCell align="right" bgcolor={row[1]["occupied"]?"#FF0000":null}>
                             {
-                              row[1]["occupied"]?<Link to={"/meeting/"+row[1]["meetingid"]+"/profile"}>{row[1]["meetingid"].substring(0,5)+"..\n"}</Link>:null
+                              row.map((cell) => {
+                                let bgcolor = null;
+                                if (cell["occupied"]){
+                                  let currentid = cell.meetingid;
+                                  if (!colorMap[currentid]){
+                                    colorMap[currentid] = colorList[colorCount];
+                                    colorCount += 1;
+                                    colorCount %= 7;
+                                  }
+                                  bgcolor = colorMap[currentid];
+                                }
+                                console.log(bgcolor)
+                                return (
+                                  <CustomTableCell align="right" bgcolor={bgcolor}>
+                                  {
+                                    cell["occupied"]?
+                                      <Link to={"/meeting/"+cell["meetingid"]+"/profile"}>{cell["meetingid"].substring(0,5)+"..\n"}</Link>
+                                      :
+                                      <div onClick={this.handleClick}/>
+                                  }
+                                  </CustomTableCell>
+                                )
+                              })
                             }
-                            </CustomTableCell>
-                            <CustomTableCell align="right" bgcolor={row[2]["occupied"]?"#FF0000":null}>
-                            {
-                              row[2]["occupied"]?<Link to={"/meeting/"+row[2]["meetingid"]+"/profile"}>{row[2]["meetingid"].substring(0,5)+"..\n"}</Link>:null
-                            }
-                            </CustomTableCell>
-                            <CustomTableCell align="right" bgcolor={row[3]["occupied"]?"#FF0000":null}>
-                            {
-                              row[3]["occupied"]?<Link to={"/meeting/"+row[3]["meetingid"]+"/profile"}>{row[3]["meetingid"].substring(0,5)+"..\n"}</Link>:null
-                            }
-                            </CustomTableCell>
-                            <CustomTableCell align="right" bgcolor={row[4]["occupied"]?"#FF0000":null}>
-                            {
-                              row[4]["occupied"]?<Link to={"/meeting/"+row[4]["meetingid"]+"/profile"}>{row[4]["meetingid"].substring(0,5)+"..\n"}</Link>:null
-                            }
-                            </CustomTableCell>
-                            <CustomTableCell align="right" bgcolor={row[5]["occupied"]?"#FF0000":null}>
-                            {
-                              row[5]["occupied"]?<Link to={"/meeting/"+row[5]["meetingid"]+"/profile"}>{row[5]["meetingid"].substring(0,5)+"..\n"}</Link>:null
-                            }
-                            </CustomTableCell>
                           </TableRow>
                         )
                       })}
