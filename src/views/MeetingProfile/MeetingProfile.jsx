@@ -60,7 +60,7 @@ class MeetingProfile extends React.Component {
 
   render(){
     const { classes } = this.props;
-    //const meetingid = this.props.match.params.meetingid
+    const meetingid = this.props.match.params.meetingid
     const disabled = !this.state.host
     return (
       <div>
@@ -69,7 +69,7 @@ class MeetingProfile extends React.Component {
             <Card>
               <CardHeader color={meetingCardColor(this.state.status)}>
                 <h4 className={classes.cardTitleWhite}>{this.state.heading}</h4>
-                <p className={classes.cardCategoryWhite}>{this.state.status}</p>
+                <p className={classes.cardCategoryWhite}>{meetingid + "\n" + this.state.status}</p>
               </CardHeader>
               <CardBody>
                 <GridContainer>
