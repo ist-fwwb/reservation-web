@@ -99,7 +99,7 @@ const meetings = [
 ];
 
 const exitButton = (id) => {
-  return <Button color="danger" size="sm">退出会议 {id}</Button>;
+  return <Button color="danger" size="sm" onChange={handleExit(id)}>退出会议 {id}</Button>;
 } 
 
 const manageButton = (id) => {
