@@ -7,6 +7,8 @@ import InputLabel from "@material-ui/core/InputLabel";
 import Chip from '@material-ui/core/Chip';
 import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
+import MenuItem from '@material-ui/core/MenuItem';
+import TextField from '@material-ui/core/TextField';
 
 import Stars from '@material-ui/icons/Stars';
 import Add from '@material-ui/icons/Add';
@@ -20,20 +22,9 @@ import dashboardStyle from "assets/jss/material-dashboard-react/layouts/dashboar
 import CustomInput from "components/CustomInput/CustomInput.jsx";
 import Button from "components/CustomButtons/Button.jsx";
 
-function meetingCardColor(status){
-  if (status === "Pending")
-    return "success"
-  if (status === "Running")
-    return "warning"
-  if (status === "Cancelled")
-    return "rose"
-  if (status === "Stopped")
-    return "info"
-}
-
 class MeetingProfile extends React.Component {
   state = {
-    host: false,
+    host: true,
     id: "0",
     attendantNum: "7",
     date: "2018-01-10",
@@ -46,7 +37,7 @@ class MeetingProfile extends React.Component {
     roomId: "string",
     startTime: "10:30",
     status: "Cancelled",
-    type: "COMMON",
+    type: "URGENT",
     attendants: [
       { name: "汪汪汪", host: true},
       { name: "是是是"},
@@ -67,99 +58,102 @@ class MeetingProfile extends React.Component {
         <GridContainer>
           <GridItem xs={12} sm={12} md={12}>
             <Card>
-              <CardHeader color={meetingCardColor(this.state.status)}>
+              <CardHeader 
+                style={{background:"#000"}}
+                color="danger"
+              >
                 <h4 className={classes.cardTitleWhite}>{this.state.heading}</h4>
                 <p className={classes.cardCategoryWhite}>{meetingid + "\n" + this.state.status}</p>
               </CardHeader>
               <CardBody>
                 <GridContainer>
-                  <GridItem xs={12} sm={12} md={3}>
-                    <CustomInput
-                      labelText="发起人"
-                      id="company-disabled"
-                      formControlProps={{
-                        fullWidth: true
-                      }}
-                      inputProps={{
-                        disabled: disabled,
-                        value: this.state.hostId
-                      }}
-                    />
-                  </GridItem>
-                  <GridItem xs={12} sm={12} md={3}>
-                    <CustomInput
-                      labelText="日期"
-                      id="username-disabled"
-                      formControlProps={{
-                        fullWidth: true
-                      }}
-                      inputProps={{
-                        disabled: disabled,
-                        value: this.state.date
-                      }}
+                  <GridItem xs={12} sm={12} md={4}>
+                    <TextField
+                      label="发起人"
+                      disabled
+                      fullWidth
+                      className={classes.textField}
+                      value={this.state.hostId}
+                      margin="normal"
+                      variant="outlined"
                     />
                   </GridItem>
                   <GridItem xs={12} sm={12} md={4}>
-                    <CustomInput
-                      labelText="时间"
-                      id="time"
-                      formControlProps={{
-                        fullWidth: true
+                    <TextField
+                      label="状态"
+                      disabled
+                      fullWidth
+                      className={classes.textField}
+                      value={this.state.status}
+                      margin="normal"
+                      variant="outlined"
+                    />
+                  </GridItem>
+                  <GridItem xs={12} sm={12} md={3}>
+                    <TextField
+                      error={this.state.type==="URGENT"}
+                      select
+                      disabled={disabled}
+                      fullWidth
+                      name="type"
+                      label="会议类型"
+                      className={classes.textField}
+                      value={this.state.type}
+                      onChange={this.handleChange}
+                      SelectProps={{
+                        MenuProps: {
+                          className: classes.menu,
+                        },
                       }}
-                      inputProps={{
-                        name: "time",
-                        disabled: disabled,
-                        value: this.state.startTime + " ~ " + this.state.endTime
-                      }}
-                    /> 
+                      margin="normal"
+                      variant="outlined"
+                    >
+                      <MenuItem key={"COMMON"} value={"COMMON"}>
+                        普通
+                      </MenuItem>
+                      <MenuItem key={"URGENT"} value={"URGENT"}>
+                        紧急
+                      </MenuItem>
+                    </TextField>
                   </GridItem>
                 </GridContainer>
                 <GridContainer>
-                  <GridItem xs={12} sm={12} md={3}>
-                    <CustomInput
-                      labelText="会议室"
-                      id="location"
-                      formControlProps={{
-                        fullWidth: true
-                      }}
-                      inputProps={{
-                        name: "location",
-                        disabled: disabled,
-                        value: this.state.location
-                      }}
+                  <GridItem xs={12} sm={12} md={4}>
+                    <TextField
+                      label="会议室"
+                      disabled
+                      fullWidth
+                      className={classes.textField}
+                      value={this.state.location}
+                      margin="normal"
+                      variant="outlined"
+                    />
+                  </GridItem>
+                  <GridItem xs={12} sm={12} md={4}>
+                    <TextField
+                      label="日期"
+                      disabled
+                      fullWidth
+                      className={classes.textField}
+                      value={this.state.date}
+                      margin="normal"
+                      variant="outlined"
                     />
                   </GridItem>
                   <GridItem xs={12} sm={12} md={3}>
-                    <CustomInput
-                      labelText="类型"
-                      id="type"
-                      formControlProps={{
-                        fullWidth: true
-                      }}
-                      inputProps={{
-                        name: "type",
-                        disabled: disabled,
-                        value: this.state.type
-                      }}
-                    />
-                  </GridItem>
-                  <GridItem xs={12} sm={12} md={3}>
-                    <CustomInput
-                      labelText="状态"
-                      id="position"
-                      formControlProps={{
-                        fullWidth: true
-                      }}
-                      inputProps={{
-                        name: "position",
-                        disabled: disabled,
-                        value: this.state.status
-                      }}
+                    <TextField
+                      label="时间"
+                      disabled
+                      fullWidth
+                      className={classes.textField}
+                      value={this.state.startTime + " ~ " + this.state.endTime}
+                      margin="normal"
+                      variant="outlined"
                     />
                   </GridItem>
                 </GridContainer>
                 <GridContainer>
-                  <GridItem xs={12} sm={12} md={12}>
+                  <GridItem xs={12} sm={12} md={11}>
                     <Card>
                       <CardBody>
                         <Typography className={classes.title} color="textSecondary" gutterBottom>
@@ -188,20 +182,16 @@ class MeetingProfile extends React.Component {
                   </GridItem>
                 </GridContainer>
                 <GridContainer>
-                  <GridItem xs={12} sm={12} md={12}>
-                    <InputLabel style={{ color: "#AAAAAA" }}>会议简介</InputLabel>
-                    <CustomInput
-                      id="description"
-                      formControlProps={{
-                        fullWidth: true
-                      }}
-                      inputProps={{
-                        disabled: disabled,
-                        name: "description",
-                        value: this.state.description,
-                        multiline: true,
-                        rows: 5
-                      }}
+                  <GridItem xs={12} sm={12} md={11}>
+                    <TextField
+                      label="会议简介"
+                      multiline
+                      fullWidth
+                      rows="4"
+                      value={this.state.description}
+                      className={classes.textField}
+                      margin="normal"
+                      variant="outlined"
                     />
                   </GridItem>
                 </GridContainer>

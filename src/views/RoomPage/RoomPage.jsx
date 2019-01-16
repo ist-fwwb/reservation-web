@@ -87,9 +87,13 @@ class RoomPage extends React.Component {
                       </h3>
                     </CardHeader>
                     <CardBody>
-                      <img src={Schedule} width="24px"/>&nbsp;&nbsp;<Link align="left" to={"/room/"+room.location+"/schedule"}>日程安排</Link>
-                      <br/>
-                      <Info/>&nbsp;&nbsp;<Link aligh="right" to={"/room/"+room.location+"/profile"}>基本信息</Link>
+                      <table>
+                        <tr>
+                          <td><Info/>&nbsp;&nbsp;<Link aligh="right" to={"/room/"+room.location+"/profile"}>基本信息</Link></td>
+                          <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                          <td><img src={Schedule} width="24px"/>&nbsp;&nbsp;<Link align="left" to={"/room/"+room.location+"/schedule"}>日程安排</Link></td>
+                        </tr>
+                      </table>
                     </CardBody>
                     <CardFooter stats>
                       <div className={classes.stats}>
