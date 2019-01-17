@@ -22,6 +22,7 @@ export const dashboardRoutes = [
   {
     path: "/home",
     sidebarName: "首页",
+    navbarName: "首页",
     icon: Home,
     component: HomePage
   },

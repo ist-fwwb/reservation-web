@@ -11,7 +11,6 @@ import CardHeader from "components/Card/CardHeader.jsx";
 import CardIcon from "components/Card/CardIcon.jsx";
 import CardBody from "components/Card/CardBody.jsx";
 import CardFooter from "components/Card/CardFooter.jsx";
-import Checkbox from '@material-ui/core/Checkbox';
 import Icon from "@material-ui/core/Icon";
 import dashboardStyle from "assets/jss/material-dashboard-react/layouts/dashboardStyle.jsx";
 import airConditioner from "assets/icon/airConditioner.svg";
@@ -68,22 +67,22 @@ class RoomProfile extends React.Component {
                         <tr>
                           <td>
                           {
-                            this.state.airConditioned?<img width={"60%"} src={airConditioner}/>:<img width={"60%"} src={airConditioner0}/>
+                            this.state.airConditioned?<img width={"60%"} src={airConditioner} alt="icon"/>:<img width={"60%"} src={airConditioner0} alt="icon"/>
                           }
                           </td>
                           <td>
                           {
-                            this.state.blackBoard?<img width={"60%"} src={blackBoard}/>:<img width={"60%"} src={blackBoard0}/>
+                            this.state.blackBoard?<img width={"60%"} src={blackBoard} alt="icon"/>:<img width={"60%"} src={blackBoard0} alt="icon"/>
                           }
                           </td>
                           <td>
                           {
-                            this.state.desk?<img width={"60%"} src={desk}/>:<img width={"60%"} src={desk0}/>
+                            this.state.desk?<img width={"60%"} src={desk} alt="icon"/>:<img width={"60%"} src={desk0} alt="icon"/>
                           }
                           </td>
                           <td>
                           {
-                            this.state.projector?<img width={"60%"} src={projector}/>:<img width={"60%"} src={projector0}/>
+                            this.state.projector?<img width={"60%"} src={projector} alt="icon"/>:<img width={"60%"} src={projector0} alt="icon"/>
                           }
                           </td>
                         </tr>
@@ -104,22 +103,22 @@ class RoomProfile extends React.Component {
                         <tr>
                           <td>
                           {
-                            this.state.power?<img width={"60%"} src={power}/>:<img width={"60%"} src={power0}/>
+                            this.state.power?<img width={"60%"} src={power} alt="icon"/>:<img width={"60%"} src={power0} alt="icon"/>
                           }
                           </td>
                           <td>
                           {
-                            this.state.wifi?<img width={"60%"} src={wifi}/>:<img width={"60%"} src={wifi0}/>
+                            this.state.wifi?<img width={"60%"} src={wifi} alt="icon"/>:<img width={"60%"} src={wifi0} alt="icon"/>
                           }
                           </td>
                           <td>
                           {
-                            this.state.wireNetwork?<img width={"60%"} src={wireNetwork}/>:<img width={"60%"} src={wireNetwork0}/>
+                            this.state.wireNetwork?<img width={"60%"} src={wireNetwork} alt="icon"/>:<img width={"60%"} src={wireNetwork0} alt="icon"/>
                           }
                           </td>
                           <td>
                           {
-                            this.state.tv?<img width={"60%"} src={tv}/>:<img width={"60%"} src={tv0}/>
+                            this.state.tv?<img width={"60%"} src={tv} alt="icon"/>:<img width={"60%"} src={tv0} alt="icon"/>
                           }
                           </td>
                         </tr>
@@ -169,7 +168,7 @@ class RoomProfile extends React.Component {
                 </GridItem>
                 <GridItem xs={12} sm={6} md={4}>
                   <br/>
-                  <img src={meetingRoomImage} width={"110%"}/>
+                  <img src={meetingRoomImage} width={"110%"} alt="meetingroom"/>
                 </GridItem>
               </GridContainer>
               </CardBody>

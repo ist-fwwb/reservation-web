@@ -20,7 +20,6 @@ import CardHeader from "components/Card/CardHeader.jsx";
 import CardBody from "components/Card/CardBody.jsx";
 import CardIcon from "components/Card/CardIcon.jsx";
 import CardFooter from "components/Card/CardFooter.jsx";
-import RoomLink from "components/RoomLink/RoomLink.jsx";
 
 import dashboardStyle from "assets/jss/material-dashboard-react/views/dashboardStyle.jsx";
 
@@ -73,7 +72,6 @@ class RoomPage extends React.Component {
         <GridContainer>
           {
             rooms.map((room) => {
-              let roomLink = <RoomLink location={room.location}/>;
               return (
                 <GridItem xs={12} sm={6} md={4}>
                   <Card>
@@ -91,7 +89,7 @@ class RoomPage extends React.Component {
                         <tr>
                           <td><Info/>&nbsp;&nbsp;<Link aligh="right" to={"/room/"+room.location+"/profile"}>基本信息</Link></td>
                           <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
-                          <td><img src={Schedule} width="24px"/>&nbsp;&nbsp;<Link align="left" to={"/room/"+room.location+"/schedule"}>日程安排</Link></td>
+                          <td><img src={Schedule} width="24px" alt="schedule icon"/>&nbsp;&nbsp;<Link align="left" to={"/room/"+room.location+"/schedule"}>日程安排</Link></td>
                         </tr>
                       </table>
                     </CardBody>
