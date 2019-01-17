@@ -1,6 +1,5 @@
 // @material-ui/icons
 import Dashboard from "@material-ui/icons/Dashboard";
-import Person from "@material-ui/icons/Person";
 import Work from "@material-ui/icons/Work";
 import Home from "@material-ui/icons/Home";
 // import ContentPaste from "@material-ui/icons/ContentPaste";
@@ -41,13 +40,6 @@ export const dashboardRoutes = [
     component: MeetingPage
   },
   {
-    path: "/user",
-    sidebarName: "个人信息",
-    navbarName: "个人信息",
-    icon: Person,
-    component: UserProfile
-  },
-  {
     path: "/table",
     sidebarName: "Table List",
     navbarName: "Table List",
@@ -83,7 +75,11 @@ let routesNotInSideBar = [
   {
     path: "/meeting/:meetingid/profile",
     component: MeetingProfile
-  }
+  },
+  {
+    path: "/user",
+    component: UserProfile
+  },
 ];
 
 export const deepRoutes = routesNotInSideBar.concat(dashboardRoutes);
