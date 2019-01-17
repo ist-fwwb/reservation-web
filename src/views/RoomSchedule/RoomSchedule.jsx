@@ -417,6 +417,8 @@ const data = [
   },
 ]
 
+const occupiedMessage = "会议室被占用";
+const timeChosenMessage = "请先选择时间";
 const colorList = [purple[200], pink[200], orange[300], cyan[200], teal[300]]
 let colorMap = {};
 
@@ -502,53 +504,69 @@ class RoomSchedule extends React.Component{
     );
   }
 
+  clearBetween = (firstChosen, secondChosen, scheduleData) => {
+    scheduleData[firstChosen[0]][firstChosen[1]]["click"] = false;
+    scheduleData[secondChosen[0]][secondChosen[1]]["click"] = false;
+    let start;
+    let end;
+    if (firstChosen[0] > secondChosen[0]) {
+      start = secondChosen[0];
+      end = firstChosen[0];
+    }
+    else{
+      start = firstChosen[0];
+      end = secondChosen[0];
+    }
+    let tempDay = secondChosen[1];
+    for (let i = start + 1; i < end; i ++){
+      scheduleData[i][tempDay]["between"] = false;
+    }
+    return scheduleData;
+  }
+
+  warning = (msg) => {
+    this.setState({
+      notificationType: "danger",
+      notificationMessage: msg
+    })
+    this.showNotification("br");
+  }
+
   // x stands for the 8:00/8:30/...
   // y stand for Monday/Tuesday/...
+
   handleClick = (e, date, x, y) => {
     e.preventDefault();
     let firstChosen = this.state.firstChosen;
     let secondChosen = this.state.secondChosen;
     let scheduleData = this.state.scheduleData;
+    let currentCell = scheduleData[x][y];
     // The user click for the third time, after he has chosen the start and the end
     if (firstChosen && secondChosen){
-      if (firstChosen === [x,y]){
-        scheduleData[x][y]["click"] = false;
+      // state 2 -> state 0
+      if (currentCell["click"] || currentCell["between"]){
+        scheduleData = this.clearBetween(firstChosen, secondChosen, scheduleData);
         this.setState({
           scheduleData: scheduleData,
-          firstChosen: secondChosen,
-          secondChosen: null
-        })
-        return;
-      }
-      else if (secondChosen === [x,y]){
-        scheduleData[x][y]["click"] = false;
-        this.setState({
-          scheduleData: scheduleData,
+          firstChosen: null,
           secondChosen: null,
+          date: null
         })
         return;
       }
       else {
+        if (scheduleData[x][y]["occupied"]){
+          this.warning(occupiedMessage);
+          return;
+        }
+        // state 2 -> state 1
         scheduleData[x][y]["click"] = true;
-        scheduleData[firstChosen[0]][firstChosen[1]]["click"] = false;
-        scheduleData[secondChosen[0]][secondChosen[1]]["click"] = false;
-        let start;
-        let end;
-        if (firstChosen[0] > secondChosen[0]) {
-          start = secondChosen[0];
-          end = firstChosen[0];
-        }
-        else{
-          start = firstChosen[0];
-          end = secondChosen[0];
-        }
-        let tempDay = secondChosen[1];
-        for (let i = start + 1; i < end; i ++){
-          scheduleData[i][tempDay]["between"] = false;
-        }
+        
+        scheduleData = this.clearBetween(firstChosen, secondChosen, scheduleData);
         this.setState({
           scheduleData: scheduleData,
-          firstChosen: [x, y],
+          firstChosen: [x,y],
+          date: date,
           secondChosen: null,
         })
         return;
@@ -557,16 +575,24 @@ class RoomSchedule extends React.Component{
     // The user click for the first time
     // The following situaiton is impossible:
     //    firstChosen is null but secondChosen isn't
+
     else if (!firstChosen){
+      if (scheduleData[x][y]["occupied"]){
+        this.warning(occupiedMessage);
+        return;
+      }
+      // state 0 -> state 1
       scheduleData[x][y]["click"] = true;
       this.setState({
         scheduleData: scheduleData,
+        date: date,
         firstChosen: [x,y]
       })
       return;
     }
     // The user click for the second time
     else if (firstChosen === [x,y]){ 
+      // state 1 -> state 0
       scheduleData[x][y]["click"] = false;
       this.setState({
         scheduleData: scheduleData,
@@ -575,6 +601,11 @@ class RoomSchedule extends React.Component{
       return;
     }
     else if (firstChosen[1] === y){
+      // state 1 -> state 2
+      if (scheduleData[x][y]["occupied"]){
+        this.warning(occupiedMessage);
+        return;
+      }
       // check whether there're timeslice been occupied between them
       let start;
       let end;
@@ -586,13 +617,9 @@ class RoomSchedule extends React.Component{
         start = firstChosen[0];
         end = x;
       }
-      for (let i = start + 1; i < end; i ++){
+      for (let i = start + 1; i <= end; i ++){
         if (scheduleData[i][y]["occupied"]){
-          this.setState({
-            notificationType: "danger",
-            notificationMessage: "会议室被占用!"
-          })
-          this.showNotification("br");
+          this.warning(occupiedMessage);
           return;
         }
       }
@@ -603,7 +630,6 @@ class RoomSchedule extends React.Component{
       this.setState({
         scheduleData: scheduleData,
         secondChosen: [x,y],
-        date: date,
         notificationType: "success",
         notificationMessage: date + " " + time(start) + " ~ " + time(end+1)
       })
@@ -611,6 +637,11 @@ class RoomSchedule extends React.Component{
       return;
     }
     else{
+      if (scheduleData[x][y]["occupied"]){
+        this.warning(occupiedMessage);
+        return;
+      }
+      // state 1 -> state 1
       scheduleData[firstChosen[0]][firstChosen[1]]["click"] = false;
       scheduleData[x][y]["click"] = true;
 
@@ -625,11 +656,7 @@ class RoomSchedule extends React.Component{
   handleSubmit = (e) => {
     e.preventDefault();
     if (!(this.state.firstChosen && this.state.secondChosen)){
-      this.setState({
-        notificationType: "danger",
-        notificationMessage: "请选择时间!"
-      })
-      this.showNotification("br");
+      this.warning(timeChosenMessage);
       return;
     }
     // fetch
@@ -647,13 +674,16 @@ class RoomSchedule extends React.Component{
       let end;
       if (firstChosen[0] > secondChosen[0]){
         start = secondChosen[0];
-        end = secondChosen[0];
+        end = firstChosen[0];
       }
       else{
         end = secondChosen[0];
-        start = secondChosen[0];
+        start = firstChosen[0];
       }
       timeChosen = this.state.date + " " + time(start) + " ~ " + time(end+1);
+    }
+    else if (firstChosen && !secondChosen){
+      timeChosen = this.state.date + " " + time(firstChosen[0]) + " ~ " + time(firstChosen[0]+1);
     }
     return(
       <div>
@@ -692,11 +722,11 @@ class RoomSchedule extends React.Component{
                     <TableHead>
                       <TableRow>
                         <CustomTableCell>时间</CustomTableCell>
-                        <CustomTableCell align="right">{scheduleData[0][0]["date"]}<br/>星期一</CustomTableCell>
-                        <CustomTableCell align="right">{scheduleData[0][1]["date"]}<br/>星期二</CustomTableCell>
-                        <CustomTableCell align="right">{scheduleData[0][2]["date"]}<br/>星期三</CustomTableCell>
-                        <CustomTableCell align="right">{scheduleData[0][3]["date"]}<br/>星期四</CustomTableCell>
-                        <CustomTableCell align="right">{scheduleData[0][4]["date"]}<br/>星期五</CustomTableCell>
+                        <CustomTableCell align="left">{scheduleData[0][0]["date"]}<br/>星期一</CustomTableCell>
+                        <CustomTableCell align="left">{scheduleData[0][1]["date"]}<br/>星期二</CustomTableCell>
+                        <CustomTableCell align="left">{scheduleData[0][2]["date"]}<br/>星期三</CustomTableCell>
+                        <CustomTableCell align="left">{scheduleData[0][3]["date"]}<br/>星期四</CustomTableCell>
+                        <CustomTableCell align="left">{scheduleData[0][4]["date"]}<br/>星期五</CustomTableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
@@ -729,14 +759,17 @@ class RoomSchedule extends React.Component{
                                   }
                                 }
                                 return (
-                                  <CustomTableCell key={y} align="right" bgcolor={bgcolor} onClick={(e) => {this.handleClick(e, cell["date"], x, y)}}>
+                                  <CustomTableCell style={{padding:0}} key={y} align="left" onClick={(e) => {this.handleClick(e, cell["date"], x, y)}}>
                                   {
                                     cell["occupied"]?
-                                      <Link to={"/meeting/"+cell["meetingid"]+"/profile"}>
-                                                {cell["meetingid"].substring(0,5)+"..\n"}
-                                      </Link>
+                                      <div style={{background:bgcolor ,borderRadius:"15px", lineHeight:"45px" ,height:"45px", width:"92%", textAlign:"center"}}>
+                                        <Link to={"/meeting/"+cell["meetingid"]+"/profile"}>
+                                                  {cell["meetingid"].substring(0,5)+"..\n"}
+                                        </Link>
+                                      </div>
                                       :
-                                      null
+                                      <div style={{background:bgcolor ,borderRadius:"15px", lineHeight:"45px" ,height:"45px", width:"92%", textAlign:"center"}}>
+                                      </div>
                                   }
                                   </CustomTableCell>
                                 )
