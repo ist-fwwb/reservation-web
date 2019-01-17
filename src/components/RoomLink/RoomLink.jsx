@@ -66,8 +66,8 @@ class RoomLink extends React.Component{
               <Paper>
                 <ClickAwayListener onClickAway={this.handleClose}>
                   <MenuList>
-                    <MenuItem><Link to={"/room/"+location+"/schedule"} style={{fontSize:'5px'}}>查看会议室日程安排</Link></MenuItem>
-                    <MenuItem><Link to={"/room/"+location+"/profile"} style={{fontSize:'5px'}}>查看会议室基本信息</Link></MenuItem>
+                    <MenuItem><Link to={"/room/"+location+"/schedule"} style={{fontSize:'5px'}}>日程安排</Link></MenuItem>
+                    <MenuItem><Link to={"/room/"+location+"/profile"} style={{fontSize:'5px'}}>基本信息</Link></MenuItem>
                   </MenuList>
                 </ClickAwayListener>
               </Paper>
