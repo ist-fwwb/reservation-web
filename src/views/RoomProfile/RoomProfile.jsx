@@ -13,22 +13,31 @@ import CardBody from "components/Card/CardBody.jsx";
 import CardFooter from "components/Card/CardFooter.jsx";
 import Icon from "@material-ui/core/Icon";
 import dashboardStyle from "assets/jss/material-dashboard-react/layouts/dashboardStyle.jsx";
-import airConditioner from "assets/icon/airConditioner.svg";
-import airConditioner0 from "assets/icon/airConditioner0.svg";
-import blackBoard from "assets/icon/blackBoard.svg";
-import blackBoard0 from "assets/icon/blackBoard0.svg";
-import desk from "assets/icon/desk.svg";
-import desk0 from "assets/icon/desk0.svg";
-import projector from "assets/icon/projector.svg";
-import projector0 from "assets/icon/projector0.svg";
-import power from "assets/icon/power.svg";
-import power0 from "assets/icon/power0.svg";
-import wifi from "assets/icon/wifi.svg";
-import wifi0 from "assets/icon/wifi0.svg";
-import wireNetwork from "assets/icon/wireNetwork.svg";
-import wireNetwork0 from "assets/icon/wireNetwork0.svg";
-import tv from "assets/icon/tv.svg";
-import tv0 from "assets/icon/tv0.svg";
+import airConditionerIcon from "assets/icon/airConditioner.svg";
+import airConditionerIcon0 from "assets/icon/airConditioner0.svg";
+import blackBoardIcon from "assets/icon/blackBoard.svg";
+import blackBoardIcon0 from "assets/icon/blackBoard0.svg";
+import deskIcon from "assets/icon/desk.svg";
+import deskIcon0 from "assets/icon/desk0.svg";
+import projectorIcon from "assets/icon/projector.svg";
+import projectorIcon0 from "assets/icon/projector0.svg";
+import powerIcon from "assets/icon/power.svg";
+import powerIcon0 from "assets/icon/power0.svg";
+import wifiIcon from "assets/icon/wifi.svg";
+import wifiIcon0 from "assets/icon/wifi0.svg";
+import wireNetworkIcon from "assets/icon/wireNetwork.svg";
+import wireNetworkIcon0 from "assets/icon/wireNetwork0.svg";
+import tvIcon from "assets/icon/tv.svg";
+import tvIcon0 from "assets/icon/tv0.svg";
+import { roomController } from "variables/general.jsx";
+
+function roomCategory(eng){
+  if (eng === "SMALL")
+    return "小会议室";
+  else if (eng === "BIG")
+    return "大会议室";
+  return "中会议室";
+}
 
 class RoomProfile extends React.Component {
   state = {
@@ -42,16 +51,43 @@ class RoomProfile extends React.Component {
     tv: true,
   }
 
+  componentDidMount(){
+    let roomId = this.props.match.params.roomId
+    fetch(roomController.getRoomByRoomId(roomId), {
+      credentials: 'include',
+      method:'get'
+    })
+    .then(res => res.json())
+    .then((data) => {
+      this.setState({room: data})
+    })
+  }
+
   render(){
     const { classes } = this.props;
-    const roomid = this.props.match.params.roomid
+    //const roomId = this.props.match.params.roomId
+    const room = this.state.room;
+    if (!room)
+      return null;
+
+    const devices = this.state.room.utils;
+    const airConditioned = devices.includes("AIRCONDITIONER");
+    const blackBoard = devices.includes("BLACKBOARD");
+    const desk = devices.includes("DESK");
+    const projector = devices.includes("PROJECTOR");
+    const power = devices.includes("POWER");
+    const wifi = devices.includes("WIFI");
+    const wireNetwork = devices.includes("WIRENETWORK");
+    const tv = devices.includes("TV");
+    
     return (
       <div>
         <GridContainer>
           <GridItem xs={12} sm={12} md={12}>
             <Card>
               <CardBody>
-              <h3>{"会议室 " + roomid }</h3>
+              <h3>{room.location }</h3>
+              <small>{roomCategory(room.size)}</small>
               <GridContainer>
                 <GridItem xs={12} sm={6} md={4}>
                   <Card>
@@ -64,25 +100,26 @@ class RoomProfile extends React.Component {
                     </CardHeader>
                     <CardBody>
                       <table>
+                        <tbody>
                         <tr>
                           <td>
                           {
-                            this.state.airConditioned?<img width={"60%"} src={airConditioner} alt="icon"/>:<img width={"60%"} src={airConditioner0} alt="icon"/>
+                            airConditioned?<img width={"60%"} src={airConditionerIcon} alt="icon"/>:<img width={"60%"} src={airConditionerIcon0} alt="icon"/>
                           }
                           </td>
                           <td>
                           {
-                            this.state.blackBoard?<img width={"60%"} src={blackBoard} alt="icon"/>:<img width={"60%"} src={blackBoard0} alt="icon"/>
+                            blackBoard?<img width={"60%"} src={blackBoardIcon} alt="icon"/>:<img width={"60%"} src={blackBoardIcon0} alt="icon"/>
                           }
                           </td>
                           <td>
                           {
-                            this.state.desk?<img width={"60%"} src={desk} alt="icon"/>:<img width={"60%"} src={desk0} alt="icon"/>
+                            desk?<img width={"60%"} src={deskIcon} alt="icon"/>:<img width={"60%"} src={deskIcon0} alt="icon"/>
                           }
                           </td>
                           <td>
                           {
-                            this.state.projector?<img width={"60%"} src={projector} alt="icon"/>:<img width={"60%"} src={projector0} alt="icon"/>
+                            projector?<img width={"60%"} src={projectorIcon} alt="icon"/>:<img width={"60%"} src={projectorIcon0} alt="icon"/>
                           }
                           </td>
                         </tr>
@@ -103,22 +140,22 @@ class RoomProfile extends React.Component {
                         <tr>
                           <td>
                           {
-                            this.state.power?<img width={"60%"} src={power} alt="icon"/>:<img width={"60%"} src={power0} alt="icon"/>
+                            power?<img width={"60%"} src={powerIcon} alt="icon"/>:<img width={"60%"} src={powerIcon0} alt="icon"/>
                           }
                           </td>
                           <td>
                           {
-                            this.state.wifi?<img width={"60%"} src={wifi} alt="icon"/>:<img width={"60%"} src={wifi0} alt="icon"/>
+                            wifi?<img width={"60%"} src={wifiIcon} alt="icon"/>:<img width={"60%"} src={wifiIcon0} alt="icon"/>
                           }
                           </td>
                           <td>
                           {
-                            this.state.wireNetwork?<img width={"60%"} src={wireNetwork} alt="icon"/>:<img width={"60%"} src={wireNetwork0} alt="icon"/>
+                            wireNetwork?<img width={"60%"} src={wireNetworkIcon} alt="icon"/>:<img width={"60%"} src={wireNetworkIcon0} alt="icon"/>
                           }
                           </td>
                           <td>
                           {
-                            this.state.tv?<img width={"60%"} src={tv} alt="icon"/>:<img width={"60%"} src={tv0} alt="icon"/>
+                            tv?<img width={"60%"} src={tvIcon} alt="icon"/>:<img width={"60%"} src={tvIcon0} alt="icon"/>
                           }
                           </td>
                         </tr>
@@ -136,6 +173,7 @@ class RoomProfile extends React.Component {
                             电视
                           </td>
                         </tr>
+                        </tbody>
                       </table>
                     </CardBody>
                     <CardFooter stats>

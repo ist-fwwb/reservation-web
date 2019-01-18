@@ -12,7 +12,7 @@ import UserProfile from "views/UserProfile/UserProfile.jsx";
 import TableList from "views/TableList/TableList.jsx";
 import Icons from "views/Icons/Icons.jsx";
 import NotificationsPage from "views/Notifications/Notifications.jsx";
-import RoomSchedule from "views/RoomSchedule/RoomSchedule.jsx";
+import RoomSchedulePage from "views/RoomSchedulePage/RoomSchedulePage.jsx";
 import RoomProfile from "views/RoomProfile/RoomProfile.jsx";
 import HomePage from "views/HomePage/HomePage.jsx";
 import MeetingProfile from "views/MeetingProfile/MeetingProfile.jsx";
@@ -65,19 +65,19 @@ export const dashboardRoutes = [
 
 let routesNotInSideBar = [
   {
-    path: "/room/:roomid/schedule",
-    component: RoomSchedule
+    path: "/room/:roomId/:roomLocation/schedule",
+    component: RoomSchedulePage
   },
   {
-    path: "/room/:roomid/profile",
+    path: "/room/:roomId/profile",
     component: RoomProfile
   },
   {
-    path: "/meeting/:meetingid/profile",
+    path: "/meeting/:meetingId/profile",
     component: MeetingProfile
   },
   {
-    path: "/user",
+    path: "/user/:userId/profile",
     component: UserProfile
   },
 ];

@@ -20,6 +20,7 @@ import CardHeader from "components/Card/CardHeader.jsx";
 import CardBody from "components/Card/CardBody.jsx";
 import CardIcon from "components/Card/CardIcon.jsx";
 import CardFooter from "components/Card/CardFooter.jsx";
+import { roomController } from "variables/general.jsx";
 
 import dashboardStyle from "assets/jss/material-dashboard-react/views/dashboardStyle.jsx";
 
@@ -28,10 +29,10 @@ let rooms = [{location: '410',capacity: 10, status: 0},
 {location: '412',capacity: 5, status: 2},
 {location: '501',capacity: 5, status: 0}]
 
-function roomCategory(capacity){
-  if (capacity <= 5)
+function roomCategory(eng){
+  if (eng === "SMALL")
     return "小会议室";
-  else if (capacity > 10)
+  else if (eng === "BIG")
     return "大会议室";
   return "中会议室";
 }
@@ -64,33 +65,59 @@ function roomCardIcon(status){
 }
 
 class RoomPage extends React.Component {
+  constructor(props){
+    super(props);
+    this.state = {
+      rooms: null
+    }
+  }
+
+  componentDidMount(){
+    fetch(roomController.getRoom()+"/",{
+        credentials: 'include',
+        method:'get'
+      })
+      .then(res => res.json())
+      .then((data) => {
+        this.setState({rooms: data})
+      });
+  }
 
   render() {
     const { classes } = this.props;
+    const rooms = this.state.rooms;
+    if (!rooms)
+      return null;
     return (
       <div>
         <GridContainer>
           {
             rooms.map((room) => {
               return (
-                <GridItem xs={12} sm={6} md={4}>
+                <GridItem xs={12} sm={6} md={4} key={room.id}>
                   <Card>
-                    <CardHeader color={roomCardColor(room.status)} stats icon>
-                      <CardIcon color={roomCardColor(room.status)}>
-                        {roomCardIcon(room.status)}
+                    <CardHeader color="success" stats icon>
+                      <CardIcon color="success">
+                        {<SentimentVerySatisfied/>}
                       </CardIcon>
                       <p className={classes.cardCategory}>{roomStatus(room.status)}</p>
                       <h3 className={classes.cardTitle}>
-                      {roomCategory(room.capacity) + " " + room.location}<br/> <small>{"容量:"+room.capacity}</small>
+                      {room.location}
+                      <br/> 
+                      <small>{roomCategory(room.size)}</small>
+                      <br/>
+                      <small>{"容量:"+10}</small>
                       </h3>
                     </CardHeader>
                     <CardBody>
                       <table>
-                        <tr>
-                          <td><Info/>&nbsp;&nbsp;<Link aligh="right" to={"/room/"+room.location+"/profile"}>基本信息</Link></td>
-                          <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
-                          <td><img src={Schedule} width="24px" alt="schedule icon"/>&nbsp;&nbsp;<Link align="left" to={"/room/"+room.location+"/schedule"}>日程安排</Link></td>
-                        </tr>
+                        <tbody>
+                          <tr>
+                            <td><Info/>&nbsp;&nbsp;<Link aligh="right" to={"/room/"+room.id+"/profile"}>基本信息</Link></td>
+                            <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                            <td><img src={Schedule} width="24px" alt="schedule icon"/>&nbsp;&nbsp;<Link align="left" to={"/room/"+room.id +"/"+room.location+"/schedule"}>日程安排</Link></td>
+                          </tr>
+                        </tbody>
                       </table>
                     </CardBody>
                     <CardFooter stats>
