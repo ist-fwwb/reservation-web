@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from 'prop-types';
 // core components
 import GridItem from "components/Grid/GridItem.jsx";
 import GridContainer from "components/Grid/GridContainer.jsx";
@@ -29,6 +30,7 @@ import green from '@material-ui/core/colors/green';
 
 import { time } from 'variables/time.jsx';
 import { Link } from "react-router-dom";
+import { timeSliceController, meetingController, today } from "variables/general.jsx";
 
 
 const data = [
@@ -419,6 +421,8 @@ const data = [
 
 const occupiedMessage = "会议室被占用";
 const timeChosenMessage = "请先选择时间";
+const reservationSuccessMessage = "预约成功";
+
 const colorList = [purple[200], pink[200], orange[300], cyan[200], teal[300]]
 let colorMap = {};
 
@@ -434,6 +438,7 @@ const CustomTableCell = withStyles(theme => ({
 
 function dataToRows(data){
   let re = [];
+  if (data.length)
   for (let i in data){
     let ele = data[i];
     let day = (new Date(ele.date).getDay());
@@ -477,7 +482,7 @@ class RoomSchedule extends React.Component{
       notificationMessage: "null",
       notificationType: null,
 
-      scheduleData: dataToRows(data),
+      scheduleData: null,
 
       date: null,
       firstChosen: null,
@@ -486,11 +491,24 @@ class RoomSchedule extends React.Component{
   }
 
   componentWillUnmount() {
-    var id = window.setTimeout(null, 0);
+    let id = window.setTimeout(null, 0);
     while (id--) {
       window.clearTimeout(id);
     }
   }
+
+  
+  componentDidMount() {
+    fetch(timeSliceController.getTimeSilceByRoomId(this.props.roomId), {
+      credentials: 'include',
+      method: 'get',
+    })
+    .then(res => res.json())
+    .then((data) => {
+      this.setState({scheduleData: dataToRows(data)})
+    })
+  }
+
   showNotification(place) {
     let x = [];
     x[place] = true;
@@ -647,6 +665,7 @@ class RoomSchedule extends React.Component{
 
       this.setState({
         scheduleData: scheduleData,
+        date: date,
         firstChosen: [x,y],
       })
       return;
@@ -655,17 +674,75 @@ class RoomSchedule extends React.Component{
 
   handleSubmit = (e) => {
     e.preventDefault();
+    let firstChosen = this.state.firstChosen;
+    let secondChosen = this.state.secondChosen;
     if (!(this.state.firstChosen && this.state.secondChosen)){
       this.warning(timeChosenMessage);
       return;
     }
-    // fetch
-    window.location.href = "/meeting";
+    let start;
+    let end;
+    let date = this.state.date;
+    if (!secondChosen){
+      start = firstChosen[0];
+      end = start + 1;
+    }
+    else{
+      start = firstChosen[0];
+      end = secondChosen[0]+1;
+    }
+    
+    let meeting = {
+      "attendantNum": null,
+      "attendants": null,
+      "date": date,
+      "description": "无",
+      "endTime": end,
+      "heading": "Meeting-" + date + "-" + start + "-" + end ,
+      "hostId": this.props.userId,
+      "location": null,
+      "needSignIn": false,
+      "roomId": this.props.roomId,
+      "startTime": start,
+      "type": "COMMON"
+    }
+    meeting = JSON.stringify(meeting);
+    console.log(this.props.userId)
+    console.log(meeting)
+    fetch(meetingController.createMeeting(), {
+      credentials: 'include',
+      method: 'post',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: meeting
+    })
+    .then( res => res.json())
+    .then((data) => {
+      if (data.error){
+        this.setState({
+          notificationType: "danger",
+          notificationMessage: data.error
+        })
+        this.showNotification("br");
+      }
+      else {
+        console.log(data)
+        this.setState({
+          notificationType: "success",
+          notificationMessage: reservationSuccessMessage
+        })
+        this.showNotification("br");
+        //window.location.href = "/meeting";
+      }
+    })
   }
 
   render(){
-    let colorCount = 0;
     let scheduleData = this.state.scheduleData;
+    let { roomId, roomLocation} = this.props;
+    let colorCount = 0;
     let timeChosen = "";
     let firstChosen = this.state.firstChosen;
     let secondChosen = this.state.secondChosen;
@@ -691,46 +768,60 @@ class RoomSchedule extends React.Component{
           <GridItem xs={12} sm={12} md={12}>
             <Card>
               <CardHeader>
-                <h2>{"会议室 " + this.props.match.params.roomid}</h2>
+                <h2>{roomLocation}</h2>
                 <table>
-                  <tr>
-                    <td width={220}>
-                      <TextField
-                        fullWidth
-                        disabled
-                        label="预约时间"
-                        value={timeChosen}
-                        margin="normal"
-                        variant="outlined"
-                      />
-                    </td>
-                    <td>
-                      &nbsp;&nbsp;&nbsp;&nbsp;
-                    </td>
-                    <td>
-                      <Fab variant="extended" color="primary" onClick={this.handleSubmit}>
-                        <Done/>
-                        &nbsp;&nbsp;确定预约
-                      </Fab>
-                    </td>
-                  </tr>
+                  <tbody>
+                    <tr>
+                      <td width={220}>
+                        <TextField
+                          fullWidth
+                          disabled
+                          label="预约时间"
+                          value={timeChosen}
+                          margin="normal"
+                          variant="outlined"
+                        />
+                      </td>
+                      <td>
+                        &nbsp;&nbsp;&nbsp;&nbsp;
+                      </td>
+                      <td>
+                        <Fab variant="extended" color="primary" onClick={this.handleSubmit}>
+                          <Done/>
+                          &nbsp;&nbsp;确定预约
+                        </Fab>
+                      </td>
+                    </tr>
+                  </tbody>
                 </table>
               </CardHeader>
               <CardBody>
                 <Paper>
                   <Table>
                     <TableHead>
-                      <TableRow>
-                        <CustomTableCell>时间</CustomTableCell>
-                        <CustomTableCell align="left">{scheduleData[0][0]["date"]}<br/>星期一</CustomTableCell>
-                        <CustomTableCell align="left">{scheduleData[0][1]["date"]}<br/>星期二</CustomTableCell>
-                        <CustomTableCell align="left">{scheduleData[0][2]["date"]}<br/>星期三</CustomTableCell>
-                        <CustomTableCell align="left">{scheduleData[0][3]["date"]}<br/>星期四</CustomTableCell>
-                        <CustomTableCell align="left">{scheduleData[0][4]["date"]}<br/>星期五</CustomTableCell>
-                      </TableRow>
+                      {
+                        ! scheduleData ? 
+                        <TableRow>
+                          <CustomTableCell>时间</CustomTableCell>
+                          <CustomTableCell align="left">星期一</CustomTableCell>
+                          <CustomTableCell align="left">星期二</CustomTableCell>
+                          <CustomTableCell align="left">星期三</CustomTableCell>
+                          <CustomTableCell align="left">星期四</CustomTableCell>
+                          <CustomTableCell align="left">星期五</CustomTableCell>
+                        </TableRow>
+                        :
+                        <TableRow>
+                          <CustomTableCell>时间</CustomTableCell>
+                          <CustomTableCell align="left">{scheduleData[0][0]["date"]}<br/>星期一</CustomTableCell>
+                          <CustomTableCell align="left">{scheduleData[0][1]["date"]}<br/>星期二</CustomTableCell>
+                          <CustomTableCell align="left">{scheduleData[0][2]["date"]}<br/>星期三</CustomTableCell>
+                          <CustomTableCell align="left">{scheduleData[0][3]["date"]}<br/>星期四</CustomTableCell>
+                          <CustomTableCell align="left">{scheduleData[0][4]["date"]}<br/>星期五</CustomTableCell>
+                        </TableRow>
+                      }                        
                     </TableHead>
                     <TableBody>
-                      {scheduleData.map((row, x) => {
+                      {! scheduleData ? null : scheduleData.map((row, x) => {
                         // only display 8:00 ~ 18:00
                         if (x < 16 || x >= 36){
                           return null;
@@ -798,5 +889,10 @@ class RoomSchedule extends React.Component{
     )
   }
 }
+
+RoomSchedule.propTypes = {
+  roomId: PropTypes.string.isRequired,
+  roomLocation: PropTypes.string.isRequired,
+};
 
 export default RoomSchedule;
