@@ -19,24 +19,16 @@ import dashboardStyle from "assets/jss/material-dashboard-react/layouts/dashboar
 import image from "assets/img/sidebar-2.jpg";
 import logo from "assets/img/reactlogo.png";
 
-const switchRoutes = (
-  <Switch>
-    {deepRoutes.map((prop, key) => {
-      if (prop.redirect)
-        return <Redirect from={prop.path} to={prop.to} key={key} />;
-      return <Route exact path={prop.path} component={prop.component} key={key} />;
-    })}
-  </Switch>
-);
-
 class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      mobileOpen: false
+      mobileOpen: false,
+      userId: "5c41abc09e6fb70013b8f9d9"
     };
     this.resizeFunction = this.resizeFunction.bind(this);
   }
+
   handleDrawerToggle = () => {
     this.setState({ mobileOpen: !this.state.mobileOpen });
   };
@@ -63,11 +55,14 @@ class App extends React.Component {
   componentWillUnmount() {
     window.removeEventListener("resize", this.resizeFunction);
   }
+
   render() {
     const { classes, ...rest } = this.props;
+    const userId = this.state.userId;
     return (
       <div className={classes.wrapper}>
         <Sidebar
+          userId={userId}
           routes={dashboardRoutes}
           logoText={"智能会议室"}
           logo={logo}
@@ -81,10 +76,21 @@ class App extends React.Component {
           <Header
             routes={dashboardRoutes}
             handleDrawerToggle={this.handleDrawerToggle}
+            userId={userId}
             {...rest}
           />
             <div className={classes.content}>
-              <div className={classes.container}>{switchRoutes}</div>
+              <div className={classes.container}>
+                <Switch>
+                {
+                  deepRoutes.map((prop, key) => {
+                    if (prop.redirect)
+                      return <Redirect from={prop.path} to={prop.to} key={key} />;
+                    return <Route exact path={prop.path} key={key} render={ (props) => <prop.component userId={userId} {...props}/> } />;
+                  })
+                }
+                </Switch>
+              </div>
             </div>
           <Footer /> 
         </div>
