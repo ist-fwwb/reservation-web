@@ -1,16 +1,22 @@
 import React from "react";
 // @material-ui/core components
 import withStyles from "@material-ui/core/styles/withStyles";
-import InputLabel from "@material-ui/core/InputLabel";
+import TextField from '@material-ui/core/TextField';
+import Snackbar from "components/Snackbar/Snackbar.jsx";
+
+import ErrorOutline from "@material-ui/icons/ErrorOutline";
+import Done from "@material-ui/icons/Done";
+
 // core components
 import GridItem from "components/Grid/GridItem.jsx";
 import GridContainer from "components/Grid/GridContainer.jsx";
-import CustomInput from "components/CustomInput/CustomInput.jsx";
 import Button from "components/CustomButtons/Button.jsx";
 import Card from "components/Card/Card.jsx";
 import CardHeader from "components/Card/CardHeader.jsx";
 import CardBody from "components/Card/CardBody.jsx";
 import CardFooter from "components/Card/CardFooter.jsx";
+import { userController } from "variables/general.jsx";
+
 
 const styles = {
   cardCategoryWhite: {
@@ -31,28 +37,103 @@ const styles = {
   }
 };
 
+const editSuccessMessage = "修改成功";
+
 class UserProfile extends React.Component {
-  state = {
-    username: "zzbslayer",
-    email: "zzbslayer@sjtu.edu.cn",
-    firstName: "Oh",
-    lastName: "Whatever",
-    position: "CEO",
-    description: "这个人很懒什么都没有留下",
-  };
+  constructor(props){
+    super(props);
+    this.state={
+      loaded: false,
+
+      br: false,
+      notificationMessage: "null",
+      notificationType: null,
+    };
+  }
+
+
+  componentDidMount(){
+    let api = userController.getUserByUserId(this.props.userId);
+    fetch(api,{
+      credentials: 'include',
+      method: 'get'
+    })
+    .then( res => res.json())
+    .then((data) => {
+      this.setState({
+        ...data,
+        loaded: true
+      });
+    })
+  }
 
   handleChange = (e) => {
-    this.setState({[e.target.name]:e.target.value})
+    e.preventDefault();
+    this.setState({[e.target.name]:e.target.value});
+  }
+
+  handleSubmit = (e) => {
+    e.preventDefault();
+    let msg = JSON.stringify(this.state);    
+    let api = userController.editUser(this.props.match.params.userId);
+    fetch(api, {
+      credentials: 'include',
+      method:'put',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: msg,
+    })
+    .then(res => res.json())
+    .then((data) => {
+      if (data.error)
+        this.warning(data.error);
+      else
+        this.success(editSuccessMessage);
+    })
+  }
+
+  showNotification = (place) => {
+    let x = [];
+    x[place] = true;
+    this.setState(x);
+    this.alertTimeout = setTimeout(
+      function() {
+        x[place] = false;
+        this.setState(x);
+      }.bind(this),
+      6000
+    );
+  }
+
+  typeToIcon = (type) => {
+    if (type === "success")
+      return Done;
+    if (type === "danger")
+      return ErrorOutline;
+    return null;
+  }
+
+  success = (msg) => {
+    this.setState({
+      notificationType: "success",
+      notificationMessage: msg
+    })
+    this.showNotification("br");
+  }
+
+  warning = (msg) => {
+    this.setState({
+      notificationType: "danger",
+      notificationMessage: msg
+    });
+    this.showNotification("br");
   }
 
   render(){
     const { classes } = this.props;
-    const email = this.state.email;
-    const username = this.state.username;
-    const firstName = this.state.firstName;
-    const lastName = this.state.lastName;
-    const description = this.state.description;
-    const position = this.state.position;
+    const { loaded, enterpriceId, phone, name, type, faceFile, featureFile } = this.state;
     return (
       <div>
         <GridContainer>
@@ -64,115 +145,99 @@ class UserProfile extends React.Component {
               <CardBody>
                 <GridContainer>
                   <GridItem xs={12} sm={12} md={3}>
-                    <CustomInput
-                      labelText="公司"
-                      id="company-disabled"
-                      formControlProps={{
-                        fullWidth: true
-                      }}
-                      inputProps={{
-                        disabled: true,
-                        value: "Whatever Company"
-                      }}
+                    <TextField
+                      label="公司"
+                      disabled
+                      fullWidth
+                      value={loaded?enterpriceId:"NULL"}
+                      margin="normal"
+                      variant="outlined"
                     />
                   </GridItem>
                   <GridItem xs={12} sm={12} md={3}>
-                    <CustomInput
-                      labelText="用户名"
-                      id="username-disabled"
-                      formControlProps={{
-                        fullWidth: true
-                      }}
-                      inputProps={{
-                        disabled: true,
-                        value: username
-                      }}
+                    <TextField
+                      label="手机号"
+                      disabled
+                      fullWidth
+                      name="phone"
+                      value={loaded?phone:"NULL"}
+                      margin="normal"
+                      variant="outlined"
                     />
                   </GridItem>
                   <GridItem xs={12} sm={12} md={4}>
-                    <CustomInput
-                      labelText="邮箱地址"
-                      id="email"
-                      formControlProps={{
-                        fullWidth: true
-                      }}
-                      inputProps={{
-                        name: "email",
-                        value: email,
-                        onChange: this.handleChange
-                      }}
+                    <TextField
+                      label="姓名"
+                      fullWidth
+                      name="name"
+                      onChange={this.handleChange}
+                      value={loaded?name:"NULL"}
+                      margin="normal"
+                      variant="outlined"
                     />
                   </GridItem>
                 </GridContainer>
                 <GridContainer>
                   <GridItem xs={12} sm={12} md={3}>
-                    <CustomInput
-                      labelText="名"
-                      id="firstName"
-                      formControlProps={{
-                        fullWidth: true
-                      }}
-                      inputProps={{
-                        name: "firstName",
-                        value: firstName,
-                        onChange: this.handleChange
-                      }}
+                    <TextField
+                      label="whatever"
+                      fullWidth
+                      value="whatever"
+                      margin="normal"
+                      variant="outlined"
                     />
                   </GridItem>
                   <GridItem xs={12} sm={12} md={3}>
-                    <CustomInput
-                      labelText="姓"
-                      id="last-name"
-                      formControlProps={{
-                        fullWidth: true
-                      }}
-                      inputProps={{
-                        name: "lastName",
-                        value: lastName,
-                        onChange: this.handleChange
-                      }}
+                    <TextField
+                      label="whatever"
+                      fullWidth
+                      value="whatever"
+                      margin="normal"
+                      variant="outlined"
                     />
                   </GridItem>
                   <GridItem xs={12} sm={12} md={3}>
-                    <CustomInput
-                      labelText="职位"
-                      id="position"
-                      formControlProps={{
-                        fullWidth: true
-                      }}
-                      inputProps={{
-                        name: "position",
-                        value: position,
-                        onChange: this.handleChange
-                      }}
+                    <TextField
+                      label="whatever"
+                      fullWidth
+                      value="whatever"
+                      margin="normal"
+                      variant="outlined"
                     />
                   </GridItem>
                 </GridContainer>
                 <GridContainer>
                   <GridItem xs={12} sm={12} md={12}>
-                    <InputLabel style={{ color: "#AAAAAA" }}>个人简介</InputLabel>
-                    <CustomInput
-                      id="about-me"
-                      formControlProps={{
-                        fullWidth: true
-                      }}
-                      inputProps={{
-                        name: "description",
-                        value: description,
-                        onChange: this.handleChange,
-                        multiline: true,
-                        rows: 5
-                      }}
+                    <TextField
+                      label="个人简介"
+                      multiline
+                      fullWidth
+                      rows="4"
+                      value="这个人很懒，什么都没留下"
+                      margin="normal"
+                      variant="outlined"
                     />
                   </GridItem>
                 </GridContainer>
               </CardBody>
               <CardFooter>
-                <Button color="success">确认修改</Button>
+                {
+                  !loaded ? null :
+                    <Button color="success" onClick={this.handleSubmit}>确认修改</Button>
+                }
               </CardFooter>
             </Card>
           </GridItem>
         </GridContainer>
+        <Snackbar
+          place="br"
+          color={this.state.notificationType}
+          icon={this.typeToIcon(this.state.notificationType)}
+          message={this.state.notificationMessage}
+          open={this.state.br}
+          closeNotification={() => this.setState({ br: false })}
+          close
+        />
       </div>
     );
   }
