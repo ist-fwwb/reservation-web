@@ -5,11 +5,13 @@ import withStyles from "@material-ui/core/styles/withStyles";
 // @material-ui/icons
 
 import Update from "@material-ui/icons/Update";
-import SentimentVeryDissatisfied from "@material-ui/icons/SentimentVeryDissatisfied";
-import SentimentDissatisfied from "@material-ui/icons/SentimentDissatisfied";
+//import SentimentVeryDissatisfied from "@material-ui/icons/SentimentVeryDissatisfied";
+//import SentimentDissatisfied from "@material-ui/icons/SentimentDissatisfied";
 import SentimentVerySatisfied from "@material-ui/icons/SentimentVerySatisfied";
 import Info from "@material-ui/icons/Info";
 import Schedule from "assets/icon/schedule.svg";
+import ErrorOutline from "@material-ui/icons/ErrorOutline";
+import Done from "@material-ui/icons/Done";
 
 import { Link } from "react-router-dom";
 // core components
@@ -20,14 +22,10 @@ import CardHeader from "components/Card/CardHeader.jsx";
 import CardBody from "components/Card/CardBody.jsx";
 import CardIcon from "components/Card/CardIcon.jsx";
 import CardFooter from "components/Card/CardFooter.jsx";
+import Snackbar from "components/Snackbar/Snackbar.jsx";
 import { roomController } from "variables/general.jsx";
 
 import dashboardStyle from "assets/jss/material-dashboard-react/views/dashboardStyle.jsx";
-
-let rooms = [{location: '410',capacity: 10, status: 0},
-{location: '411',capacity: 15, status: 1},
-{location: '412',capacity: 5, status: 2},
-{location: '501',capacity: 5, status: 0}]
 
 function roomCategory(eng){
   if (eng === "SMALL")
@@ -46,6 +44,7 @@ function roomStatus(status){
     return "开会中";
 }
 
+/*
 function roomCardColor(status){
   if (status === 0)
     return "success";
@@ -62,14 +61,47 @@ function roomCardIcon(status){
     return <SentimentDissatisfied/>;
   else if (status === 2)
     return <SentimentVeryDissatisfied/>;
-}
+}*/
 
 class RoomPage extends React.Component {
   constructor(props){
     super(props);
     this.state = {
+      br: false,
+      notificationMessage: "null",
+      notificationType: null,
+
       rooms: null
     }
+  }
+
+  showNotification = (place) => {
+    let x = [];
+    x[place] = true;
+    this.setState(x);
+    this.alertTimeout = setTimeout(
+      function() {
+        x[place] = false;
+        this.setState(x);
+      }.bind(this),
+      6000
+    );
+  }
+
+  typeToIcon = (type) => {
+    if (type === "success")
+      return Done;
+    if (type === "danger")
+      return ErrorOutline;
+    return null;
+  }
+
+  warning = (msg) => {
+    this.setState({
+      notificationType: "danger",
+      notificationMessage: msg
+    })
+    this.showNotification("br");
   }
 
   componentDidMount(){
@@ -79,7 +111,10 @@ class RoomPage extends React.Component {
       })
       .then(res => res.json())
       .then((data) => {
-        this.setState({rooms: data})
+        if (data.error)
+          this.warning(data.error);
+        else
+          this.setState({rooms: data})
       });
   }
 
@@ -132,6 +167,15 @@ class RoomPage extends React.Component {
             })
           }
         </GridContainer>
+        <Snackbar
+          place="br"
+          color={this.state.notificationType}
+          icon={this.typeToIcon(this.state.notificationType)}
+          message={this.state.notificationMessage}
+          open={this.state.br}
+          closeNotification={() => this.setState({ br: false })}
+          close
+        />
       </div>
     );
   }

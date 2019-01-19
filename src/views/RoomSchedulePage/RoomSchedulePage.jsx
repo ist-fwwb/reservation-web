@@ -6,7 +6,6 @@ class RoomSchedulePage extends React.Component{
   constructor(props) {
     super(props);
     this.state = {
-      userId: "12450"
     };
   }
 
@@ -14,7 +13,7 @@ class RoomSchedulePage extends React.Component{
     let { roomId, roomLocation} = this.props.match.params;
     return(
       <div>
-        <RoomSchedule roomId={roomId} roomLocation={roomLocation} userId={this.state.userId}/>
+        <RoomSchedule roomId={roomId} roomLocation={roomLocation} userId={this.props.userId}/>
       </div>
     )
   }

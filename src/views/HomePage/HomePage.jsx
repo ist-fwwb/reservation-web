@@ -8,13 +8,16 @@ import LibraryAdd from "@material-ui/icons/LibraryAdd";
 import FiberNew from "@material-ui/icons/FiberNew";
 import History from "@material-ui/icons/History";
 import Note from "@material-ui/icons/Note";
+import ErrorOutline from "@material-ui/icons/ErrorOutline";
+import Done from "@material-ui/icons/Done";
 
 import Table from "components/Table/Table.jsx";
 import Button from "components/CustomButtons/Button.jsx";
+import Snackbar from "components/Snackbar/Snackbar.jsx";
 import RoomLink from "components/RoomLink/RoomLink.jsx";
+import { meetingController, today } from "variables/general.jsx";
 import { Link } from "react-router-dom";
-
-const today = "2019-02-02";
+import { idToTime } from "variables/general.jsx";
 
 const historyMeetings = [{
   id: "0",
@@ -68,41 +71,6 @@ const attendMeetings = [
     }
 ];
 
-const meetings = [
-  {
-    id: "7",
-    attendantNum: "5",
-    attendants: {},
-    date: "2019-02-05",
-    description: "whatever",
-    endTime: "10:00",
-    heading: "Meeting 1",
-    hostId: "1",
-    location: "501",
-    needSignIn: false,
-    roomId: "string",
-    startTime: "10:30",
-    status: "Pending",
-    type: "COMMON"
-  },
-  {
-    id: "8",
-    attendantNum: "6",
-    attendants: {},
-    date: "2019-02-02",
-    description: "whatever description",
-    endTime: "11:30",
-    heading: "Meeting 2",
-    hostId: "2",
-    location: "502",
-    needSignIn: false,
-    roomId: "string",
-    startTime: "12:30",
-    status: "Pending",
-    type: "COMMON"
-    }
-];
-
 const news = [
   ["温州皮革厂倒闭了", "2018-01-20"],
   ["温州皮革厂开业了", "2018-01-21"],
@@ -126,10 +94,10 @@ function JSONToArray(jsonArray, type){
     let temp_ele = [];
 
     temp_ele.push(<Link to={"/meeting/"+ele.id+"/profile"}>{ele.heading}</Link>)
-    temp_ele.push(<RoomLink location={ele.location}/>);
+    temp_ele.push(<RoomLink location={ele.location} roomId={ele.roomId}/>);
     if (type !== "meeting")
       temp_ele.push(ele.date);
-    temp_ele.push(ele.startTime + "~" + ele.endTime);
+    temp_ele.push(idToTime(ele.startTime) + "~" + idToTime(ele.endTime));
     if (type === "meeting")
       temp_ele.push(ele.status);
     else if (type === "attend")
@@ -140,9 +108,59 @@ function JSONToArray(jsonArray, type){
 }
 
 class HomePage extends React.Component{
-  state = {
+  constructor(props){
+    super(props);
+    this.state = {
+      br: false,
+      notificationMessage: "null",
+      notificationType: null,
+
+      meetings: null,
+    }
   }
+  
+  componentDidMount(){
+    fetch(meetingController.getMeetingByUserIdAndDate(this.props.userId, today),{
+      credentials: 'include',
+      method: 'get',
+    })
+    .then(res => res.json())
+    .then((data) => {
+      this.setState({meetings: data})
+    })
+  }
+
+  showNotification = (place) => {
+    let x = [];
+    x[place] = true;
+    this.setState(x);
+    this.alertTimeout = setTimeout(
+      function() {
+        x[place] = false;
+        this.setState(x);
+      }.bind(this),
+      6000
+    );
+  }
+
+  typeToIcon = (type) => {
+    if (type === "success")
+      return Done;
+    if (type === "danger")
+      return ErrorOutline;
+    return null;
+  }
+
+  warning = (msg) => {
+    this.setState({
+      notificationType: "danger",
+      notificationMessage: msg
+    })
+    this.showNotification("br");
+  }
+
   render(){
+    let meetings = this.state.meetings;
     return(
       <div>
         <GridContainer>
@@ -179,7 +197,7 @@ class HomePage extends React.Component{
                     <Table
                       tableHeaderColor="primary"
                       tableHead={["会议名称", "会议室", "时间", "状态"]}
-                      tableData={JSONToArray(meetings, "meeting")}
+                      tableData={meetings ? JSONToArray(meetings, "meeting") : []}
                     />
                   )
                 },
@@ -229,6 +247,15 @@ class HomePage extends React.Component{
               />
           </GridItem>
         </GridContainer>
+        <Snackbar
+          place="br"
+          color={this.state.notificationType}
+          icon={this.typeToIcon(this.state.notificationType)}
+          message={this.state.notificationMessage}
+          open={this.state.br}
+          closeNotification={() => this.setState({ br: false })}
+          close
+        />
       </div>
     )
   }

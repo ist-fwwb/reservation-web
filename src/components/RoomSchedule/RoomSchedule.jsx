@@ -28,396 +28,8 @@ import cyan from '@material-ui/core/colors/cyan';
 import teal from '@material-ui/core/colors/teal';
 import green from '@material-ui/core/colors/green';
 
-import { time } from 'variables/time.jsx';
 import { Link } from "react-router-dom";
-import { timeSliceController, meetingController, today } from "variables/general.jsx";
-
-
-const data = [
-  {
-    "id": "5c38b1cc4fc69d001339a7f2",
-    "roomId": "5c38b1cc4fc69d001339a7ec",
-    "timeSlice": [
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      "5c3dd232eb75240013cf20ee",
-      null,
-      null,
-      null,
-      null,
-      "232eb75240013cf20ee",
-      null,
-      null,
-      null,
-      "2eb75240013cf20ee",
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      "2753cf20ee",
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
-    ],
-    "date": "2019-01-16"
-  },
-  {
-    "id": "5c38b1cc4fc69d001339a7f2",
-    "roomId": "5c38b1cc4fc69d001339a7ec",
-    "timeSlice": [
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
-    ],
-    "date": "2019-01-17"
-  },
-  {
-    "id": "5c38b1cc4fc69d001339a7f2",
-    "roomId": "5c38b1cc4fc69d001339a7ec",
-    "timeSlice": [
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      "5c32eb75240013cf20ee",
-      "5c32eb75240013cf20ee",
-      "5c32eb75240013cf20ee",
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      "5c3dd3b752403cfee",
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      "c3dd32eb5240013cf20e",
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
-    ],
-    "date": "2019-01-18"
-  },
-  {
-    "id": "5c38b1cc4fc69d001339a7f2",
-    "roomId": "5c38b1cc4fc69d001339a7ec",
-    "timeSlice": [
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      "c3dd232eb75240013cf20e",
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      "5d2eb75240013cf0ee",
-      "5d2eb75240013cf0ee",
-      "5d2eb75240013cf0ee",
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
-    ],
-    "date": "2019-01-19"
-  },
-  {
-    "id": "5c38b1cc4fc69d001339a7f2",
-    "roomId": "5c38b1cc4fc69d001339a7ec",
-    "timeSlice": [
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      "5240013cf20e",
-      "5240013cf20e",
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      "0013cf20ee",
-      "0013cf20ee",
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
-    ],
-    "date": "2019-01-20"
-  },
-  {
-    "id": "5c38b1cc4fc69d001339a7f2",
-    "roomId": "5c38b1cc4fc69d001339a7ec",
-    "timeSlice": [
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      "cf20ee",
-      "cf20ee",
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      "5ee",
-      "5ee",
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
-    ],
-    "date": "2019-01-21"
-  },
-  {
-    "id": "5c38b1cc4fc69d001339a7f2",
-    "roomId": "5c38b1cc4fc69d001339a7ec",
-    "timeSlice": [
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      "7524001ee",
-      "7524001ee",
-      "7524001ee",
-      "7524001ee",
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
-    ],
-    "date": "2019-01-22"
-  },
-]
+import { timeSliceController, meetingController, idToTime } from "variables/general.jsx";
 
 const occupiedMessage = "会议室被占用";
 const timeChosenMessage = "请先选择时间";
@@ -466,14 +78,6 @@ function dataToRows(data){
   return re;
 }
 
-function typeToIcon(type){
-  if (type === "success")
-    return Done;
-  if (type === "danger")
-    return ErrorOutline;
-  return null;
-}
-
 class RoomSchedule extends React.Component{
   constructor(props) {
     super(props);
@@ -505,11 +109,14 @@ class RoomSchedule extends React.Component{
     })
     .then(res => res.json())
     .then((data) => {
-      this.setState({scheduleData: dataToRows(data)})
+      if (data.error)
+        this.warning(data.error);
+      else
+        this.setState({scheduleData: dataToRows(data)})
     })
   }
 
-  showNotification(place) {
+  showNotification = (place) => {
     let x = [];
     x[place] = true;
     this.setState(x);
@@ -520,6 +127,30 @@ class RoomSchedule extends React.Component{
       }.bind(this),
       6000
     );
+  }
+
+  typeToIcon = (type) => {
+    if (type === "success")
+      return Done;
+    if (type === "danger")
+      return ErrorOutline;
+    return null;
+  }
+
+  warning = (msg) => {
+    this.setState({
+      notificationType: "danger",
+      notificationMessage: msg
+    })
+    this.showNotification("br");
+  }
+
+  success = (msg) => {
+    this.setState({
+      notificationType: "success",
+      notificationMessage: msg
+    })
+    this.showNotification("br");
   }
 
   clearBetween = (firstChosen, secondChosen, scheduleData) => {
@@ -540,14 +171,6 @@ class RoomSchedule extends React.Component{
       scheduleData[i][tempDay]["between"] = false;
     }
     return scheduleData;
-  }
-
-  warning = (msg) => {
-    this.setState({
-      notificationType: "danger",
-      notificationMessage: msg
-    })
-    this.showNotification("br");
   }
 
   // x stands for the 8:00/8:30/...
@@ -649,7 +272,7 @@ class RoomSchedule extends React.Component{
         scheduleData: scheduleData,
         secondChosen: [x,y],
         notificationType: "success",
-        notificationMessage: date + " " + time(start) + " ~ " + time(end+1)
+        notificationMessage: date + " " + idToTime(start) + " ~ " + idToTime(end+1)
       })
       this.showNotification("br");
       return;
@@ -707,8 +330,6 @@ class RoomSchedule extends React.Component{
       "type": "COMMON"
     }
     meeting = JSON.stringify(meeting);
-    console.log(this.props.userId)
-    console.log(meeting)
     fetch(meetingController.createMeeting(), {
       credentials: 'include',
       method: 'post',
@@ -721,19 +342,10 @@ class RoomSchedule extends React.Component{
     .then( res => res.json())
     .then((data) => {
       if (data.error){
-        this.setState({
-          notificationType: "danger",
-          notificationMessage: data.error
-        })
-        this.showNotification("br");
+        this.warning(data.error);
       }
       else {
-        console.log(data)
-        this.setState({
-          notificationType: "success",
-          notificationMessage: reservationSuccessMessage
-        })
-        this.showNotification("br");
+        this.success(reservationSuccessMessage);
         //window.location.href = "/meeting";
       }
     })
@@ -741,7 +353,7 @@ class RoomSchedule extends React.Component{
 
   render(){
     let scheduleData = this.state.scheduleData;
-    let { roomId, roomLocation} = this.props;
+    let { roomLocation } = this.props;
     let colorCount = 0;
     let timeChosen = "";
     let firstChosen = this.state.firstChosen;
@@ -757,10 +369,10 @@ class RoomSchedule extends React.Component{
         end = secondChosen[0];
         start = firstChosen[0];
       }
-      timeChosen = this.state.date + " " + time(start) + " ~ " + time(end+1);
+      timeChosen = this.state.date + " " + idToTime(start) + " ~ " + idToTime(end+1);
     }
     else if (firstChosen && !secondChosen){
-      timeChosen = this.state.date + " " + time(firstChosen[0]) + " ~ " + time(firstChosen[0]+1);
+      timeChosen = this.state.date + " " + idToTime(firstChosen[0]) + " ~ " + idToTime(firstChosen[0]+1);
     }
     return(
       <div>
@@ -830,7 +442,7 @@ class RoomSchedule extends React.Component{
                         return(
                           <TableRow key={x}>
                             <CustomTableCell component="th" scope="row">
-                              {time(x)+"~"+time(x+1)}
+                              {idToTime(x)+"~"+idToTime(x+1)}
                             </CustomTableCell>
                             {
                               row.map((cell, y) => {
@@ -874,7 +486,7 @@ class RoomSchedule extends React.Component{
                   <Snackbar
                     place="br"
                     color={this.state.notificationType}
-                    icon={typeToIcon(this.state.notificationType)}
+                    icon={this.typeToIcon(this.state.notificationType)}
                     message={this.state.notificationMessage}
                     open={this.state.br}
                     closeNotification={() => this.setState({ br: false })}

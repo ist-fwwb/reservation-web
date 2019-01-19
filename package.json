@@ -1,7 +1,7 @@
 {
-  "name": "material-dashboard-react",
+  "name": "reservation-web",
   "version": "1.5.0",
-  "description": "Material Dashboard React. Coded by Creative Tim",
+  "description": "reservation web",
   "private": false,
   "main": "dist/index.js",
   "dependencies": {

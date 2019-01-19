@@ -15,16 +15,16 @@ import Icon from "@material-ui/core/Icon";
 import dashboardStyle from "assets/jss/material-dashboard-react/layouts/dashboardStyle.jsx";
 import airConditionerIcon from "assets/icon/airConditioner.svg";
 import airConditionerIcon0 from "assets/icon/airConditioner0.svg";
-import blackBoardIcon from "assets/icon/blackBoard.svg";
-import blackBoardIcon0 from "assets/icon/blackBoard0.svg";
+import blackBoardIcon from "assets/icon/blackboard.png";
+import blackBoardIcon0 from "assets/icon/blackboard0.png";
 import deskIcon from "assets/icon/desk.svg";
 import deskIcon0 from "assets/icon/desk0.svg";
 import projectorIcon from "assets/icon/projector.svg";
 import projectorIcon0 from "assets/icon/projector0.svg";
 import powerIcon from "assets/icon/power.svg";
 import powerIcon0 from "assets/icon/power0.svg";
-import wifiIcon from "assets/icon/wifi.svg";
-import wifiIcon0 from "assets/icon/wifi0.svg";
+import wifiIcon from "assets/icon/wifi.png";
+import wifiIcon0 from "assets/icon/wifi0.png";
 import wireNetworkIcon from "assets/icon/wireNetwork.svg";
 import wireNetworkIcon0 from "assets/icon/wireNetwork0.svg";
 import tvIcon from "assets/icon/tv.svg";
@@ -41,14 +41,14 @@ function roomCategory(eng){
 
 class RoomProfile extends React.Component {
   state = {
-    airConditioned: true,
-    blackBoard: true,
+    airConditioned: false,
+    blackBoard: false,
     desk: false,
-    projector: true,
-    power: true,
+    projector: false,
+    power: false,
     wifi: false,
     wireNetwork: false,
-    tv: true,
+    tv: false,
   }
 
   componentDidMount(){
@@ -67,18 +67,25 @@ class RoomProfile extends React.Component {
     const { classes } = this.props;
     //const roomId = this.props.match.params.roomId
     const room = this.state.room;
-    if (!room)
-      return null;
-
-    const devices = this.state.room.utils;
-    const airConditioned = devices.includes("AIRCONDITIONER");
-    const blackBoard = devices.includes("BLACKBOARD");
-    const desk = devices.includes("DESK");
-    const projector = devices.includes("PROJECTOR");
-    const power = devices.includes("POWER");
-    const wifi = devices.includes("WIFI");
-    const wireNetwork = devices.includes("WIRENETWORK");
-    const tv = devices.includes("TV");
+    let airConditioned = false;
+    let blackBoard = false;
+    let desk = false;
+    let projector = false;
+    let power = false;
+    let wifi = false;
+    let wireNetwork = false;
+    let tv = false;
+    if (room){
+      const devices = this.state.room.utils;
+      airConditioned = devices.includes("AIRCONDITIONER");
+      blackBoard = devices.includes("BLACKBOARD");
+      desk = devices.includes("DESK");
+      projector = devices.includes("PROJECTOR");
+      power = devices.includes("POWER");
+      wifi = devices.includes("WIFI");
+      wireNetwork = devices.includes("WIRENETWORK");
+      tv = devices.includes("TV");
+    }
     
     return (
       <div>
@@ -86,8 +93,14 @@ class RoomProfile extends React.Component {
           <GridItem xs={12} sm={12} md={12}>
             <Card>
               <CardBody>
-              <h3>{room.location }</h3>
-              <small>{roomCategory(room.size)}</small>
+                {
+                  room ? <div>
+                    <h3>{room.location}</h3>
+                    <small>{roomCategory(room.size)}</small>
+                    </div>
+                    : <h3>{this.props.match.params.roomId}</h3>
+                }
+              
               <GridContainer>
                 <GridItem xs={12} sm={6} md={4}>
                   <Card>

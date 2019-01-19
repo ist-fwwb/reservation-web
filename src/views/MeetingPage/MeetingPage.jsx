@@ -315,7 +315,7 @@ class MeetingPage extends React.Component {
       let temp_ele = [];
       temp_ele.push(<Link to={"/meeting/"+ele.id+"/profile"}>{ele.heading}</Link>);
       temp_ele.push(ele.hostId);
-      temp_ele.push(<RoomLink location={ele.location}/>);
+      temp_ele.push(<RoomLink location={ele.location} roomId={ele.roomId}/>);
       temp_ele.push(ele.date);
       temp_ele.push(ele.startTime + "~" + ele.endTime);
       if (type === "history")
@@ -441,6 +441,8 @@ class MeetingPage extends React.Component {
                             {attendMeetings.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(ele => {
                               let host = (userId === ele.hostId);
                               let meetingId = ele.id;
+                              if (host)
+                                return null;
                               return (
                                 <TableRow key={ele.id}>
                                   <TableCell align="left">
@@ -509,7 +511,6 @@ class MeetingPage extends React.Component {
                           </TableHead>
                           <TableBody>
                             {historyMeetings.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(ele => {
-                              let host = (userId === ele.hostId);
                               let meetingId = ele.id;
                               return (
                                 <TableRow key={ele.id}>
