@@ -26,7 +26,7 @@ function Header({ ...props }) {
     });
     return name;
   }
-  const { classes, color } = props;
+  const { classes, color, userId } = props;
   const appBarClasses = classNames({
     [" " + classes[color]]: color
   });
@@ -40,7 +40,7 @@ function Header({ ...props }) {
           </Button>
         </div>
         <Hidden smDown implementation="css">
-          <HeaderLinks />
+          <HeaderLinks userId={userId}/>
         </Hidden>
         <Hidden mdUp implementation="css">
           <IconButton

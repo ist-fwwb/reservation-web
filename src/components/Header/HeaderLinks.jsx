@@ -31,7 +31,7 @@ class HeaderLinks extends React.Component {
   };
 
   render() {
-    const { classes } = this.props;
+    const { classes, userId } = this.props;
     const { open } = this.state;
     return (
       <div>
@@ -76,7 +76,7 @@ class HeaderLinks extends React.Component {
             </Button>
           </Link>
         </div>
-        <Link to="/user">
+        <Link to={"/user/"+userId+"/profile"}>
           <Button
             color={window.innerWidth > 959 ? "transparent" : "white"}
             justIcon={window.innerWidth > 959}
