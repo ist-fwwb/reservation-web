@@ -39,7 +39,7 @@ class RoomLink extends React.Component{
   render (){
     const { classes } = this.props;
     const { open } = this.state;
-    const location = this.props.location;
+    const { location, roomId }= this.props;
     return (
       <div className={classes.root}>
         <Button
@@ -63,8 +63,8 @@ class RoomLink extends React.Component{
               <Paper>
                 <ClickAwayListener onClickAway={this.handleClose}>
                   <MenuList>
-                    <MenuItem><Link to={"/room/"+location+"/schedule"} style={{fontSize:'5px'}}>日程安排</Link></MenuItem>
-                    <MenuItem><Link to={"/room/"+location+"/profile"} style={{fontSize:'5px'}}>基本信息</Link></MenuItem>
+                    <MenuItem><Link to={"/room/"+roomId + "/" + location+"/schedule"} style={{fontSize:'5px'}}>日程安排</Link></MenuItem>
+                    <MenuItem><Link to={"/room/"+roomId+"/profile"} style={{fontSize:'5px'}}>基本信息</Link></MenuItem>
                   </MenuList>
                 </ClickAwayListener>
               </Paper>
@@ -77,6 +77,8 @@ class RoomLink extends React.Component{
 }
 RoomLink.propTypes = {
   classes: PropTypes.object.isRequired,
+  location: PropTypes.string.isRequired,
+  roomId: PropTypes.string.isRequired,
 };
 
 export default withStyles(styles)(RoomLink);
