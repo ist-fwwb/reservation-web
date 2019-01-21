@@ -41,10 +41,19 @@ const meetingController = {
   "attendMeetingByAttendantNum": (attendantNum, userId) => (server + "/meeting/" + attendantNum + "/attendants?userId=" + userId),
   "exitMeetingByMeetingId": (meetingId , userId) => (server +"/meeting/" + meetingId + "/attendants/" + userId),
   "getMeetingByUserIdAndDate": (userId, date) => (server + "/user/" + userId + "/meeting/" + date),
+  "getMeetingByUserId": (userId) => (server + "/user/" + userId + "/meeting"),
 };
 
 const userController = {
-  "getUser": () => (server + "/user"),
+  "getUserByIds":(ids) => {
+    let idsStr = "ids=";
+    let del = "%2C";
+    ids.map(id => idsStr += (id + del));
+    idsStr = idsStr.substring(0, idsStr.length - 3);
+    let api = server + "/user?" + idsStr;
+    return api;
+  },
+  "getUser": (type=null) => (type?(server + "/user?type=" + type):(server + "/user")),
   "register": () => (server + "/user"), //json params in req body
   "login": (phone, password) => (server + "/user/login?phone=" + phone + "&password=" + password),
   "getUserByUserId": (userId) => (server + "/user/" + userId),
