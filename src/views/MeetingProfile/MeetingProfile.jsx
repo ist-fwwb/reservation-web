@@ -318,10 +318,11 @@ class MeetingProfile extends React.Component {
     .then((res) => {
       if (res.ok){
         this.success("解散成功");
-        //window.location.href = "/";
+        window.location.reload();
       }
       else
         this.warning("解散失败");
+        this.confirmDismissClose();
     })
   }
 
@@ -347,7 +348,7 @@ class MeetingProfile extends React.Component {
       }
       else{
         this.warning("退出失败");
-        this.confirmAttendClose();
+        this.confirmExitClose();
       }
     })
   }
@@ -411,7 +412,8 @@ class MeetingProfile extends React.Component {
     }
     const { classes } = this.props;
     const { addAttendants, loaded1, loaded2, attendantsWithName, host, location, startTime, endTime, type, status, hostId, date, description, heading }= this.state;
-    const disabled = !host;
+    const pending = (status === "Pending");
+    const disabled = !host || !pending;
     const loaded = loaded1 && loaded2;
     let inMeeting = false;
     if (!host){
@@ -587,7 +589,7 @@ class MeetingProfile extends React.Component {
                 </GridContainer>
               </CardBody>
               {
-                !loaded ? null :
+                !loaded || !pending ? null :
                 ( host ? 
                     <CardFooter>
                       <Button variant="outlined">确认修改</Button>
