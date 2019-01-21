@@ -16,6 +16,7 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Dialog from '@material-ui/core/Dialog';
+import DialogContent from '@material-ui/core/DialogContent';
 import DialogActions from '@material-ui/core/DialogActions';
 import Slide from '@material-ui/core/Slide';
 import blue from '@material-ui/core/colors/blue';
@@ -31,6 +32,7 @@ import CardBody from "components/Card/CardBody.jsx";
 import CardFooter from "components/Card/CardFooter.jsx";
 import dashboardStyle from "assets/jss/material-dashboard-react/layouts/dashboardStyle.jsx";
 import Snackbar from "components/Snackbar/Snackbar.jsx";
+import RoomSchedule from "components/RoomSchedule/RoomSchedule.jsx";
 
 import { meetingController, idToTime, userController } from "variables/general.jsx";
 
@@ -91,7 +93,7 @@ class AttendantsDialog extends React.Component {
     const { classes, onClose, open, ...other } = this.props;
     const { addattendants } = this.state;
     return (
-      <Dialog onClose={this.props.onClose} aria-labelledby="simple-dialog-title" open={open} {...other}>
+      <Dialog onClose={this.props.onClose} scroll={"paper"} aria-labelledby="simple-dialog-title" open={open} {...other}>
         <DialogTitle id="simple-dialog-title">邀请用户加入会议</DialogTitle>
         <div>
           <List className={classes.root}>
@@ -143,6 +145,8 @@ class MeetingProfile extends React.Component {
       confirmAttendOpen: false,
       // confirm dissmiss dialog
       confirmDismissOpen: false,
+      // confirm timechange dialog
+      confirmTimeChangeOpen: false,
 
       // addAttendants menu
       open: false,
@@ -380,6 +384,19 @@ class MeetingProfile extends React.Component {
     })
   }
 
+  // confirm attend dialog
+  confirmTimeChangeClickOpen = () => {
+    this.setState({ confirmTimeChangeOpen: true });
+  };
+
+  confirmTimeChangeClose = () => {
+    this.setState({ confirmTimeChangeOpen: false });
+  };
+
+  handleTimeChange = (startTime, endTime) => {
+    this.setState({ startTime, endTime });
+  }
+
   // add attendants
   handleOpen = () => {
     this.setState({
@@ -405,6 +422,34 @@ class MeetingProfile extends React.Component {
     this.setState({ attendantsWithName, addAttendants });
     this.handleClose();
   };
+
+  handleTimeChange = (state) => {
+    this.setState(state);
+    if (state.notificationType)
+      this.showNotification("br");
+  }
+
+  ConfirmTimeChange = () => {
+    let { firstChosen, secondChosen } = this.state;
+    let startTime;
+    let endTime;
+    if (firstChosen && secondChosen){
+      if (firstChosen[0] > secondChosen[0]){
+        startTime = secondChosen[0];
+        endTime = firstChosen[0]+1;
+      }
+      else{
+        endTime = secondChosen[0]+1;
+        startTime = firstChosen[0];
+      }
+    }
+    else if (firstChosen && !secondChosen){
+      startTime = firstChosen[0];
+      endTime = startTime + 1;
+    }
+    this.setState({startTime, endTime, date: this.state.chosenDate});
+    this.confirmTimeChangeClose();
+  }
 
   render(){
     if (this.state.error){
@@ -592,8 +637,41 @@ class MeetingProfile extends React.Component {
                 !loaded || !pending ? null :
                 ( host ? 
                     <CardFooter>
-                      <Button variant="outlined">确认修改</Button>
-                      <Button variant="outlined" onClick={this.confirmDismissClickOpen} color="secondary">解散会议</Button>
+                      <GridContainer>
+                        <GridItem xs={12} sm={12} md={4}>
+                          <Button variant="outlined" color="primary" onClick={this.confirmTimeChangeClickOpen}>修改时间</Button>
+                          <Dialog
+                            fullScreen
+                            open={this.state.confirmTimeChangeOpen}
+                            TransitionComponent={Transition}
+                            keepMounted
+                            onClose={this.confirmTimeChangeClose}
+                            aria-labelledby="alert-dialog-slide-title"
+                            aria-describedby="alert-dialog-slide-description"
+                          >
+                            <DialogTitle id="alert-dialog-slide-title">
+                              {"修改时间"}
+                            </DialogTitle>
+                            <DialogContent>
+                              <RoomSchedule roomId={this.state.roomId} handleChange={this.handleTimeChange}/>
+                            </DialogContent>
+                            <DialogActions>
+                            <Button onClick={this.confirmTimeChangeClose} color="primary">
+                              取消
+                            </Button>
+                            <Button onClick={this.ConfirmTimeChange} color="secondary">
+                              确定
+                            </Button>
+                          </DialogActions>
+                          </Dialog>
+                        </GridItem>
+                        <GridItem xs={12} sm={12} md={4}>
+                          <Button variant="outlined" onClick={this.confirmSubmitClickOpen}>确认修改</Button>
+                        </GridItem>
+                        <GridItem xs={12} sm={12} md={4}>
+                          <Button variant="outlined" onClick={this.confirmDismissClickOpen} color="secondary">解散会议</Button>
+                        </GridItem>
+                      </GridContainer>
                       <Dialog
                         open={this.state.confirmDismissOpen}
                         TransitionComponent={Transition}
