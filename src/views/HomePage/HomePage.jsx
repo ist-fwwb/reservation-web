@@ -14,7 +14,6 @@ import Done from "@material-ui/icons/Done";
 import Table from "components/Table/Table.jsx";
 import Button from "components/CustomButtons/Button.jsx";
 import Snackbar from "components/Snackbar/Snackbar.jsx";
-import RoomLink from "components/RoomLink/RoomLink.jsx";
 import { meetingController, today } from "variables/general.jsx";
 import { Link } from "react-router-dom";
 import { idToTime } from "variables/general.jsx";
@@ -94,7 +93,7 @@ function JSONToArray(jsonArray, type){
     let temp_ele = [];
 
     temp_ele.push(<Link to={"/meeting/"+ele.id+"/profile"}>{ele.heading}</Link>)
-    temp_ele.push(<RoomLink location={ele.location} roomId={ele.roomId}/>);
+    temp_ele.push(<Link to={"/room/"+ele.id+"/profile"}>{ele.location}</Link>);
     if (type !== "meeting")
       temp_ele.push(ele.date);
     temp_ele.push(idToTime(ele.startTime) + "~" + idToTime(ele.endTime));

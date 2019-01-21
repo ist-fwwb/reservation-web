@@ -65,6 +65,10 @@ class UserProfile extends React.Component {
         loaded: true
       });
     })
+    .catch(error => {
+      console.log(error);
+      this.setState({error: true});
+    })
   }
 
   handleChange = (e) => {
@@ -134,6 +138,7 @@ class UserProfile extends React.Component {
   render(){
     const { classes } = this.props;
     const { loaded, enterpriceId, phone, name, type, faceFile, featureFile } = this.state;
+    const disabled = !(this.props.userId === this.props.match.params.userId);
     return (
       <div>
         <GridContainer>
@@ -168,6 +173,7 @@ class UserProfile extends React.Component {
                   <GridItem xs={12} sm={12} md={4}>
                     <TextField
                       label="姓名"
+                      disabled={disabled}
                       fullWidth
                       name="name"
                       onChange={this.handleChange}
@@ -181,6 +187,7 @@ class UserProfile extends React.Component {
                   <GridItem xs={12} sm={12} md={3}>
                     <TextField
                       label="whatever"
+                      disabled={disabled}
                       fullWidth
                       value="whatever"
                       margin="normal"
@@ -190,6 +197,7 @@ class UserProfile extends React.Component {
                   <GridItem xs={12} sm={12} md={3}>
                     <TextField
                       label="whatever"
+                      disabled={disabled}
                       fullWidth
                       value="whatever"
                       margin="normal"
@@ -199,6 +207,7 @@ class UserProfile extends React.Component {
                   <GridItem xs={12} sm={12} md={3}>
                     <TextField
                       label="whatever"
+                      disabled={disabled}
                       fullWidth
                       value="whatever"
                       margin="normal"
@@ -210,6 +219,7 @@ class UserProfile extends React.Component {
                   <GridItem xs={12} sm={12} md={12}>
                     <TextField
                       label="个人简介"
+                      disabled={disabled}
                       multiline
                       fullWidth
                       rows="4"
@@ -222,8 +232,10 @@ class UserProfile extends React.Component {
               </CardBody>
               <CardFooter>
                 {
-                  !loaded ? null :
+                  !loaded ? null :(
+                    disabled ? null :
                     <Button color="success" onClick={this.handleSubmit}>确认修改</Button>
+                  )
                 }
               </CardFooter>
             </Card>

@@ -6,7 +6,6 @@ import GridItem from "components/Grid/GridItem.jsx";
 import GridContainer from "components/Grid/GridContainer.jsx";
 import CustomTabs from "components/CustomTabs/CustomTabs.jsx";
 import Button from "components/CustomButtons/Button.jsx";
-import RoomLink from "components/RoomLink/RoomLink.jsx";
 
 import Assignment from "@material-ui/icons/Assignment";
 import LibraryAdd from "@material-ui/icons/LibraryAdd";
@@ -19,97 +18,8 @@ import TableFooter from '@material-ui/core/TableFooter';
 import TablePagination from '@material-ui/core/TablePagination';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
-import IconButton from '@material-ui/core/IconButton';
-import FirstPageIcon from '@material-ui/icons/FirstPage';
-import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
-import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
-import LastPageIcon from '@material-ui/icons/LastPage';
 import { Link } from "react-router-dom";
-
-const actionsStyles = theme => ({
-  root: {
-    flexShrink: 0,
-    color: theme.palette.text.secondary,
-    marginLeft: theme.spacing.unit * 2.5,
-  },
-});
-
-class TablePaginationActions extends React.Component {
-  handleFirstPageButtonClick = event => {
-    this.props.onChangePage(event, 0);
-  };
-
-  handleBackButtonClick = event => {
-    this.props.onChangePage(event, this.props.page - 1);
-  };
-
-  handleNextButtonClick = event => {
-    this.props.onChangePage(event, this.props.page + 1);
-  };
-
-  handleLastPageButtonClick = event => {
-    this.props.onChangePage(
-      event,
-      Math.max(0, Math.ceil(this.props.count / this.props.rowsPerPage) - 1),
-    );
-  };
-
-  render() {
-    const { classes, count, page, rowsPerPage, theme } = this.props;
-
-    return (
-      <div className={classes.root}>
-        <IconButton
-          onClick={this.handleFirstPageButtonClick}
-          disabled={page === 0}
-          aria-label="First Page"
-        >
-          {theme.direction === 'rtl' ? <LastPageIcon /> : <FirstPageIcon />}
-        </IconButton>
-        <IconButton
-          onClick={this.handleBackButtonClick}
-          disabled={page === 0}
-          aria-label="Previous Page"
-        >
-          {theme.direction === 'rtl' ? <KeyboardArrowRight /> : <KeyboardArrowLeft />}
-        </IconButton>
-        <IconButton
-          onClick={this.handleNextButtonClick}
-          disabled={page >= Math.ceil(count / rowsPerPage) - 1}
-          aria-label="Next Page"
-        >
-          {theme.direction === 'rtl' ? <KeyboardArrowLeft /> : <KeyboardArrowRight />}
-        </IconButton>
-        <IconButton
-          onClick={this.handleLastPageButtonClick}
-          disabled={page >= Math.ceil(count / rowsPerPage) - 1}
-          aria-label="Last Page"
-        >
-          {theme.direction === 'rtl' ? <FirstPageIcon /> : <LastPageIcon />}
-        </IconButton>
-      </div>
-    );
-  }
-}
-
-TablePaginationActions.propTypes = {
-  classes: PropTypes.object.isRequired,
-  count: PropTypes.number.isRequired,
-  onChangePage: PropTypes.func.isRequired,
-  page: PropTypes.number.isRequired,
-  rowsPerPage: PropTypes.number.isRequired,
-  theme: PropTypes.object.isRequired,
-};
-
-const TablePaginationActionsWrapped = withStyles(actionsStyles, { withTheme: true })(
-  TablePaginationActions,
-);
-
-let counter = 0;
-function createData(name, calories, fat) {
-  counter += 1;
-  return { id: counter, name, calories, fat };
-}
+import { meetingController, idToTime } from 'variables/general.jsx';
 
 const styles = theme => ({
   root: {
@@ -131,13 +41,13 @@ const historyMeetingsData = [{
   attendants: {},
   date: "2018-01-10",
   description: "whatever",
-  endTime: "10:00",
+  endTime: "20",
   heading: "Meeting 1",
   hostId: "0",
   location: "508",
   needSignIn: false,
   roomId: "string",
-  startTime: "10:30",
+  startTime: "21",
   status: "Cancelled",
   type: "COMMON"
   },
@@ -149,13 +59,13 @@ const attendMeetingsData = [
     attendants: {},
     date: "2018-02-01",
     description: "whatever",
-    endTime: "14:00",
+    endTime: "19",
     heading: "Meeting b",
     hostId: "1",
     location: "501",
     needSignIn: false,
     roomId: "string",
-    startTime: "14:30",
+    startTime: "20",
     status: "Pending",
     type: "COMMON"
   },
@@ -165,47 +75,13 @@ const attendMeetingsData = [
     attendants: {},
     date: "2018-02-03",
     description: "whatever description",
-    endTime: "16:00",
+    endTime: "30",
     heading: "Meeting a",
     hostId: "2",
     location: "504",
     needSignIn: false,
     roomId: "string",
-    startTime: "16:30",
-    status: "Pending",
-    type: "COMMON"
-    }
-];
-const meetingsData = [
-  {
-    id: "7",
-    attendantNum: "5",
-    attendants: {},
-    date: "2018-02-01",
-    description: "whatever",
-    endTime: "10:00",
-    heading: "Meeting 1",
-    hostId: "1",
-    location: "501",
-    needSignIn: false,
-    roomId: "string",
-    startTime: "10:30",
-    status: "Pending",
-    type: "COMMON"
-  },
-  {
-    id: "8",
-    attendantNum: "6",
-    attendants: {},
-    date: "2018-02-02",
-    description: "whatever description",
-    endTime: "11:30",
-    heading: "Meeting 2",
-    hostId: "2",
-    location: "502",
-    needSignIn: false,
-    roomId: "string",
-    startTime: "12:30",
+    startTime: "31",
     status: "Pending",
     type: "COMMON"
     }
@@ -215,37 +91,59 @@ class MeetingPage extends React.Component {
   constructor(props){
     super(props);
     this.state = {
-      meetings: meetingsData,
+      meetings: null,
       attendMeetings: attendMeetingsData,
       historyMeetings: historyMeetingsData,
-      userId: 1,
-      rows: [
-        createData('Cupcake', 305, 3.7),
-        createData('Donut', 452, 25.0),
-        createData('Eclair', 262, 16.0),
-        createData('Frozen yoghurt', 159, 6.0),
-        createData('Gingerbread', 356, 16.0),
-        createData('Honeycomb', 408, 3.2),
-        createData('Ice cream sandwich', 237, 9.0),
-        createData('Jelly Bean', 375, 0.0),
-        createData('KitKat', 518, 26.0),
-        createData('Lollipop', 392, 0.2),
-        createData('Marshmallow', 318, 0),
-        createData('Nougat', 360, 19.0),
-        createData('Oreo', 437, 18.0),
-      ].sort((a, b) => (a.calories < b.calories ? -1 : 1)),
-      page: 0,
-      rowsPerPage: 5,
+
+      meetingsPage: 0,
+      meetingsRowsPerPage: 5,
+
+      attendMeetingsPage: 0,
+      attendMeetingsRowsPerPage: 5,
+
+      historyMeetingsPage: 0,
+      historyMeetingsRowsPerPage: 5,
     }
   }
 
-  handleChangePage = (event, page) => {
-    this.setState({ page });
+  componentDidMount(){
+    let api = meetingController.getMeetingByUserId(this.props.userId);
+    fetch(api, {
+      credentials: 'include',
+      method: 'get'
+    })
+    .then(res => res.json())
+    .then((data) => {
+      this.setState({
+        meetings: data,
+      })
+    })
+  }
+
+  handleChangeMeetingsPage = (event, page) => {
+    this.setState({ meetingsPage: page });
   };
 
-  handleChangeRowsPerPage = event => {
-    this.setState({ rowsPerPage: event.target.value });
+  handleChangeMeetingsRowsPerPage = event => {
+    this.setState({ meetingsRowsPerPage: event.target.value });
   };
+
+  handleChangeAttendMeetingsPage = (event, page) => {
+    this.setState({ attendMeetingsPage: page });
+  };
+
+  handleChangeAttendMeetingsRowsPerPage = event => {
+    this.setState({ attendMeetingsRowsPerPage: event.target.value });
+  };
+
+  handleChangeHistoryMeetingsPage = (event, page) => {
+    this.setState({ historyMeetingsPage: page });
+  };
+
+  handleChangeHistoryMeetingsRowsPerPage = event => {
+    this.setState({ historyMeetingsRowsPerPage: event.target.value });
+  };
+
 
   exitButton = (meetingId, userId, host) => {
     if (host)
@@ -308,38 +206,12 @@ class MeetingPage extends React.Component {
     return;
   }
 
-  JSONToArray = (jsonArray, type, userId) => {
-    let re = [];
-    for (let i in jsonArray){
-      let ele = jsonArray[i];
-      let temp_ele = [];
-      temp_ele.push(<Link to={"/meeting/"+ele.id+"/profile"}>{ele.heading}</Link>);
-      temp_ele.push(ele.hostId);
-      temp_ele.push(<RoomLink location={ele.location} roomId={ele.roomId}/>);
-      temp_ele.push(ele.date);
-      temp_ele.push(ele.startTime + "~" + ele.endTime);
-      if (type === "history")
-        temp_ele.push(ele.status);
-      if (type === "meeting")
-        temp_ele.push([this.checkButton(ele.id, userId, userId===ele.hostId), "\t", this.exitButton(ele.id, userId, userId===ele.hostId)]);
-      else if (type === "history")
-        temp_ele.push([this.checkButtons(ele.id, userId, userId===ele.hostId)])
-      else if (type === "attend")
-        temp_ele.push([this.checkButtons(ele.id, userId, userId===ele.hostId), "\t", this.joinButton(ele.id, userId, userId===ele.hostId)]);
-      re.push(temp_ele);
-    }
-    return re;
-  }
-
   render() {
-    let userId = this.state.userId;
-    let meetings = this.state.meetings;
-    let attendMeetings = this.state.attendMeetings;
-    let historyMeetings = this.state.historyMeetings;
+    let userId = this.props.userId;
+    let { meetings, attendMeetings, historyMeetings } = this.state;
 
     const { classes } = this.props;
-    const { rows, rowsPerPage, page } = this.state;
-    const emptyRows = rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
+    const { meetingsRowsPerPage, meetingsPage, attendMeetingsRowsPerPage, attendMeetingsPage, historyMeetingsRowsPerPage, historyMeetingsPage } = this.state;
     return (
       <div>
         <GridContainer>
@@ -355,19 +227,20 @@ class MeetingPage extends React.Component {
                   tabContent: (
                     <Paper className={classes.root}>
                       <div className={classes.tableWrapper}>
+                      {! meetings ? null : 
                         <Table className={classes.table} fixedHeader={false} style={{ width: "auto", tableLayout: "auto" }}>
                           <TableHead>
                             <TableRow>
-                              <TableCell align="left" style={{minWidth:"70px"}}>会议名称</TableCell>
-                              <TableCell align="left" style={{minWidth:"50px"}}>发起人</TableCell>
-                              <TableCell align="left" style={{minWidth:"50px"}}>会议室</TableCell>
-                              <TableCell align="left" style={{minWidth:"80px"}}>日期</TableCell>
-                              <TableCell align="left" style={{minWidth:"80px"}}>时间</TableCell>
+                              <TableCell align="left">会议名称</TableCell>
+                              <TableCell align="left">发起人</TableCell>
+                              <TableCell align="left">会议室</TableCell>
+                              <TableCell align="left">日期</TableCell>
+                              <TableCell align="left">时间</TableCell>
                               <TableCell align="left">操作</TableCell>
                             </TableRow>
                           </TableHead>
                           <TableBody>
-                            {meetings.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(ele => {
+                            { meetings.slice(meetingsPage * meetingsRowsPerPage, meetingsPage * meetingsRowsPerPage + meetingsRowsPerPage).map(ele => {
                               let host = (userId === ele.hostId);
                               let meetingId = ele.id;
                               return (
@@ -375,15 +248,14 @@ class MeetingPage extends React.Component {
                                   <TableCell align="left">
                                     <Link to={"/meeting/"+ele.id+"/profile"}>{ele.heading}</Link>
                                   </TableCell>
-                                  <TableCell align="left">{ele.hostId}</TableCell>
-                                  <TableCell align="left"><RoomLink location={ele.location}/></TableCell>
+                                  <TableCell align="left"><Link to={"/user/"+ele.hostId+"/profile"}>{ele.hostId}</Link></TableCell>
+                                  <TableCell align="left"><Link to={"/room/"+ele.id+"/profile"}>{ele.location}</Link></TableCell>
                                   <TableCell align="left">{ele.date}</TableCell>
-                                  <TableCell align="left">{ele.startTime + "~" + ele.endTime}</TableCell>
+                                  <TableCell align="left">{idToTime(ele.startTime) + "~" + idToTime(ele.endTime)}</TableCell>
                                   <TableCell align="left">
                                     <Button color="info" size="sm" onClick={ (e) => this.handleCheck(e, meetingId, userId)}>
                                       {host?"管理会议":"查看会议"}
                                     </Button>
-                                    &nbsp;
                                     {
                                       host?<Button color="danger" size="sm" onClick={ (e) => this.handleDismiss(e, meetingId, userId)}>解散会议</Button>
                                       :<Button color="danger" size="sm" onClick={ (e) => this.handleExit(e, meetingId, userId)}>退出会议</Button>
@@ -392,11 +264,16 @@ class MeetingPage extends React.Component {
                                 </TableRow>
                               )
                             })}
-                            {emptyRows > 0 && (
-                              <TableRow style={{ height: 48 * emptyRows }}>
-                                <TableCell colSpan={6} />
-                              </TableRow>
-                            )}
+                            {
+                              () => {
+                                const meetingsEmptyRows = meetingsRowsPerPage - Math.min(meetingsRowsPerPage, meetings.length - meetingsPage * meetingsRowsPerPage);
+                                return meetingsEmptyRows > 0 && (
+                                  <TableRow style={{ height: 48 * meetingsEmptyRows }}>
+                                    <TableCell colSpan={6} />
+                                  </TableRow>
+                                )
+                              }
+                            }
                           </TableBody>
                           <TableFooter>
                             <TableRow>
@@ -404,18 +281,18 @@ class MeetingPage extends React.Component {
                                 rowsPerPageOptions={[5, 10, 25]}
                                 colSpan={3}
                                 count={meetings.length}
-                                rowsPerPage={rowsPerPage}
-                                page={page}
+                                rowsPerPage={meetingsRowsPerPage}
+                                page={meetingsPage}
                                 SelectProps={{
                                   native: true,
                                 }}
-                                onChangePage={this.handleChangePage}
-                                onChangeRowsPerPage={this.handleChangeRowsPerPage}
-                                ActionsComponent={TablePaginationActionsWrapped}
+                                onChangePage={this.handleChangeMeetingsPage}
+                                onChangeRowsPerPage={this.handleChangeMeetingsRowsPerPage}
                               />
                             </TableRow>
                           </TableFooter>
                         </Table>
+                      }
                       </div>
                     </Paper>
                   )
@@ -426,19 +303,20 @@ class MeetingPage extends React.Component {
                   tabContent: (
                     <Paper className={classes.root}>
                       <div className={classes.tableWrapper}>
+                      {! attendMeetings ? null : 
                         <Table className={classes.table} fixedHeader={false} style={{ width: "auto", tableLayout: "auto" }}>
                           <TableHead>
                             <TableRow>
-                              <TableCell align="left" style={{minWidth:"70px"}}>会议名称</TableCell>
-                              <TableCell align="left" style={{minWidth:"50px"}}>发起人</TableCell>
-                              <TableCell align="left" style={{minWidth:"50px"}}>会议室</TableCell>
-                              <TableCell align="left" style={{minWidth:"80px"}}>日期</TableCell>
-                              <TableCell align="left" style={{minWidth:"80px"}}>时间</TableCell>
+                              <TableCell align="left">会议名称</TableCell>
+                              <TableCell align="left">发起人</TableCell>
+                              <TableCell align="left">会议室</TableCell>
+                              <TableCell align="left">日期</TableCell>
+                              <TableCell align="left">时间</TableCell>
                               <TableCell align="left" >操作</TableCell>
                             </TableRow>
                           </TableHead>
                           <TableBody>
-                            {attendMeetings.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(ele => {
+                            {attendMeetings.slice(attendMeetingsPage * attendMeetingsRowsPerPage, attendMeetingsPage * attendMeetingsRowsPerPage + attendMeetingsRowsPerPage).map(ele => {
                               let host = (userId === ele.hostId);
                               let meetingId = ele.id;
                               if (host)
@@ -449,14 +327,13 @@ class MeetingPage extends React.Component {
                                     <Link to={"/meeting/"+ele.id+"/profile"}>{ele.heading}</Link>
                                   </TableCell>
                                   <TableCell align="left">{ele.hostId}</TableCell>
-                                  <TableCell align="left"><RoomLink location={ele.location}/></TableCell>
+                                  <TableCell align="left"><Link to={"/room/"+ele.id+"/profile"}>{ele.location}</Link></TableCell>
                                   <TableCell align="left">{ele.date}</TableCell>
-                                  <TableCell align="left">{ele.startTime + "~" + ele.endTime}</TableCell>
+                                  <TableCell align="left">{idToTime(ele.startTime) + "~" + idToTime(ele.endTime)}</TableCell>
                                   <TableCell align="left">
                                     <Button color="info" size="sm" onClick={ (e) => this.handleCheck(e, meetingId, userId)}>
                                       查看会议
                                     </Button>
-                                    &nbsp;
                                     <Button color="success" size="sm" onClick={ (e) => this.handleJoin(e, meetingId, userId)}>
                                       加入会议
                                     </Button>
@@ -464,30 +341,36 @@ class MeetingPage extends React.Component {
                                 </TableRow>
                               )
                             })}
-                            {emptyRows > 0 && (
-                              <TableRow style={{ height: 48 * emptyRows }}>
-                                <TableCell colSpan={6} />
-                              </TableRow>
-                            )}
+                            {
+                              () => {
+                                const attendMeetingsEmptyRows = attendMeetingsRowsPerPage - Math.min(attendMeetingsRowsPerPage, attendMeetings.length - attendMeetingsPage * attendMeetingsRowsPerPage);
+                                return attendMeetingsEmptyRows > 0 && (
+                                  <TableRow style={{ height: 48 * attendMeetingsEmptyRows }}>
+                                    <TableCell colSpan={6} />
+                                  </TableRow>
+                              )
+                            }}
                           </TableBody>
                           <TableFooter>
                             <TableRow>
                               <TablePagination
+                                pname={"attendMeetingsPage"}
+                                rppname={"attendMeetingsRowsPerPage"}
                                 rowsPerPageOptions={[5, 10, 25]}
                                 colSpan={3}
                                 count={attendMeetings.length}
-                                rowsPerPage={rowsPerPage}
-                                page={page}
+                                rowsPerPage={attendMeetingsRowsPerPage}
+                                page={attendMeetingsPage}
                                 SelectProps={{
                                   native: true,
                                 }}
-                                onChangePage={this.handleChangePage}
-                                onChangeRowsPerPage={this.handleChangeRowsPerPage}
-                                ActionsComponent={TablePaginationActionsWrapped}
+                                onChangePage={this.handleChangeAttendMeetingsPage}
+                                onChangeRowsPerPage={this.handleChangeAttendMeetingsRowsPerPage}
                               />
                             </TableRow>
                           </TableFooter>
                         </Table>
+                      }
                       </div>
                     </Paper>
                   )
@@ -498,19 +381,20 @@ class MeetingPage extends React.Component {
                   tabContent: (
                     <Paper className={classes.root}>
                       <div className={classes.tableWrapper}>
+                      {! historyMeetings ? null : 
                         <Table className={classes.table} fixedHeader={false} style={{ width: "auto", tableLayout: "auto" }}>
                           <TableHead>
                             <TableRow>
-                              <TableCell align="left" style={{minWidth:"70px"}}>会议名称</TableCell>
-                              <TableCell align="left" style={{minWidth:"50px"}}>发起人</TableCell>
-                              <TableCell align="left" style={{minWidth:"50px"}}>会议室</TableCell>
-                              <TableCell align="left" style={{minWidth:"80px"}}>日期</TableCell>
-                              <TableCell align="left" style={{minWidth:"80px"}}>时间</TableCell>
+                              <TableCell align="left">会议名称</TableCell>
+                              <TableCell align="left">发起人</TableCell>
+                              <TableCell align="left">会议室</TableCell>
+                              <TableCell align="left">日期</TableCell>
+                              <TableCell align="left">时间</TableCell>
                               <TableCell align="left">操作</TableCell>
                             </TableRow>
                           </TableHead>
                           <TableBody>
-                            {historyMeetings.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(ele => {
+                            {historyMeetings.slice(historyMeetingsPage * historyMeetingsRowsPerPage, historyMeetingsPage * historyMeetingsRowsPerPage + historyMeetingsRowsPerPage).map(ele => {
                               let meetingId = ele.id;
                               return (
                                 <TableRow key={ele.id}>
@@ -518,9 +402,9 @@ class MeetingPage extends React.Component {
                                     <Link to={"/meeting/"+ele.id+"/profile"}>{ele.heading}</Link>
                                   </TableCell>
                                   <TableCell align="left">{ele.hostId}</TableCell>
-                                  <TableCell align="left"><RoomLink location={ele.location}/></TableCell>
+                                  <TableCell align="left"><Link to={"/room/"+ele.id+"/profile"}>{ele.location}</Link></TableCell>
                                   <TableCell align="left">{ele.date}</TableCell>
-                                  <TableCell align="left">{ele.startTime + "~" + ele.endTime}</TableCell>
+                                  <TableCell align="left">{idToTime(ele.startTime) + "~" + idToTime(ele.endTime)}</TableCell>
                                   <TableCell align="left">
                                     <Button color="info" size="sm" onClick={ (e) => this.handleCheck(e, meetingId, userId)}>
                                       查看会议
@@ -529,30 +413,36 @@ class MeetingPage extends React.Component {
                                 </TableRow>
                               )
                             })}
-                            {emptyRows > 0 && (
-                              <TableRow style={{ height: 48 * emptyRows }}>
-                                <TableCell colSpan={6} />
-                              </TableRow>
-                            )}
+                            {
+                              () => {
+                                const historyMeetingsEmptyRows = historyMeetingsRowsPerPage - Math.min(historyMeetingsRowsPerPage, historyMeetings.length - historyMeetingsPage * historyMeetingsRowsPerPage);
+                                return historyMeetingsEmptyRows > 0 && (
+                                  <TableRow style={{ height: 48 * historyMeetingsEmptyRows }}>
+                                    <TableCell colSpan={6} />
+                                  </TableRow>
+                              )
+                            }}
                           </TableBody>
                           <TableFooter>
                             <TableRow>
                               <TablePagination
+                                pname={"historyMeetingsPage"}
+                                rppname={"historyMeetingsRowsPerPage"}
                                 rowsPerPageOptions={[5, 10, 25]}
                                 colSpan={3}
                                 count={historyMeetings.length}
-                                rowsPerPage={rowsPerPage}
-                                page={page}
+                                rowsPerPage={historyMeetingsRowsPerPage}
+                                page={historyMeetingsPage}
                                 SelectProps={{
                                   native: true,
                                 }}
-                                onChangePage={this.handleChangePage}
-                                onChangeRowsPerPage={this.handleChangeRowsPerPage}
-                                ActionsComponent={TablePaginationActionsWrapped}
+                                onChangePage={this.handleChangeHistoryMeetingsPage}
+                                onChangeRowsPerPage={this.handleChangeHistoryMeetingsRowsPerPage}
                               />
                             </TableRow>
                           </TableFooter>
                         </Table>
+                      }
                       </div>
                     </Paper>
                   )

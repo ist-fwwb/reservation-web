@@ -5,12 +5,16 @@ import GridContainer from "components/Grid/GridContainer.jsx";
 import withStyles from "@material-ui/core/styles/withStyles";
 import meetingRoomImage from "assets/img/meetingroom.jpeg";
 
-import Update from "@material-ui/icons/Update";
 import Card from "components/Card/Card.jsx";
 import CardHeader from "components/Card/CardHeader.jsx";
 import CardIcon from "components/Card/CardIcon.jsx";
 import CardBody from "components/Card/CardBody.jsx";
 import CardFooter from "components/Card/CardFooter.jsx";
+import Snackbar from "components/Snackbar/Snackbar.jsx";
+
+import Update from "@material-ui/icons/Update";
+import ErrorOutline from "@material-ui/icons/ErrorOutline";
+import Done from "@material-ui/icons/Done";
 import Icon from "@material-ui/core/Icon";
 import dashboardStyle from "assets/jss/material-dashboard-react/layouts/dashboardStyle.jsx";
 import airConditionerIcon from "assets/icon/airConditioner.svg";
@@ -41,6 +45,10 @@ function roomCategory(eng){
 
 class RoomProfile extends React.Component {
   state = {
+    br: false,
+    notificationMessage: "null",
+    notificationType: null,
+
     airConditioned: false,
     blackBoard: false,
     desk: false,
@@ -59,11 +67,47 @@ class RoomProfile extends React.Component {
     })
     .then(res => res.json())
     .then((data) => {
-      this.setState({room: data})
+      this.setState({room: data});
+    })
+    .catch(error => {
+      console.log(error);
+      this.setState({error: true});
     })
   }
 
+  showNotification = (place) => {
+    let x = [];
+    x[place] = true;
+    this.setState({[place]: true});
+    this.alertTimeout = setTimeout(
+      function() {
+        x[place] = false;
+        this.setState(x);
+      }.bind(this),
+      6000
+    );
+  }
+
+  typeToIcon = (type) => {
+    if (type === "success")
+      return Done;
+    if (type === "danger")
+      return ErrorOutline;
+    return null;
+  }
+
+  warning = (msg) => {
+    this.setState({
+      notificationType: "danger",
+      notificationMessage: msg
+    })
+    this.showNotification("br");
+  }
+
   render(){
+    if (this.state.error){
+      return <h2>404 Not Found</h2>
+    }
     const { classes } = this.props;
     //const roomId = this.props.match.params.roomId
     const room = this.state.room;
@@ -226,6 +270,15 @@ class RoomProfile extends React.Component {
             </Card>
           </GridItem>
         </GridContainer>
+        <Snackbar
+          place="br"
+          color={this.state.notificationType}
+          icon={this.typeToIcon(this.state.notificationType)}
+          message={this.state.notificationMessage}
+          open={this.state.br}
+          closeNotification={() => this.setState({ br: false })}
+          close
+        />
       </div>
     )
   }
