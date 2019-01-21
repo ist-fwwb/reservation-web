@@ -50,9 +50,9 @@ const CustomTableCell = withStyles(theme => ({
 
 function dataToRows(data){
   let re = [];
-  if (data.length)
   for (let i in data){
     let ele = data[i];
+    let nameMap = ele.meetingNames;
     let day = (new Date(ele.date).getDay());
     if (day === 6 || day === 0)
       continue;
@@ -69,6 +69,7 @@ function dataToRows(data){
       else {
         re[j][day-1]["occupied"] = true;
         re[j][day-1]["meetingid"] = timeSlice[j];
+        re[j][day-1]["name"] = nameMap[timeSlice[j]];
       }
       re[j][day-1]["date"] = ele.date;
       re[j][day-1]["click"] = false;
@@ -346,7 +347,7 @@ class RoomSchedule extends React.Component{
       }
       else {
         this.success(reservationSuccessMessage);
-        //window.location.href = "/meeting";
+        window.location.reload();
       }
     })
   }
@@ -467,7 +468,7 @@ class RoomSchedule extends React.Component{
                                     cell["occupied"]?
                                       <div style={{background:bgcolor ,borderRadius:"15px", lineHeight:"45px" ,height:"45px", width:"92%", textAlign:"center"}}>
                                         <Link to={"/meeting/"+cell["meetingid"]+"/profile"}>
-                                                  {cell["meetingid"].substring(0,5)+"..\n"}
+                                                  {!cell["name"] ? "null" : (cell["name"].length > 5 ? cell["name"].substring(0,5)+".." : cell["name"])}
                                         </Link>
                                       </div>
                                       :
