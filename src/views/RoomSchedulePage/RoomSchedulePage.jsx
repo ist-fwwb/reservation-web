@@ -106,7 +106,7 @@ class RoomSchedulePage extends React.Component{
       "hostId": this.props.userId,
       "location": null,
       "needSignIn": false,
-      "roomId": this.props.roomId,
+      "roomId": this.props.match.params.roomId,
       "startTime": start,
       "type": "COMMON"
     }
@@ -134,7 +134,7 @@ class RoomSchedulePage extends React.Component{
       }
     })
     .catch(error => {
-      console.log(error);
+      this.warning(error);
     })
   }
 
@@ -164,7 +164,6 @@ class RoomSchedulePage extends React.Component{
     else if (firstChosen && !secondChosen){
       timeChosen = this.state.chosenDate + " " + idToTime(firstChosen[0]) + " ~ " + idToTime(firstChosen[0]+1);
     }
-    console.log(this.handleChange)
     return(
       <div>
         <GridContainer>
