@@ -34,66 +34,15 @@ const styles = theme => ({
   },
 });
 
-
-const historyMeetingsData = [{
-  id: "0",
-  attendantNum: "7",
-  attendants: {},
-  date: "2018-01-10",
-  description: "whatever",
-  endTime: "20",
-  heading: "Meeting 1",
-  hostId: "0",
-  location: "508",
-  needSignIn: false,
-  roomId: "string",
-  startTime: "21",
-  status: "Cancelled",
-  type: "COMMON"
-  },
-];
-const attendMeetingsData = [
-  {
-    id: "4",
-    attendantNum: "4",
-    attendants: {},
-    date: "2018-02-01",
-    description: "whatever",
-    endTime: "19",
-    heading: "Meeting b",
-    hostId: "1",
-    location: "501",
-    needSignIn: false,
-    roomId: "string",
-    startTime: "20",
-    status: "Pending",
-    type: "COMMON"
-  },
-  {
-    id: "6",
-    attendantNum: "3",
-    attendants: {},
-    date: "2018-02-03",
-    description: "whatever description",
-    endTime: "30",
-    heading: "Meeting a",
-    hostId: "2",
-    location: "504",
-    needSignIn: false,
-    roomId: "string",
-    startTime: "31",
-    status: "Pending",
-    type: "COMMON"
-    }
-];
-
 class MeetingPage extends React.Component {
   constructor(props){
     super(props);
     this.state = {
       meetings: null,
-      attendMeetings: attendMeetingsData,
-      historyMeetings: historyMeetingsData,
+      attendMeetings: null,
+      historyCancelledMeetings: null,
+      historyStoppedMeetings: null,
+
 
       meetingsPage: 0,
       meetingsRowsPerPage: 5,
@@ -107,7 +56,7 @@ class MeetingPage extends React.Component {
   }
 
   componentDidMount(){
-    let api = meetingController.getMeetingByUserId(this.props.userId);
+    let api = meetingController.getMeetingByUserIdAndStatus(this.props.userId, "Pending");
     fetch(api, {
       credentials: 'include',
       method: 'get'
@@ -118,6 +67,46 @@ class MeetingPage extends React.Component {
         meetings: data,
       })
     })
+    .catch(e => console.log(e))
+
+    let api2 = meetingController.getMeetingByDateAndRoomIdAndStatus(null, null, "Pending");
+    fetch(api2, {
+      credentials: 'include',
+      method: 'get'
+    })
+    .then(res => res.json())
+    .then((data) => {
+      this.setState({
+        attendMeetings: data
+      })
+    })
+    .catch(e => console.log(e))
+
+    let api3 = meetingController.getMeetingByUserIdAndStatus(this.props.userId, "Cancelled");
+    fetch(api3, {
+      credentials: 'include',
+      method: 'get'
+    })
+    .then(res => res.json())
+    .then((data) => {
+      this.setState({
+        historyCancelledMeetings: data
+      })
+    })
+    .catch(e => console.log(e))
+
+    let api4 = meetingController.getMeetingByUserIdAndStatus(this.props.userId, "Stopped");
+    fetch(api4, {
+      credentials: 'include',
+      method: 'get'
+    })
+    .then(res => res.json())
+    .then((data) => {
+      this.setState({
+        historyStoppedMeetings: data
+      })
+    })
+    .catch(e => console.log(e))
   }
 
   handleChangeMeetingsPage = (event, page) => {
@@ -152,14 +141,8 @@ class MeetingPage extends React.Component {
       return <Button color="danger" size="sm" onClick={ (e) => this.handleExit(e, meetingId, userId)}>退出会议 {meetingId}</Button>;
   } 
   
-  checkButton = (meetingId, userId, host) => {
-    return <Button color="success" size="sm" onClick={ (e) => this.handleCheck(e, meetingId, userId)}>
-            {host ? ("管理会议 " + meetingId) : ("查看会议" + meetingId)}
-          </Button>;
-  }
-  
   joinButton = (meetingId, userId, host) => {
-    return <Button color="success" size="sm">加入会议 {meetingId}</Button>
+    return <Button color="success" size="sm">加入会议</Button>
   }
   
   handleCheck = (e, meetingId, userId) => {
@@ -208,8 +191,13 @@ class MeetingPage extends React.Component {
 
   render() {
     let userId = this.props.userId;
-    let { meetings, attendMeetings, historyMeetings } = this.state;
-
+    let { meetings, attendMeetings, historyCancelledMeetings, historyStoppedMeetings } = this.state;
+    let historyLoaded = false;
+    let historyMeetings = historyCancelledMeetings; 
+    if ( historyCancelledMeetings && historyStoppedMeetings){
+      historyLoaded = true;
+      historyMeetings = historyMeetings.concat(historyStoppedMeetings);
+    }
     const { classes } = this.props;
     const { meetingsRowsPerPage, meetingsPage, attendMeetingsRowsPerPage, attendMeetingsPage, historyMeetingsRowsPerPage, historyMeetingsPage } = this.state;
     return (
@@ -243,10 +231,12 @@ class MeetingPage extends React.Component {
                             { meetings.slice(meetingsPage * meetingsRowsPerPage, meetingsPage * meetingsRowsPerPage + meetingsRowsPerPage).map(ele => {
                               let host = (userId === ele.hostId);
                               let meetingId = ele.id;
+                              if (!(ele.status === "Pending" || ele.status === "Running"))
+                                return null;
                               return (
                                 <TableRow key={ele.id}>
                                   <TableCell align="left">
-                                    <Link to={"/meeting/"+ele.id+"/profile"}>{ele.heading}</Link>
+                                    <Link to={"/meeting/"+ele.id+"/profile"}>{ele.heading?ele.heading: "null"}</Link>
                                   </TableCell>
                                   <TableCell align="left"><Link to={"/user/"+ele.hostId+"/profile"}>{ele.hostId}</Link></TableCell>
                                   <TableCell align="left"><Link to={"/room/"+ele.id+"/profile"}>{ele.location}</Link></TableCell>
@@ -321,19 +311,18 @@ class MeetingPage extends React.Component {
                               let meetingId = ele.id;
                               if (host)
                                 return null;
+                              if (ele.status !== "Pending" )
+                                return null;
                               return (
                                 <TableRow key={ele.id}>
                                   <TableCell align="left">
-                                    <Link to={"/meeting/"+ele.id+"/profile"}>{ele.heading}</Link>
+                                    <Link to={"/meeting/"+ele.id+"/profile"}>{ele.heading?ele.heading: "null"}</Link>
                                   </TableCell>
-                                  <TableCell align="left">{ele.hostId}</TableCell>
+                                  <TableCell align="left"><Link to={"/user/"+ele.hostId+"/profile"}>{ele.hostId}</Link></TableCell>
                                   <TableCell align="left"><Link to={"/room/"+ele.id+"/profile"}>{ele.location}</Link></TableCell>
                                   <TableCell align="left">{ele.date}</TableCell>
                                   <TableCell align="left">{idToTime(ele.startTime) + "~" + idToTime(ele.endTime)}</TableCell>
                                   <TableCell align="left">
-                                    <Button color="info" size="sm" onClick={ (e) => this.handleCheck(e, meetingId, userId)}>
-                                      查看会议
-                                    </Button>
                                     <Button color="success" size="sm" onClick={ (e) => this.handleJoin(e, meetingId, userId)}>
                                       加入会议
                                     </Button>
@@ -381,7 +370,7 @@ class MeetingPage extends React.Component {
                   tabContent: (
                     <Paper className={classes.root}>
                       <div className={classes.tableWrapper}>
-                      {! historyMeetings ? null : 
+                      {! historyLoaded ? null : 
                         <Table className={classes.table} fixedHeader={false} style={{ width: "auto", tableLayout: "auto" }}>
                           <TableHead>
                             <TableRow>
@@ -390,26 +379,19 @@ class MeetingPage extends React.Component {
                               <TableCell align="left">会议室</TableCell>
                               <TableCell align="left">日期</TableCell>
                               <TableCell align="left">时间</TableCell>
-                              <TableCell align="left">操作</TableCell>
                             </TableRow>
                           </TableHead>
                           <TableBody>
                             {historyMeetings.slice(historyMeetingsPage * historyMeetingsRowsPerPage, historyMeetingsPage * historyMeetingsRowsPerPage + historyMeetingsRowsPerPage).map(ele => {
-                              let meetingId = ele.id;
                               return (
                                 <TableRow key={ele.id}>
                                   <TableCell align="left">
-                                    <Link to={"/meeting/"+ele.id+"/profile"}>{ele.heading}</Link>
+                                    <Link to={"/meeting/"+ele.id+"/profile"}>{ele.heading ? ele.heading: "null"}</Link>
                                   </TableCell>
-                                  <TableCell align="left">{ele.hostId}</TableCell>
+                                  <TableCell align="left"><Link to={"/user/"+ele.hostId+"/profile"}>{ele.hostId}</Link></TableCell>
                                   <TableCell align="left"><Link to={"/room/"+ele.id+"/profile"}>{ele.location}</Link></TableCell>
                                   <TableCell align="left">{ele.date}</TableCell>
                                   <TableCell align="left">{idToTime(ele.startTime) + "~" + idToTime(ele.endTime)}</TableCell>
-                                  <TableCell align="left">
-                                    <Button color="info" size="sm" onClick={ (e) => this.handleCheck(e, meetingId, userId)}>
-                                      查看会议
-                                    </Button>
-                                  </TableCell>
                                 </TableRow>
                               )
                             })}

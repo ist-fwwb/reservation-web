@@ -15,7 +15,9 @@ import Snackbar from "components/Snackbar/Snackbar.jsx";
 import Update from "@material-ui/icons/Update";
 import ErrorOutline from "@material-ui/icons/ErrorOutline";
 import Done from "@material-ui/icons/Done";
+
 import Icon from "@material-ui/core/Icon";
+
 import dashboardStyle from "assets/jss/material-dashboard-react/layouts/dashboardStyle.jsx";
 import airConditionerIcon from "assets/icon/airConditioner.svg";
 import airConditionerIcon0 from "assets/icon/airConditioner0.svg";
@@ -34,6 +36,8 @@ import wireNetworkIcon0 from "assets/icon/wireNetwork0.svg";
 import tvIcon from "assets/icon/tv.svg";
 import tvIcon0 from "assets/icon/tv0.svg";
 import { roomController } from "variables/general.jsx";
+
+import { Link } from "react-router-dom";
 
 function roomCategory(eng){
   if (eng === "SMALL")
@@ -139,8 +143,15 @@ class RoomProfile extends React.Component {
               <CardBody>
                 {
                   room ? <div>
-                    <h3>{room.location}</h3>
-                    <small>{roomCategory(room.size)}</small>
+                    <div>
+                      <h3>{room.location}</h3>
+                      <small>{roomCategory(room.size)}</small>
+                    </div>
+                    <div>
+                      <Link to={"/room/"+this.props.match.params.roomId+"/"+room.location+"/schedule"}>
+                        会议日程
+                      </Link>
+                    </div>
                     </div>
                     : <h3>{this.props.match.params.roomId}</h3>
                 }
