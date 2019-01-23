@@ -11,9 +11,6 @@ import MenuItem from '@material-ui/core/MenuItem';
 import TextField from '@material-ui/core/TextField';
 import ErrorOutline from "@material-ui/icons/ErrorOutline";
 import Done from "@material-ui/icons/Done";
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemText from '@material-ui/core/ListItemText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
@@ -22,6 +19,9 @@ import Slide from '@material-ui/core/Slide';
 import blue from '@material-ui/core/colors/blue';
 import Button from "@material-ui/core/Button";
 import Checkbox from '@material-ui/core/Checkbox';
+import FormControl from '@material-ui/core/FormControl';
+import FormGroup from '@material-ui/core/FormGroup';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
 
 import Stars from '@material-ui/icons/Stars';
 import Add from '@material-ui/icons/Add';
@@ -34,12 +34,16 @@ import dashboardStyle from "assets/jss/material-dashboard-react/layouts/dashboar
 import Snackbar from "components/Snackbar/Snackbar.jsx";
 import RoomSchedule from "components/RoomSchedule/RoomSchedule.jsx";
 
-import { meetingController, idToTime, userController } from "variables/general.jsx";
+import { ScheduleDataToRows, timeSliceController, meetingController, idToTime, userController, quickSort } from "variables/general.jsx";
 
 const styles = {
   avatar: {
     backgroundColor: blue[100],
     color: blue[600],
+  },
+  root: {
+    width: '100%',
+    maxWidth: 360,
   },
 };
 
@@ -53,16 +57,8 @@ class AttendantsDialog extends React.Component {
       users: []
     };
   }
-  
-  handleSuccess = () => {
-    this.props.onSuccess(this.state.checked);
-  };
 
-  handleListItemClick = value => {
-    this.props.onClose(value);
-  };
-
-  handleToggle = value => () => {
+  handleChange = value => () => {
     const { checked } = this.state;
     const currentIndex = checked.indexOf(value);
     const newChecked = [...checked];
@@ -78,14 +74,9 @@ class AttendantsDialog extends React.Component {
     });
   };
 
-  handleSubmit = (e) => {
+  handleSubmitAddAttendants = (e) => {
     e.preventDefault();
-
-    this.handleSuccess();
-  }
-
-  handleSuccess = () => {
-    this.props.handlesuccess(this.state.checked);
+    this.props.handleSuccess(this.state.checked);
     this.setState({ checked: [] });
   }
 
@@ -95,22 +86,30 @@ class AttendantsDialog extends React.Component {
     return (
       <Dialog onClose={this.props.onClose} scroll={"paper"} aria-labelledby="simple-dialog-title" open={open} {...other}>
         <DialogTitle id="simple-dialog-title">邀请用户加入会议</DialogTitle>
-        <div>
-          <List className={classes.root}>
+        <DialogContent>
+          <FormControl component="fieldset" className={classes.formControl}>
+          <FormGroup>
             {addattendants.map(value => (
-              <ListItem key={value.id} role={undefined} dense button onClick={this.handleToggle(value)}>
+              <FormControlLabel
+              key={value.id}
+              control={
                 <Checkbox
                   checked={this.state.checked.indexOf(value) !== -1}
                   tabIndex={-1}
                   disableRipple
+                  onChange={this.handleChange(value)}
                 />
-                <ListItemText primary={value.name} />
-              </ListItem>
+              }
+              label={value.name}
+              />
             ))}
-          </List>
-          <Button variant="outlined" onClick={(e)=>this.handleSubmit(e)}>确认</Button>
-          <Button variant="outlined" color="secondary" onClick={this.props.onClose}>取消</Button>
-        </div>
+          </FormGroup>
+        </FormControl>
+        </DialogContent>
+        <DialogActions> 
+          <Button color="primary" onClick={this.props.onClose}>取消</Button>
+          <Button color="primary" onClick={(e)=>this.handleSubmitAddAttendants(e)}>确认</Button>
+        </DialogActions>
       </Dialog>
     );
   }
@@ -131,8 +130,16 @@ function Transition(props) {
 class MeetingProfile extends React.Component {
   constructor(props){
     super(props);
+    this.roomSchedule = React.createRef();
     this.state = {
+      // edit schedule
+      lastDate: "",
+      lastStartTime: -1,
+      lastEndTime: -1,
+
       loaded: false,
+
+      scheduleData: null,
 
       // warning / success message
       br: false,
@@ -143,10 +150,12 @@ class MeetingProfile extends React.Component {
       confirmExitOpen: false,
       // confirm attend dialog
       confirmAttendOpen: false,
-      // confirm dissmiss dialog
+      // confirm dismiss dialog
       confirmDismissOpen: false,
-      // confirm timechange dialog
+      // confirm time change dialog
       confirmTimeChangeOpen: false,
+      // confirm profile hange dialog
+      confirmProfileChangeOpen: false,
 
       // addAttendants menu
       open: false,
@@ -167,6 +176,9 @@ class MeetingProfile extends React.Component {
         this.warning(data1.error);
       }
       else{
+        this.setState({...data1})
+
+        // get all user could be invited to this meeting
         let userApi = userController.getUser();
         let attendantsArray = this.dicToArray(data1.attendants);
         fetch(userApi, {
@@ -186,13 +198,13 @@ class MeetingProfile extends React.Component {
           }
           delete data1.attendants;
           this.setState({
-            ...data1,
             host: data1.hostId === this.props.userId,
             addAttendants: re,
             loaded1: true,
           });
         })
 
+        // get all users' name
         let userApi2 = userController.getUserByIds(attendantsArray);
         fetch(userApi2,{
           credentials: 'include',
@@ -200,10 +212,34 @@ class MeetingProfile extends React.Component {
         })
         .then(res => res.json())
         .then((data2) => {
+          for (let i in data2){
+            if (data2[i] === null)
+              data2[i] = {id: attendantsArray[i], name: "null"}
+          }
           this.setState({
             attendantsWithName: data2,
             loaded2: true
           })
+        })
+
+        // get room timeslice
+        let timeApi = timeSliceController.getTimeSilceByRoomId(data1.roomId);
+        fetch(timeApi, {
+          credentials: 'include',
+          method: 'get',
+        })
+        .then(res => res.json())
+        .then((data2) => {
+          if (data2.error){
+            let state = {
+              notificationType: "danger",
+              notificationMessage: data2.error
+            };
+            this.setState(state);
+          }
+          else{
+            this.setState({scheduleData: data2})
+          }
         })
       }
     })
@@ -384,7 +420,7 @@ class MeetingProfile extends React.Component {
     })
   }
 
-  // confirm attend dialog
+  // confirm time change dialog
   confirmTimeChangeClickOpen = () => {
     this.setState({ confirmTimeChangeOpen: true });
   };
@@ -393,8 +429,91 @@ class MeetingProfile extends React.Component {
     this.setState({ confirmTimeChangeOpen: false });
   };
 
-  handleTimeChange = (startTime, endTime) => {
-    this.setState({ startTime, endTime });
+  handleTimeChange = (state) => {
+    this.setState(state);
+    if (state.notificationType)
+      this.showNotification("br");
+  }
+
+  ConfirmTimeChange = () => {
+    let { date, startTime, endTime } = this.state;
+    this.roomSchedule.current.clearOriginalBetween(date, startTime, endTime);
+    let { firstChosen, secondChosen } = this.state;
+    let newStartTime;
+    let newEndTime;
+    if (firstChosen && secondChosen){
+      if (firstChosen[0] > secondChosen[0]){
+        newStartTime = secondChosen[0];
+        newEndTime = firstChosen[0]+1;
+      }
+      else{
+        newEndTime = secondChosen[0]+1;
+        newStartTime = firstChosen[0];
+      }
+    }
+    else if (firstChosen && !secondChosen){
+      newStartTime = firstChosen[0];
+      newEndTime = startTime + 1;
+    }
+
+    this.setState({
+      lastStartTime: this.state.startTime,
+      lastEndTime: this.state.lastEndTime,
+      lastDate: this.state.date,
+      startTime: newStartTime, 
+      endTime: newEndTime, 
+      date: this.state.chosenDate
+    });
+    this.confirmTimeChangeClose();
+  }
+
+  // confirm profile change dialog
+  confirmProfileChangeClickOpen = () => {
+    this.setState({ confirmProfileChangeOpen: true });
+  };
+
+  confirmProfileChangeClose = () => {
+    this.setState({ confirmProfileChangeOpen: false });
+  };
+
+  handleSubmit = (e) => {
+    e.preventDefault();
+    let msg = {};
+    msg.attendantNum = this.state.attendantNum;
+    msg.attendants = this.state.attendants;
+    msg.date = this.state.date;
+    msg.description = this.state.description;
+    msg.endTime = this.state.endTime;
+    msg.startTime = this.state.startTime;
+    msg.heading = this.state.heading;
+    msg.hostId = this.state.hostId;
+    msg.id = this.props.match.params.meetingId;
+    msg.location = this.state.location;
+    msg.needSignIn = this.state.needSignIn;
+    msg.roomId = this.state.roomId;
+    msg.status = this.state.status;
+    msg.type = this.state.type;
+
+    let api = meetingController.editMeetingByMeetingId(this.props.match.params.meetingId);
+    msg = JSON.stringify(msg);
+    fetch(api, {
+      credentials: 'include',
+      method:'put',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: msg,
+    })
+    .then(res => res.json())
+    .then((data) => {
+      if (data.error)
+        this.warning(data.error);
+      else{
+        this.success(editSuccessMessage);
+        window.location.reload();
+      }
+    })
   }
 
   // add attendants
@@ -409,7 +528,7 @@ class MeetingProfile extends React.Component {
   }
 
   handleSuccess = (value) => {
-    let { addAttendants, attendantsWithName }= this.state;
+    let { addAttendants, attendantsWithName } = this.state;
     for (let i in value){
       for (let j in addAttendants){
         if (addAttendants[j].id === value[i].id){
@@ -419,44 +538,56 @@ class MeetingProfile extends React.Component {
       }
     }
     attendantsWithName = attendantsWithName.concat(value);
-    this.setState({ attendantsWithName, addAttendants });
+    let attendants = {};
+    for (let i in attendantsWithName){
+      attendants[attendantsWithName[i].id] = "null";
+    }
+    this.setState({ attendantsWithName, addAttendants, attendants });
     this.handleClose();
   };
 
-  handleTimeChange = (state) => {
-    this.setState(state);
-    if (state.notificationType)
-      this.showNotification("br");
+  handleDelete = (e, id) => {
+    e.preventDefault();
+    let {addAttendants, attendantsWithName} = this.state;
+    for (let i in attendantsWithName){
+      if (attendantsWithName[i].id === id){
+        addAttendants.push({id: attendantsWithName[i].id, name: attendantsWithName[i].name});
+        attendantsWithName.splice(i, 1);
+      }
+    }
+    let attendants = {};
+    for (let i in attendantsWithName){
+      attendants[attendantsWithName[i].id] = "null";
+    }
+    //console.log(addAttendants);
+    //addAttendants = quickSort(addAttendants, "name");
+    //console.log(addAttendants);
+    this.setState({ attendantsWithName, addAttendants, attendants });
   }
 
-  ConfirmTimeChange = () => {
-    let { firstChosen, secondChosen } = this.state;
-    let startTime;
-    let endTime;
-    if (firstChosen && secondChosen){
-      if (firstChosen[0] > secondChosen[0]){
-        startTime = secondChosen[0];
-        endTime = firstChosen[0]+1;
-      }
-      else{
-        endTime = secondChosen[0]+1;
-        startTime = firstChosen[0];
-      }
-    }
-    else if (firstChosen && !secondChosen){
-      startTime = firstChosen[0];
-      endTime = startTime + 1;
-    }
-    this.setState({startTime, endTime, date: this.state.chosenDate});
-    this.confirmTimeChangeClose();
-  }
+  
 
   render(){
     if (this.state.error){
       return <h2>404 Not Found</h2>
     }
     const { classes } = this.props;
-    const { addAttendants, loaded1, loaded2, attendantsWithName, host, location, startTime, endTime, type, status, hostId, date, description, heading }= this.state;
+    const { 
+      addAttendants, 
+      loaded1, 
+      loaded2, 
+      attendantsWithName, 
+      host, 
+      location, 
+      startTime, 
+      endTime, 
+      type, 
+      status, 
+      hostId, 
+      date, 
+      description, 
+      heading 
+    }= this.state;
     const pending = (status === "Pending");
     const disabled = !host || !pending;
     const loaded = loaded1 && loaded2;
@@ -533,7 +664,7 @@ class MeetingProfile extends React.Component {
                       <MenuItem key={"COMMON"} value={"COMMON"}>
                         普通
                       </MenuItem>
-                      <MenuItem key={"URGENT"} value={"URGENT"}>
+                      <MenuItem key={"URGENCY"} value={"URGENCY"}>
                         紧急
                       </MenuItem>
                     </TextField>
@@ -586,15 +717,27 @@ class MeetingProfile extends React.Component {
                             if (!data)
                               return null;
                             let hostIcon = <Stars/>
-                            return (
+                            let host = data.id===this.state.hostId;
+                            if (host)
+                              return (
                                 <Chip
-                                  key={key}
-                                  icon={data.id===this.state.hostId ? hostIcon:null}
-                                  label={data.name}
-                                  className={classes.chip}
-                                />
-                            );
-                          })}
+                                    key={key}
+                                    icon={ hostIcon }
+                                    label={data.name}
+                                    className={classes.chip}
+                                  />
+                              )
+                            else
+                              return (
+                                  <Chip
+                                    key={key}
+                                    label={data.name}
+                                    className={classes.chip}
+                                    onDelete={(e) => this.handleDelete(e, data.id)}
+                                  />
+                              );
+                          })
+                          }
                           {
                             disabled?null:
                               <IconButton color="primary" className={classes.button} component="span" onClick={this.handleOpen}>
@@ -604,9 +747,10 @@ class MeetingProfile extends React.Component {
                           {
                             disabled?null:
                               <AttendantsDialogWrapped
+                                key
                                 addattendants={addAttendants}
                                 open={this.state.open}
-                                handlesuccess={this.handleSuccess}
+                                handleSuccess={this.handleSuccess}
                                 onClose={this.handleClose}
                               />
                           }
@@ -639,59 +783,95 @@ class MeetingProfile extends React.Component {
                     <CardFooter>
                       <GridContainer>
                         <GridItem xs={12} sm={12} md={4}>
-                          <Button variant="outlined" color="primary" onClick={this.confirmTimeChangeClickOpen}>修改时间</Button>
+                          <Button 
+                            variant="outlined" 
+                            color="primary" 
+                            onClick={this.confirmTimeChangeClickOpen}
+                          >修改时间</Button>
+                          {
+                            ! this.state.scheduleData ? null:
+                            <Dialog
+                              fullScreen
+                              open={this.state.confirmTimeChangeOpen}
+                              TransitionComponent={Transition}
+                              keepMounted
+                              onClose={this.confirmTimeChangeClose}
+                              aria-labelledby="alert-dialog-slide-title"
+                              aria-describedby="alert-dialog-slide-description"
+                            >
+                              <DialogTitle id="alert-dialog-slide-title">
+                                {"修改时间"}
+                              </DialogTitle>
+                              <DialogContent>
+                                <RoomSchedule 
+                                  ref={this.roomSchedule}
+                                  data={ScheduleDataToRows(this.state.scheduleData)} 
+                                  originalDate={this.state.date} 
+                                  originalStartTime={this.state.startTime} 
+                                  originalEndTime={this.state.endTime} 
+                                  roomId={this.state.roomId} 
+                                  handleChange={this.handleTimeChange} 
+                                  urgency={this.state.status==="URGENCY"}
+                                />
+                              </DialogContent>
+                              <DialogActions>
+                              <Button onClick={this.confirmTimeChangeClose} color="primary">
+                                取消
+                              </Button>
+                              <Button onClick={this.ConfirmTimeChange} color="secondary">
+                                确定
+                              </Button>
+                            </DialogActions>
+                            </Dialog>
+                          }
+                        </GridItem>
+                        <GridItem xs={12} sm={12} md={4}>
+                          <Button variant="outlined" onClick={this.confirmProfileChangeClickOpen}>确认修改</Button>
                           <Dialog
-                            fullScreen
-                            open={this.state.confirmTimeChangeOpen}
+                            open={this.state.confirmProfileChangeOpen}
                             TransitionComponent={Transition}
                             keepMounted
-                            onClose={this.confirmTimeChangeClose}
+                            onClose={this.confirmProfileChangeClose}
                             aria-labelledby="alert-dialog-slide-title"
                             aria-describedby="alert-dialog-slide-description"
                           >
                             <DialogTitle id="alert-dialog-slide-title">
-                              {"修改时间"}
+                              {"确认修改会议?"}
                             </DialogTitle>
-                            <DialogContent>
-                              <RoomSchedule roomId={this.state.roomId} handleChange={this.handleTimeChange}/>
-                            </DialogContent>
                             <DialogActions>
-                            <Button onClick={this.confirmTimeChangeClose} color="primary">
-                              取消
-                            </Button>
-                            <Button onClick={this.ConfirmTimeChange} color="secondary">
-                              确定
-                            </Button>
-                          </DialogActions>
+                              <Button onClick={this.confirmProfileChangeClose} color="primary">
+                                取消
+                              </Button>
+                              <Button onClick={this.handleSubmit} color="primary">
+                                确定
+                              </Button>
+                            </DialogActions>
                           </Dialog>
                         </GridItem>
                         <GridItem xs={12} sm={12} md={4}>
-                          <Button variant="outlined" onClick={this.confirmSubmitClickOpen}>确认修改</Button>
-                        </GridItem>
-                        <GridItem xs={12} sm={12} md={4}>
                           <Button variant="outlined" onClick={this.confirmDismissClickOpen} color="secondary">解散会议</Button>
+                          <Dialog
+                            open={this.state.confirmDismissOpen}
+                            TransitionComponent={Transition}
+                            keepMounted
+                            onClose={this.confirmDismissClose}
+                            aria-labelledby="alert-dialog-slide-title"
+                            aria-describedby="alert-dialog-slide-description"
+                          >
+                            <DialogTitle id="alert-dialog-slide-title">
+                              {"确认解散会议?"}
+                            </DialogTitle>
+                            <DialogActions>
+                              <Button onClick={this.confirmDismissClose} color="primary">
+                                取消
+                              </Button>
+                              <Button onClick={this.handleDismiss} color="secondary">
+                                解散
+                              </Button>
+                            </DialogActions>
+                          </Dialog>
                         </GridItem>
                       </GridContainer>
-                      <Dialog
-                        open={this.state.confirmDismissOpen}
-                        TransitionComponent={Transition}
-                        keepMounted
-                        onClose={this.confirmDismissClose}
-                        aria-labelledby="alert-dialog-slide-title"
-                        aria-describedby="alert-dialog-slide-description"
-                      >
-                        <DialogTitle id="alert-dialog-slide-title">
-                          {"确认解散会议?"}
-                        </DialogTitle>
-                        <DialogActions>
-                          <Button onClick={this.confirmDismissClose} color="primary">
-                            取消
-                          </Button>
-                          <Button onClick={this.handleDismiss} color="secondary">
-                            解散
-                          </Button>
-                        </DialogActions>
-                      </Dialog>
                     </CardFooter>
                   : ( inMeeting ? 
                     <CardFooter>

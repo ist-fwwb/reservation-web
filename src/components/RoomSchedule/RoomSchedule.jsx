@@ -17,7 +17,7 @@ import teal from '@material-ui/core/colors/teal';
 import green from '@material-ui/core/colors/green';
 
 import { Link } from "react-router-dom";
-import { timeSliceController, idToTime } from "variables/general.jsx";
+import { idToTime } from "variables/general.jsx";
 
 const occupiedMessage = "会议室被占用";
 
@@ -34,67 +34,16 @@ const CustomTableCell = withStyles(theme => ({
   },
 }))(TableCell);
 
-function dataToRows(data){
-  let re = [];
-  for (let i in data){
-    let ele = data[i];
-    let nameMap = ele.meetingNames;
-    let day = (new Date(ele.date).getDay());
-    if (day === 6 || day === 0)
-      continue;
-    let timeSlice = ele.timeSlice;
-    for (let j in timeSlice){
-      if (!re[j])
-        re[j] = [0,0,0,0,0];
-      if (!re[j][day-1])
-        re[j][day-1] = {};
-      if (timeSlice[j]===null){
-        re[j][day-1]["occupied"] = false;
-        re[j][day-1]["meetingid"] = null;
-      }
-      else {
-        re[j][day-1]["occupied"] = true;
-        re[j][day-1]["meetingid"] = timeSlice[j];
-        re[j][day-1]["name"] = nameMap[timeSlice[j]];
-      }
-      re[j][day-1]["date"] = ele.date;
-      re[j][day-1]["click"] = false;
-      re[j][day-1]["between"] = false;
-    }
-  }
-  return re;
-}
-
 class RoomSchedule extends React.Component{
   constructor(props) {
     super(props);
     this.state = {
-      scheduleData: null,
+      scheduleData: this.props.data,
 
       chosenDate: null,
       firstChosen: null,
       secondChosen: null,
     };
-  }
-  
-  componentDidMount() {
-    fetch(timeSliceController.getTimeSilceByRoomId(this.props.roomId), {
-      credentials: 'include',
-      method: 'get',
-    })
-    .then(res => res.json())
-    .then((data) => {
-      if (data.error){
-        let state = {
-          notificationType: "danger",
-          notificationMessage: data.error
-        };
-        this.props.handleChange(state);
-      }
-      else{
-        this.setState({scheduleData: dataToRows(data)})
-      }
-    })
   }
 
   clearBetween = (firstChosen, secondChosen, scheduleData) => {
@@ -132,13 +81,13 @@ class RoomSchedule extends React.Component{
       if (currentCell["click"] || currentCell["between"]){
         scheduleData = this.clearBetween(firstChosen, secondChosen, scheduleData);
         let state = {
-          scheduleData: scheduleData,
           firstChosen: null,
           secondChosen: null,
           chosenDate: null
         };
-        this.setState(state);
         this.props.handleChange(state);
+        state.scheduleData = scheduleData;
+        this.setState(state);
         return;
       }
       else {
@@ -155,13 +104,13 @@ class RoomSchedule extends React.Component{
         
         scheduleData = this.clearBetween(firstChosen, secondChosen, scheduleData);
         let state = {
-          scheduleData: scheduleData,
           firstChosen: [x,y],
           chosenDate: date,
           secondChosen: null,
         };
-        this.setState(state);
         this.props.handleChange(state);
+        state.scheduleData = scheduleData;
+        this.setState(state);
         return;
       }
     }
@@ -181,12 +130,12 @@ class RoomSchedule extends React.Component{
       // state 0 -> state 1
       scheduleData[x][y]["click"] = true;
       let state = {
-        scheduleData: scheduleData,
         chosenDate: date,
         firstChosen: [x,y]
       };
-      this.setState(state);
       this.props.handleChange(state);
+      state.scheduleData = scheduleData;
+      this.setState(state);
       return;
     }
     // The user click for the second time
@@ -194,11 +143,11 @@ class RoomSchedule extends React.Component{
       // state 1 -> state 0
       scheduleData[x][y]["click"] = false;
       let state = {
-        scheduleData: scheduleData,
         firstChosen: null,
       };
-      this.setState(state);
       this.props.handleChange(state);
+      state.scheduleData = scheduleData;
+      this.setState(state);
       return;
     }
     else if (firstChosen[1] === y){
@@ -237,13 +186,13 @@ class RoomSchedule extends React.Component{
         scheduleData[i][y]["between"] = true;
       }
       let state = {
-        scheduleData: scheduleData,
         secondChosen: [x,y],
         notificationType: "success",
         notificationMessage: date + " " + idToTime(start) + " ~ " + idToTime(end+1)
       }
-      this.setState(state);
       this.props.handleChange(state);
+      state.scheduleData = scheduleData;
+      this.setState(state);
       return;
     }
     else{
@@ -260,25 +209,65 @@ class RoomSchedule extends React.Component{
       scheduleData[x][y]["click"] = true;
 
       let state = {
-        scheduleData: scheduleData,
         chosenDate: date,
         firstChosen: [x,y],
       };
-      this.setState(state);
       this.props.handleChange(state);
+      state.scheduleData = scheduleData;
+      this.setState(state);
       return;
     }
+  }
+
+  clearOriginalBetween = (date, startTime, endTime) => {
+    let scheduleData = this.state.scheduleData;
+    let tempDay = -1;
+    for (let i = 0; i < 5; i++){
+      if (scheduleData[0][i]["date"] === date){
+        tempDay = i;
+        break;
+      }
+    }
+    if (tempDay === -1)
+      return -1;
+    for (let i = startTime; i < endTime; i ++){
+      scheduleData[i][tempDay]["original"] = false;
+    }
+    return scheduleData;
+  }
+
+  markOriginalData = (scheduleData, originalDate, originalStartTime, originalEndTime) => {
+    let tempDay = -1;
+    for (let i = 0; i < 5; i++){
+      if (scheduleData[0][i]["date"] === originalDate){
+        tempDay = i;
+        break;
+      }
+    }
+    if (tempDay === -1)
+      return -1;
+    for (let i = originalStartTime; i < originalEndTime; i++){
+      scheduleData[i][tempDay]["original"] = true;
+      scheduleData[i][tempDay]["occupied"] = false;
+    }
+    return scheduleData;
   }
 
   render(){
     let scheduleData = this.state.scheduleData;
     let colorCount = 0;
-    
+    let { originalDate, originalStartTime, originalEndTime, urgency } = this.props;
+    // change the time of an existing meeting instead of creating one
+    if (scheduleData){
+      if (Boolean(originalDate) && Boolean(originalStartTime) && Boolean(originalEndTime)){
+        scheduleData = this.markOriginalData(scheduleData, originalDate, originalStartTime, originalEndTime);
+      }
+    }
     return(
       <Table>
         <TableHead>
           {
-            ! scheduleData ? 
+            ! scheduleData || scheduleData.length === 0 ? 
             <TableRow>
               <CustomTableCell>时间</CustomTableCell>
               <CustomTableCell align="left">星期一</CustomTableCell>
@@ -330,12 +319,23 @@ class RoomSchedule extends React.Component{
                     return (
                       <CustomTableCell style={{padding:0}} key={y} align="left" onClick={(e) => {this.handleClick(e, cell["date"], x, y)}}>
                       {
-                        cell["occupied"]?
-                          <div style={{background:bgcolor ,borderRadius:"15px", lineHeight:"45px" ,height:"45px", width:"92%", textAlign:"center"}}>
-                            <Link to={"/meeting/"+cell["meetingid"]+"/profile"}>
-                                      {!cell["name"] ? "null" : (cell["name"].length > 5 ? cell["name"].substring(0,5)+".." : cell["name"])}
-                            </Link>
-                          </div>
+                        cell["original"]? ( 
+                          cell["click"] || cell["between"] ?
+                            <div style={{background:bgcolor, borderRadius:"15px", lineHeight:"45px" ,height:"45px", width:"92%", textAlign:"center"}}>
+                              当前会议
+                            </div> 
+                          :
+                            <div style={{ background:green[50], borderRadius:"15px", lineHeight:"45px" ,height:"45px", width:"92%", textAlign:"center"}}>
+                              当前会议
+                            </div>
+                        )
+                        : cell["occupied"] ? (
+                            <div style={{background:bgcolor ,borderRadius:"15px", lineHeight:"45px" ,height:"45px", width:"92%", textAlign:"center"}}>
+                              <Link to={"/meeting/"+cell["meetingid"]+"/profile"}>
+                                        {!cell["name"] ? "null" : (cell["name"].length > 5 ? cell["name"].substring(0,5)+".." : cell["name"])}
+                              </Link>
+                            </div>
+                          )
                           :
                           <div style={{background:bgcolor ,borderRadius:"15px", lineHeight:"45px" ,height:"45px", width:"92%", textAlign:"center"}}>
                           </div>
@@ -354,8 +354,13 @@ class RoomSchedule extends React.Component{
 }
 
 RoomSchedule.propTypes = {
+  data: PropTypes.array.isRequired,
   roomId: PropTypes.string.isRequired,
-  handleChange: PropTypes.func.isRequired
+  handleChange: PropTypes.func.isRequired,
+  originalDate: PropTypes.string,
+  originalStartTime: PropTypes.number,
+  originalEndTime: PropTypes.number,
+  urgency: PropTypes.bool,
 };
 
 export default RoomSchedule;

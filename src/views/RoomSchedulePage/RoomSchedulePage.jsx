@@ -14,7 +14,7 @@ import Paper from '@material-ui/core/Paper';
 import Fab from '@material-ui/core/Fab';
 
 import RoomSchedule from "components/RoomSchedule/RoomSchedule.jsx";
-import { meetingController, idToTime } from "variables/general.jsx";
+import { ScheduleDataToRows, timeSliceController, meetingController, idToTime } from "variables/general.jsx";
 
 const timeChosenMessage = "请先选择时间";
 const reservationSuccessMessage = "预约成功";
@@ -23,6 +23,8 @@ class RoomSchedulePage extends React.Component{
   constructor(props) {
     super(props);
     this.state = {
+      scheduleData: null,
+
       br: false,
       notificationMessage: "null",
       notificationType: null,
@@ -30,6 +32,27 @@ class RoomSchedulePage extends React.Component{
       firstChosen: null,
       secondChosen: null
     };
+  }
+
+  componentDidMount() {
+    let timeApi = timeSliceController.getTimeSilceByRoomId(this.props.match.params.roomId);
+    fetch(timeApi, {
+      credentials: 'include',
+      method: 'get',
+    })
+    .then(res => res.json())
+    .then((data2) => {
+      if (data2.error){
+        let state = {
+          notificationType: "danger",
+          notificationMessage: data2.error
+        };
+        this.setState(state);
+      }
+      else{
+        this.setState({scheduleData: data2})
+      }
+    })
   }
 
   showNotification = (place) => {
@@ -112,8 +135,6 @@ class RoomSchedulePage extends React.Component{
     }
     meeting = JSON.stringify(meeting);
     let api = meetingController.createMeeting();
-    console.log(api)
-    console.log(meeting)
     fetch(api, {
       credentials: 'include',
       method: 'post',
@@ -130,7 +151,7 @@ class RoomSchedulePage extends React.Component{
       }
       else {
         this.success(reservationSuccessMessage);
-        window.location.reload();
+        window.location.href="/meeting/"+data.id+"/profile";
       }
     })
     .catch(error => {
@@ -199,7 +220,15 @@ class RoomSchedulePage extends React.Component{
               </CardHeader>
               <CardBody>
                 <Paper>
-                  <RoomSchedule roomId={roomId} handleChange={this.handleChange}/>
+                  {
+                    ! this.state.scheduleData ? null :
+                    <RoomSchedule 
+                      data={ScheduleDataToRows(this.state.scheduleData)} 
+                      roomId={roomId} 
+                      handleChange={this.handleChange}
+                    />
+
+                  }
                   <Snackbar
                     place="br"
                     color={this.state.notificationType}
