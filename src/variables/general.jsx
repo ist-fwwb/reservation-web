@@ -44,6 +44,7 @@ const meetingController = {
   "createMeeting": () => (server + "/meeting"), // json params in req body
   "editMeetingByMeetingId": (meetingId) => (server + "/meeting/" + meetingId), //json params in req body
   "deleteMeetingByMeetingId": (meetingId) => (server + "/meeting/" + meetingId),
+  "cancelMeetingByMeetingId": (meetingId) => (server + "/meeting/" + meetingId + "/status/Cancelled"),
   //"attendMeetingByMeetingId": (meetingId, userId) => (server + "/meeting/" + meetingId + "/attendants?userId=" + userId),
   "attendMeetingByAttendantNum": (attendantNum, userId) => (server + "/meeting/" + attendantNum + "/attendants?userId=" + userId),
   "exitMeetingByMeetingId": (meetingId , userId) => (server +"/meeting/" + meetingId + "/attendants/" + userId),
