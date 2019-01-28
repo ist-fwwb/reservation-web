@@ -48,7 +48,7 @@ const meetingController = {
   //"attendMeetingByMeetingId": (meetingId, userId) => (server + "/meeting/" + meetingId + "/attendants?userId=" + userId),
   "attendMeetingByAttendantNum": (attendantNum, userId) => (server + "/meeting/" + attendantNum + "/attendants?userId=" + userId),
   "exitMeetingByMeetingId": (meetingId , userId) => (server +"/meeting/" + meetingId + "/attendants/" + userId),
-  "getMeetingByUserIdAndDate": (userId, date) => (server + "/user/" + userId + "/meeting/" + date),
+  "getMeetingByUserIdAndDate": (userId, date) => (server + "/user/" + userId + "/meeting?date=" + date),
   "getMeetingByUserIdAndStatus": (userId, status) => (server + "/user/" + userId + "/meeting?status=" + status),
 };
 
@@ -63,7 +63,7 @@ const userController = {
   },
   "getUser": (type=null) => (type?(server + "/user?type=" + type):(server + "/user")),
   "register": () => (server + "/user"), //json params in req body
-  "login": (phone, password) => (server + "/user/login?phone=" + phone + "&password=" + password),
+  "login": (tel, password) => (server + "/user/login?phone=" + tel + "&password=" + password),
   "getUserByUserId": (userId) => (server + "/user/" + userId),
   "editUser": (userId) => (server + "/user/" + userId),
 };

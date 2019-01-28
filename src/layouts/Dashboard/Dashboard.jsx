@@ -18,13 +18,19 @@ import dashboardStyle from "assets/jss/material-dashboard-react/layouts/dashboar
 
 import image from "assets/img/sidebar-2.jpg";
 import logo from "assets/img/reactlogo.png";
+import LoginPage from "views/LoginPage/LoginPage.jsx";
+
+import Cookies from 'universal-cookie';
+
+const cookies = new Cookies();
 
 class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       mobileOpen: false,
-      userId: "5c481bc6b717bd0013bdab5e"
+      login: cookies.get("login"),
+      userId: cookies.get("userId"),
     };
     this.resizeFunction = this.resizeFunction.bind(this);
   }
@@ -58,7 +64,10 @@ class App extends React.Component {
 
   render() {
     const { classes, ...rest } = this.props;
-    const userId = this.state.userId;
+    const { userId, login } = this.state;
+    if (!login){
+      return <LoginPage handleLogin={this.handleLogin}/>;
+    }
     return (
       <div className={classes.wrapper}>
         <Sidebar

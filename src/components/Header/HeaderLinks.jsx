@@ -4,6 +4,7 @@ import withStyles from "@material-ui/core/styles/withStyles";
 import Hidden from "@material-ui/core/Hidden";
 // @material-ui/icons
 import Person from "@material-ui/icons/Person";
+import ExitToApp from "@material-ui/icons/ExitToApp";
 import Notifications from "@material-ui/icons/Notifications";
 import Search from "@material-ui/icons/Search";
 // core components
@@ -12,6 +13,10 @@ import Button from "components/CustomButtons/Button.jsx";
 import { Link } from "react-router-dom";
 
 import headerLinksStyle from "assets/jss/material-dashboard-react/components/headerLinksStyle.jsx";
+
+import Cookies from 'universal-cookie';
+
+const cookies = new Cookies();
 
 class HeaderLinks extends React.Component {
   state = {
@@ -29,6 +34,12 @@ class HeaderLinks extends React.Component {
 
     this.setState({ open: false });
   };
+
+  logout = () => {
+    cookies.remove("login", {path: "/"});
+    cookies.remove("userId", {path: "/"});
+    window.location.href="/";
+  }
 
   render() {
     const { classes, userId } = this.props;
@@ -87,6 +98,21 @@ class HeaderLinks extends React.Component {
             <Person className={classes.icons} />
             <Hidden mdUp implementation="css">
               <p className={classes.linkText}>个人信息</p>
+            </Hidden>
+          </Button>
+        </Link>
+
+        <Link to="/logout" onClick={this.logout}>
+          <Button
+            color={window.innerWidth > 959 ? "transparent" : "white"}
+            justIcon={window.innerWidth > 959}
+            simple={!(window.innerWidth > 959)}
+            aria-label="Logout"
+            className={classes.buttonLink}
+          >
+            <ExitToApp className={classes.icons} />
+            <Hidden mdUp implementation="css">
+              <p className={classes.linkText}>注销</p>
             </Hidden>
           </Button>
         </Link>

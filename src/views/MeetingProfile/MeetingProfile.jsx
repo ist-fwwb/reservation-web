@@ -350,7 +350,6 @@ class MeetingProfile extends React.Component {
 
   handleDismiss = () => {
     let api = meetingController.cancelMeetingByMeetingId(this.props.match.params.meetingId);
-    console.log(api);
     fetch(api,{
       credentials: 'include',
       method: 'put'

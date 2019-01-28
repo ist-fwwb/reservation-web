@@ -60,10 +60,14 @@ class UserProfile extends React.Component {
     })
     .then( res => res.json())
     .then((data) => {
-      this.setState({
-        ...data,
-        loaded: true
-      });
+      if (data.error)
+        this.warning(data.error);
+      else{
+        this.setState({
+          ...data,
+          loaded: true
+        });
+      }
     })
     .catch(error => {
       console.log(error);
