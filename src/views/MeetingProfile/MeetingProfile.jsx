@@ -34,7 +34,7 @@ import dashboardStyle from "assets/jss/material-dashboard-react/layouts/dashboar
 import Snackbar from "components/Snackbar/Snackbar.jsx";
 import RoomSchedule from "components/RoomSchedule/RoomSchedule.jsx";
 
-import { ScheduleDataToRows, timeSliceController, meetingController, idToTime, userController, quickSort } from "variables/general.jsx";
+import { ScheduleDataToRows, timeSliceController, meetingController, idToTime, userController } from "variables/general.jsx";
 
 const styles = {
   avatar: {
@@ -570,7 +570,7 @@ class MeetingProfile extends React.Component {
     e.preventDefault();
     let { tags } = this.state;
     let index = tags.indexOf(tag);
-    if (index != -1){
+    if (index !== -1){
       tags.splice(index, 1);
       this.setState({ tags });
     }

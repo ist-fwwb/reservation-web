@@ -256,7 +256,7 @@ class RoomSchedule extends React.Component{
   render(){
     let scheduleData = this.state.scheduleData;
     let colorCount = 0;
-    let { originalDate, originalStartTime, originalEndTime, urgency } = this.props;
+    let { originalDate, originalStartTime, originalEndTime } = this.props;
     // change the time of an existing meeting instead of creating one
     if (scheduleData){
       if (Boolean(originalDate) && Boolean(originalStartTime) && Boolean(originalEndTime)){

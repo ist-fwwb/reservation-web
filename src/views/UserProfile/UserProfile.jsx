@@ -141,7 +141,7 @@ class UserProfile extends React.Component {
 
   render(){
     const { classes } = this.props;
-    const { loaded, enterpriceId, phone, name, type, faceFile, featureFile } = this.state;
+    const { loaded, enterpriceId, phone, name, type } = this.state;
     const disabled = !(this.props.userId === this.props.match.params.userId);
     return (
       <div>
@@ -190,10 +190,10 @@ class UserProfile extends React.Component {
                 <GridContainer>
                   <GridItem xs={12} sm={12} md={3}>
                     <TextField
-                      label="whatever"
-                      disabled={disabled}
+                      label="type"
+                      disabled
                       fullWidth
-                      value="whatever"
+                      value={type}
                       margin="normal"
                       variant="outlined"
                     />
