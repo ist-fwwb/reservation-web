@@ -47,6 +47,55 @@ const styles = {
   },
 };
 
+class TagDialog extends React.Component {
+  constructor(props){
+    super(props);
+    this.state = {
+      newTag: ""
+    };
+  }
+
+  handleChange = (e) => {
+    e.preventDefault();
+    this.setState({[e.target.name]:e.target.value});
+  }
+
+  handleSubmitTag = (e) => {
+    e.preventDefault();
+    this.props.handleTagSuccess(this.state.newTag);
+    this.setState({ newTag: "" });
+  }
+
+  render() {
+    const { classes, onClose, open, newTag, ...other } = this.props;
+    return (
+      <Dialog onClose={this.props.onClose} scroll={"paper"} aria-labelledby="simple-dialog-title" open={open} {...other}>
+        <DialogTitle id="simple-dialog-title">添加标签</DialogTitle>
+        <DialogContent>
+          <TextField
+            label="标签"
+            name="newTag"
+            fullWidth
+            value={newTag}
+            margin="normal"
+            variant="outlined"
+            onChange={this.handleChange}
+          />
+        </DialogContent>
+        <DialogActions> 
+          <Button color="primary" onClick={this.props.onClose}>取消</Button>
+          <Button color="primary" onClick={(e)=>this.handleSubmitTag(e)}>确认</Button>
+        </DialogActions>
+      </Dialog>
+    );
+  }
+}
+TagDialog.propTypes = {
+  classes: PropTypes.object.isRequired,
+  handleTagSuccess: PropTypes.func,
+};
+
+const TagDialogWrapped = withStyles(styles)(TagDialog);
 
 class AttendantsDialog extends React.Component {
   constructor(props){
@@ -76,7 +125,7 @@ class AttendantsDialog extends React.Component {
 
   handleSubmitAddAttendants = (e) => {
     e.preventDefault();
-    this.props.handleSuccess(this.state.checked);
+    this.props.handleAttendantsSuccess(this.state.checked);
     this.setState({ checked: [] });
   }
 
@@ -117,7 +166,7 @@ class AttendantsDialog extends React.Component {
 AttendantsDialog.propTypes = {
   classes: PropTypes.object.isRequired,
   addattendants: PropTypes.array.isRequired,
-  onSuccess: PropTypes.func,
+  handleAttendantsSuccess: PropTypes.func,
 };
 const AttendantsDialogWrapped = withStyles(styles)(AttendantsDialog);
 
@@ -156,9 +205,11 @@ class MeetingProfile extends React.Component {
       confirmTimeChangeOpen: false,
       // confirm profile hange dialog
       confirmProfileChangeOpen: false,
+      // confirm tag dialog
+      openTag: false,
 
       // addAttendants menu
-      open: false,
+      openAttendants: false,
   
       host: false,
     }
@@ -281,28 +332,6 @@ class MeetingProfile extends React.Component {
   handleChange = (e) => {
     e.preventDefault();
     this.setState({[e.target.name]:e.target.value});
-  }
-
-  handleSubmit = (e) => {
-    e.preventDefault();
-    let msg = JSON.stringify(this.state);
-    let api = meetingController.editMeetingByMeetingId(this.props.match.params.meetingId);
-    fetch(api, {
-      credentials: 'include',
-      method:'put',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-      body: msg,
-    })
-    .then(res => res.json())
-    .then((data) => {
-      if (data.error)
-        this.warning(data.error);
-      else
-        this.success(editSuccessMessage);
-    })
   }
 
   showNotification = (place) => {
@@ -492,6 +521,7 @@ class MeetingProfile extends React.Component {
     msg.roomId = this.state.roomId;
     msg.status = this.state.status;
     msg.type = this.state.type;
+    msg.tags = this.state.tags;
 
     let api = meetingController.editMeetingByMeetingId(this.props.match.params.meetingId);
     msg = JSON.stringify(msg);
@@ -515,18 +545,53 @@ class MeetingProfile extends React.Component {
     })
   }
 
+  // add tags
+  handleOpenTag = () => {
+    this.setState({ openTag: true });
+  };
+
+  handleCloseTag = () => {
+    this.setState({ openTag: false });
+  }
+
+  handleTagSuccess = (value) => {
+    let tags = this.state.tags;
+    if (tags.includes(value)){
+      this.warning("标签已存在");
+      return;
+    }
+    tags.push(value);
+
+    this.setState({ tags });
+    this.handleCloseTag();
+  };
+
+  handleDeleteTag = (e, tag) => {
+    e.preventDefault();
+    let { tags } = this.state;
+    let index = tags.indexOf(tag);
+    if (index != -1){
+      tags.splice(index, 1);
+      this.setState({ tags });
+    }
+    else
+      this.warning("不存在的标签")
+    
+    
+  }
+
   // add attendants
-  handleOpen = () => {
+  handleOpenAttendants = () => {
     this.setState({
-      open: true,
+      openAttendants: true,
     });
   };
 
-  handleClose = () => {
-    this.setState({ open: false });
+  handleCloseAttendants = () => {
+    this.setState({ openAttendants: false });
   }
 
-  handleSuccess = (value) => {
+  handleAttendantsSuccess = (value) => {
     let { addAttendants, attendantsWithName } = this.state;
     for (let i in value){
       for (let j in addAttendants){
@@ -542,10 +607,10 @@ class MeetingProfile extends React.Component {
       attendants[attendantsWithName[i].id] = "null";
     }
     this.setState({ attendantsWithName, addAttendants, attendants });
-    this.handleClose();
+    this.handleCloseAttendants();
   };
 
-  handleDelete = (e, id) => {
+  handleDeleteAttendant = (e, id) => {
     e.preventDefault();
     let {addAttendants, attendantsWithName} = this.state;
     for (let i in attendantsWithName){
@@ -585,8 +650,9 @@ class MeetingProfile extends React.Component {
       hostId, 
       date, 
       description, 
-      heading 
-    }= this.state;
+      heading,
+      tags
+    } = this.state;
     const pending = (status === "Pending");
     const disabled = !host || !pending;
     const loaded = loaded1 && loaded2;
@@ -709,6 +775,56 @@ class MeetingProfile extends React.Component {
                     <Card>
                       <CardBody>
                         <Typography className={classes.title} color="textSecondary" gutterBottom>
+                          标签分类
+                        </Typography>
+                          {!loaded? null :
+                          tags.map((data, key) => {
+                            if (!data)
+                              return null;
+                            let disabled = !(this.props.userId ===this.state.hostId);
+                            if (disabled)
+                              return (
+                                <Chip
+                                    key={key}
+                                    label={data}
+                                    className={classes.chip}
+                                  />
+                              )
+                            else
+                              return (
+                                  <Chip
+                                    key={key}
+                                    label={data}
+                                    className={classes.chip}
+                                    onDelete={(e) => this.handleDeleteTag(e, data)}
+                                  />
+                              );
+                          })
+                          }
+                          {
+                            disabled?null:
+                              <IconButton color="primary" className={classes.button} component="span" onClick={this.handleOpenTag}>
+                                <Add/>
+                              </IconButton>
+                          }
+                          {
+                            disabled?null:
+                              <TagDialogWrapped
+                                key
+                                open={this.state.openTag}
+                                handleTagSuccess={this.handleTagSuccess}
+                                onClose={this.handleCloseTag}
+                              />
+                          }
+                      </CardBody>
+                    </Card>
+                  </GridItem>
+                </GridContainer>
+                <GridContainer>
+                  <GridItem xs={12} sm={12} md={11}>
+                    <Card>
+                      <CardBody>
+                        <Typography className={classes.title} color="textSecondary" gutterBottom>
                           参会人员
                         </Typography>
                           {!loaded? null :
@@ -717,6 +833,7 @@ class MeetingProfile extends React.Component {
                               return null;
                             let hostIcon = <Stars/>
                             let host = data.id===this.state.hostId;
+                            let disabled = !(this.state.hostId === this.props.userId);
                             if (host)
                               return (
                                 <Chip
@@ -726,20 +843,30 @@ class MeetingProfile extends React.Component {
                                     className={classes.chip}
                                   />
                               )
-                            else
-                              return (
+                            else{
+                              if (disabled)
+                                return (
                                   <Chip
                                     key={key}
                                     label={data.name}
                                     className={classes.chip}
-                                    onDelete={(e) => this.handleDelete(e, data.id)}
                                   />
-                              );
+                                )
+                              else
+                                return (
+                                  <Chip
+                                    key={key}
+                                    label={data.name}
+                                    className={classes.chip}
+                                    onDelete={(e) => this.handleDeleteAttendant(e, data.id)}
+                                  />
+                            );
+                            }
                           })
                           }
                           {
                             disabled?null:
-                              <IconButton color="primary" className={classes.button} component="span" onClick={this.handleOpen}>
+                              <IconButton color="primary" className={classes.button} component="span" onClick={this.handleOpenAttendants}>
                                 <Add/>
                               </IconButton>
                           }
@@ -748,9 +875,9 @@ class MeetingProfile extends React.Component {
                               <AttendantsDialogWrapped
                                 key
                                 addattendants={addAttendants}
-                                open={this.state.open}
-                                handleSuccess={this.handleSuccess}
-                                onClose={this.handleClose}
+                                open={this.state.openAttendants}
+                                handleAttendantsSuccess={this.handleAttendantsSuccess}
+                                onClose={this.handleCloseAttendants}
                               />
                           }
                       </CardBody>

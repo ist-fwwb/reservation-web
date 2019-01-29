@@ -131,7 +131,8 @@ class RoomSchedulePage extends React.Component{
       "needSignIn": false,
       "roomId": this.props.match.params.roomId,
       "startTime": start,
-      "type": "COMMON"
+      "type": "COMMON",
+      "tags": [],
     }
     meeting = JSON.stringify(meeting);
     let api = meetingController.createMeeting();
