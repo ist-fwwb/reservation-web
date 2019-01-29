@@ -6,19 +6,19 @@ import CustomTabs from "components/CustomTabs/CustomTabs.jsx";
 import Assignment from "@material-ui/icons/Assignment";
 import LibraryAdd from "@material-ui/icons/LibraryAdd";
 import FiberNew from "@material-ui/icons/FiberNew";
-import History from "@material-ui/icons/History";
 import Note from "@material-ui/icons/Note";
 import ErrorOutline from "@material-ui/icons/ErrorOutline";
 import Done from "@material-ui/icons/Done";
 
 import Slider from "react-slick";
+import TextField from '@material-ui/core/TextField';
+import Button from "@material-ui/core/Button";
 
 import Table from "components/Table/Table.jsx";
-import Button from "components/CustomButtons/Button.jsx";
+
 import Snackbar from "components/Snackbar/Snackbar.jsx";
-import { meetingController, today } from "variables/general.jsx";
+import { meetingController, idToTime, today } from "variables/general.jsx";
 import { Link } from "react-router-dom";
-import { idToTime } from "variables/general.jsx";
 
 const slidesSettings = {
   dots: true,
@@ -35,10 +35,6 @@ const notes = [
   ["Meeting b", "whatever"]
 ]
 
-const joinButton = (id) => {
-  return <Button color="success" size="sm">加入会议</Button>
-}
-
 class HomePage extends React.Component{
   constructor(props){
     super(props);
@@ -47,101 +43,46 @@ class HomePage extends React.Component{
       notificationMessage: "null",
       notificationType: null,
 
-      meetings: null,
+      error: false,
     }
   }
 
-  JSONToArray = (jsonArray, type) => {
+  JSONToArray = (jsonArray) => {
     let re = [];
     for (let i in jsonArray){
       let ele = jsonArray[i];
-      if (type === "meeting" && ele.date !== today)
+      if (!(ele.status === "Pending" || ele.status === "Running"))
         continue;
-      if (type === "meeting" && !(ele.status === "Pending" || ele.status === "Running"))
-        continue;
-      if (type === "attend" && (ele.status !== "Pending" || ele.hostId === this.props.userId))
-        continue;
+
       let temp_ele = [];
   
       temp_ele.push(<Link to={"/meeting/"+ele.id+"/profile"}>{ele.heading}</Link>)
       temp_ele.push(<Link to={"/room/"+ele.id+"/profile"}>{ele.location}</Link>);
-      if (type !== "meeting")
-        temp_ele.push(ele.date);
       temp_ele.push(idToTime(ele.startTime) + "~" + idToTime(ele.endTime));
-      if (type === "meeting")
-        temp_ele.push(ele.status);
-      else if (type === "attend")
-        temp_ele.push([joinButton(ele.id)])
+      temp_ele.push(ele.status);
       re.push(temp_ele);
     }
     return re;
   }
   
   componentDidMount(){
-    let api = meetingController.getMeetingByUserIdAndDate(this.props.userId, today);
-    fetch(api,{
-      credentials: 'include',
-      method: 'get',
-    })
-    .then(res => res.json())
-    .then((data) => {
-      this.setState({meetings: data})
-    })
-    .catch(e => {console.log(e); this.setState({error: true}); this.warning(e);})
-
-    let api2 = meetingController.getMeetingByDateAndRoomIdAndStatus(null, null, "Pending");
-    fetch(api2, {
+    let todayApi = meetingController.getMeetingByUserIdAndDateAndStatus(this.props.userId, today, "Pending");
+    console.log(todayApi)
+    fetch(todayApi, {
       credentials: 'include',
       method: 'get'
     })
     .then(res => res.json())
     .then((data) => {
-      if (data.error){
+      if (data.error)
         this.setState({error: true});
-        this.warning(data.error);
-      }
       else
         this.setState({
-          attendMeetings: data
+          todayMeetings: data,
         });
+        
     })
-    .catch(e => {console.log(e); this.setState({error: true}); this.warning(e);})
-
-    let api3 = meetingController.getMeetingByUserIdAndStatus(this.props.userId, "Cancelled");
-    fetch(api3, {
-      credentials: 'include',
-      method: 'get'
-    })
-    .then(res => res.json())
-    .then((data) => {
-      if (data.error){
-        this.setState({error: true});
-        this.warning(data.error);
-      }
-      else
-        this.setState({
-          historyCancelledMeetings: data
-        });
-    })
-    .catch(e => {console.log(e); this.setState({error: true}); this.warning(e);})
-
-    let api4 = meetingController.getMeetingByUserIdAndStatus(this.props.userId, "Stopped");
-    fetch(api4, {
-      credentials: 'include',
-      method: 'get'
-    })
-    .then(res => res.json())
-    .then((data) => {
-      if (data.error){
-        this.setState({error: true});
-        this.warning(data.error);
-      }
-      else
-        this.setState({
-          historyStoppedMeetings: data
-        });
-    })
-    .catch(e => {console.log(e); this.setState({error: true}); this.warning(e);})
+    .catch(e => console.log(e))
   }
 
   showNotification = (place) => {
@@ -173,18 +114,49 @@ class HomePage extends React.Component{
     this.showNotification("br");
   }
 
+  success = (msg) => {
+    this.setState({
+      notificationType: "success",
+      notificationMessage: msg
+    })
+    this.showNotification("br");
+  }
+
+  handleChange = (e) => {
+    e.preventDefault();
+    this.setState({[e.target.name]:e.target.value});
+  }
+
+  handleAttend = () => {
+    let api = meetingController.attendMeetingByAttendantNum(this.state.attendantNum, this.props.userId);
+    fetch(api,{
+      credentials: 'include',
+      method: 'post'
+    })
+    .then(res => res.json())
+    .then((data) => {
+      if (data.error){
+        this.warning("加入失败");
+      }
+      else {
+        this.success("加入成功");
+        if (data.date === today){
+          let { todayMeetings } = this.state;
+          todayMeetings.push(data);
+          this.setState({
+            todayMeetings,
+            attendantNum: ""
+          });
+        }
+        
+      }
+    })
+  }
+
   render(){
     if (this.state.error)
       return <h2>Network Error</h2>
-    let { meetings, attendMeetings, historyCancelledMeetings, historyStoppedMeetings } = this.state;
-    let historyMeetings = historyCancelledMeetings; 
-    console.log(historyMeetings)
-    let historyLoaded = false;
-    if ( historyCancelledMeetings && historyStoppedMeetings){
-      historyLoaded = true;
-      historyMeetings = historyMeetings.concat(historyStoppedMeetings);
-    }
-    
+    let { todayMeetings } = this.state;
     return(
       <div>
         <GridContainer>
@@ -206,7 +178,7 @@ class HomePage extends React.Component{
                             paddingBottom: '40%',
                             overflow: 'hidden',
                           }}>
-                          <img width="100%" src={"https://images.pexels.com/photos/459225/pexels-photo-459225.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940"} />
+                          <img width="100%" alt="img" src={"https://images.pexels.com/photos/459225/pexels-photo-459225.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940"} />
                         </div>
                         <div style={{ 
                             maxWidth: '100%',
@@ -215,7 +187,7 @@ class HomePage extends React.Component{
                             overflow: 'hidden',
                           }}
                         >
-                          <img width="100%" src={"https://images.pexels.com/photos/248797/pexels-photo-248797.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940"} />
+                          <img width="100%" alt="img" src={"https://images.pexels.com/photos/248797/pexels-photo-248797.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940"} />
                         </div>
                       </Slider>
                       <br/>
@@ -235,38 +207,32 @@ class HomePage extends React.Component{
                   tabName: "今日会议",
                   tabIcon: Assignment,
                   tabContent: (
-                    ! meetings ? null : 
                     <Table
                       tableHeaderColor="primary"
                       tableHead={["会议名称", "会议室", "时间", "状态"]}
-                      tableData={meetings ? this.JSONToArray(meetings, "meeting") : []}
+                      tableData={todayMeetings ? this.JSONToArray(todayMeetings) : []}
                     />
+                      
                   )
                 },
                 {
                   tabName: "加入会议",
                   tabIcon: LibraryAdd,
                   tabContent: (
-                    ! attendMeetings ? null :
-                    <Table
-                      tableHeaderColor="primary"
-                      tableHead={["会议名称", "会议室", "日期", "时间", "操作"]}
-                      tableData={this.JSONToArray(attendMeetings, "attend")}
-                    />
+                    <div>
+                      <TextField
+                        fullWidth
+                        label="四位数字"
+                        name="attendantNum"
+                        value={this.state.attendantNum}
+                        margin="normal"
+                        variant="outlined"
+                        onChange={this.handleChange}
+                      />
+                      <Button color="primary" onClick={this.handleAttend}>加入</Button>
+                    </div>
                   )
                 },
-                {
-                  tabName: "历史会议",
-                  tabIcon: History,
-                  tabContent: (
-                    ! historyLoaded ? null :
-                    <Table
-                      tableHeaderColor="primary"
-                      tableHead={["会议名称", "会议室", "日期", "时间"]}
-                      tableData={this.JSONToArray(historyMeetings, "history")}
-                    />
-                  )
-                }
               ]}
             />
           </GridItem>

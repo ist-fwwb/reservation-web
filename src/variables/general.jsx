@@ -50,6 +50,7 @@ const meetingController = {
   "exitMeetingByMeetingId": (meetingId , userId) => (server +"/meeting/" + meetingId + "/attendants/" + userId),
   "getMeetingByUserIdAndDate": (userId, date) => (server + "/user/" + userId + "/meeting?date=" + date),
   "getMeetingByUserIdAndStatus": (userId, status) => (server + "/user/" + userId + "/meeting?status=" + status),
+  "getMeetingByUserIdAndDateAndStatus": (userId, date, status) => (server + "/user/" + userId + "/meeting?status=" + status + "&date=" + date),
 };
 
 const userController = {
