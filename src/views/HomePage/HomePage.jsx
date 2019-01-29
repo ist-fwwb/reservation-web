@@ -11,6 +11,8 @@ import Note from "@material-ui/icons/Note";
 import ErrorOutline from "@material-ui/icons/ErrorOutline";
 import Done from "@material-ui/icons/Done";
 
+import Slider from "react-slick";
+
 import Table from "components/Table/Table.jsx";
 import Button from "components/CustomButtons/Button.jsx";
 import Snackbar from "components/Snackbar/Snackbar.jsx";
@@ -18,10 +20,15 @@ import { meetingController, today } from "variables/general.jsx";
 import { Link } from "react-router-dom";
 import { idToTime } from "variables/general.jsx";
 
-const news = [
-  ["温州皮革厂倒闭了", "2018-01-20"],
-  ["温州皮革厂开业了", "2018-01-21"],
-];
+const slidesSettings = {
+  dots: true,
+  fade: true,
+  infinite: true,
+  autoplay: true,
+  speed: 2000,
+  slidesToShow: 1,
+  slidesToScroll: 1
+};
 
 const notes = [
   ["Meeting a", "whatever"],
@@ -177,6 +184,7 @@ class HomePage extends React.Component{
       historyLoaded = true;
       historyMeetings = historyMeetings.concat(historyStoppedMeetings);
     }
+    
     return(
       <div>
         <GridContainer>
@@ -190,11 +198,28 @@ class HomePage extends React.Component{
                   tabName: "公司新闻",
                   tabIcon: FiberNew,
                   tabContent: (
-                    <Table
-                    tableHeaderColor="primary"
-                    tableHead={["标题", "日期"]}
-                    tableData={news}
-                  />
+                    <div>
+                      <Slider {...slidesSettings}>
+                        <div style={{ 
+                            maxWidth: '100%',
+                            height: 0,
+                            paddingBottom: '40%',
+                            overflow: 'hidden',
+                          }}>
+                          <img width="100%" src={"https://images.pexels.com/photos/459225/pexels-photo-459225.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940"} />
+                        </div>
+                        <div style={{ 
+                            maxWidth: '100%',
+                            height: 0,
+                            paddingBottom: '40%',
+                            overflow: 'hidden',
+                          }}
+                        >
+                          <img width="100%" src={"https://images.pexels.com/photos/248797/pexels-photo-248797.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940"} />
+                        </div>
+                      </Slider>
+                      <br/>
+                    </div>
                   )
                 }
               ]}
