@@ -6,7 +6,10 @@ import GridItem from "components/Grid/GridItem.jsx";
 import GridContainer from "components/Grid/GridContainer.jsx";
 import CustomTabs from "components/CustomTabs/CustomTabs.jsx";
 import Button from "components/CustomButtons/Button.jsx";
+import Snackbar from "components/Snackbar/Snackbar.jsx";
 
+import ErrorOutline from "@material-ui/icons/ErrorOutline";
+import Done from "@material-ui/icons/Done";
 import Assignment from "@material-ui/icons/Assignment";
 import LibraryAdd from "@material-ui/icons/LibraryAdd";
 import History from "@material-ui/icons/History";
@@ -18,6 +21,7 @@ import TableFooter from '@material-ui/core/TableFooter';
 import TablePagination from '@material-ui/core/TablePagination';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
+
 import { Link } from "react-router-dom";
 import { meetingController, idToTime } from 'variables/general.jsx';
 
@@ -38,6 +42,12 @@ class MeetingPage extends React.Component {
   constructor(props){
     super(props);
     this.state = {
+      // warning / success message
+      br: false,
+      notificationMessage: "null",
+      notificationType: null,
+
+
       meetings: null,
       attendMeetings: null,
       historyCancelledMeetings: null,
@@ -55,6 +65,43 @@ class MeetingPage extends React.Component {
     }
   }
 
+  showNotification = (place) => {
+    let x = [];
+    x[place] = true;
+    this.setState(x);
+    this.alertTimeout = setTimeout(
+      function() {
+        x[place] = false;
+        this.setState(x);
+      }.bind(this),
+      6000
+    );
+  }
+
+  typeToIcon = (type) => {
+    if (type === "success")
+      return Done;
+    if (type === "danger")
+      return ErrorOutline;
+    return null;
+  }
+
+  success = (msg) => {
+    this.setState({
+      notificationType: "success",
+      notificationMessage: msg
+    })
+    this.showNotification("br");
+  }
+
+  warning = (msg) => {
+    this.setState({
+      notificationType: "danger",
+      notificationMessage: msg
+    });
+    this.showNotification("br");
+  }
+
   componentDidMount(){
     let api = meetingController.getMeetingByUserIdAndStatus(this.props.userId, "Pending");
     fetch(api, {
@@ -63,8 +110,22 @@ class MeetingPage extends React.Component {
     })
     .then(res => res.json())
     .then((data) => {
+      // delete the meetings that he has joined
+      let { attendMeetings } = this.state;
+      if (this.state.loaded2){
+        for (let i in data){
+          for (let j=0; j < attendMeetings.length; j++){
+            if (data[i].id === attendMeetings[j].id){
+              attendMeetings.splice(j, 1);
+              j--;
+            }
+          }
+        }
+      }
       this.setState({
         meetings: data,
+        loaded1: true,
+        attendMeetings
       })
     })
     .catch(e => console.log(e))
@@ -76,8 +137,21 @@ class MeetingPage extends React.Component {
     })
     .then(res => res.json())
     .then((data) => {
+      // delete the meetings that he has joined
+      if (this.state.loaded1){
+        let {meetings} = this.state;
+        for (let i in meetings){
+          for (let j=0; j < data.length; j++){
+            if (meetings[i].id === data[j].id){
+              data.splice(j, 1);
+              j--;
+            }
+          }
+        }
+      }
       this.setState({
-        attendMeetings: data
+        attendMeetings: data,
+        loaded2: true,
       })
     })
     .catch(e => console.log(e))
@@ -132,61 +206,87 @@ class MeetingPage extends React.Component {
   handleChangeHistoryMeetingsRowsPerPage = event => {
     this.setState({ historyMeetingsRowsPerPage: event.target.value });
   };
-
-
-  exitButton = (meetingId, userId, host) => {
-    if (host)
-      return <Button color="danger" size="sm" onClick={ (e) => this.handleDismiss(e, meetingId, userId)}>解散会议 {meetingId}</Button>;
-    else
-      return <Button color="danger" size="sm" onClick={ (e) => this.handleExit(e, meetingId, userId)}>退出会议 {meetingId}</Button>;
-  } 
   
-  joinButton = (meetingId, userId, host) => {
-    return <Button color="success" size="sm">加入会议</Button>
-  }
-  
-  handleCheck = (e, meetingId, userId) => {
+  handleCheck = (e, meetingId) => {
     e.preventDefault();
     window.location.href = "/meeting/" + meetingId + "/profile";
   }
 
-  handleJoin = (e, meetingId, userId) => {
+  handleJoin = (e, attendantNum) => {
     e.preventDefault();
-    let attendMeetings = this.state.attendMeetings;
-    for (let i in attendMeetings){
-      if (attendMeetings[i].id === meetingId){
-        attendMeetings.splice(i,1);
-        break;
+    let api = meetingController.attendMeetingByAttendantNum(attendantNum, this.props.userId);
+    console.log(api)
+    fetch(api,{
+      credentials: 'include',
+      method: 'post'
+    })
+    .then((res) => {
+      if (res.ok){
+        let { meetings, attendMeetings } = this.state;
+        for (let i in attendMeetings){
+          if (attendMeetings[i].attendantNum === attendantNum){
+            meetings.push(attendMeetings[i]);
+            attendMeetings.splice(i,1);
+            break;
+          }
+        }
+        this.setState({meetings, attendMeetings});
+        this.success("加入成功");
       }
-    }
-    this.setState({attendMeetings})
-    return;
+      else{
+        this.warning("加入失败");
+      }
+    })
   }
 
-  handleExit = (e, meetingId, userId) => {
+  handleExit = (e, meetingId) => {
     e.preventDefault();
-    let meetings = this.state.meetings;
-    for (let i in meetings){
-      if (meetings[i].id === meetingId){
-        meetings.splice(i,1);
-        break;
+    let api = meetingController.exitMeetingByMeetingId(meetingId, this.props.userId);
+    fetch(api,{
+      credentials: 'include',
+      method: 'delete'
+    })
+    .then((res) => {
+      if (res.ok){
+        let { meetings, attendMeetings } = this.state;
+        for (let i in meetings){
+          if (meetings[i].id === meetingId){
+            attendMeetings.push(meetings[i]);
+            meetings.splice(i,1);
+            break;
+          }
+        }
+        this.setState({ meetings, attendMeetings })
+        this.success("退出成功");
       }
-    }
-    this.setState({meetings})
-    return;
+      else{
+        this.warning("退出失败");
+      }
+    })
   }
   
-  handleDismiss = (e, meetingId, userId) => {
+  handleDismiss = (e, meetingId) => {
     e.preventDefault();
-    let meetings = this.state.meetings;
-    for (let i in meetings){
-      if (meetings[i].id === meetingId){
-        meetings.splice(i,1);
-        break;
+    let api = meetingController.cancelMeetingByMeetingId(meetingId);
+    fetch(api,{
+      credentials: 'include',
+      method: 'put'
+    })
+    .then((res) => {
+      if (res.ok){
+        let meetings = this.state.meetings;
+        for (let i in meetings){
+          if (meetings[i].id === meetingId){
+            meetings.splice(i,1);
+            break;
+          }
+        }
+        this.setState({meetings})
+        this.success("解散成功");
       }
-    }
-    this.setState({meetings})
-    return;
+      else
+        this.warning("解散失败");
+    })    
   }
 
   render() {
@@ -243,12 +343,9 @@ class MeetingPage extends React.Component {
                                   <TableCell align="left">{ele.date}</TableCell>
                                   <TableCell align="left">{idToTime(ele.startTime) + "~" + idToTime(ele.endTime)}</TableCell>
                                   <TableCell align="left">
-                                    <Button color="info" size="sm" onClick={ (e) => this.handleCheck(e, meetingId, userId)}>
-                                      {host?"管理会议":"查看会议"}
-                                    </Button>
                                     {
-                                      host?<Button color="danger" size="sm" onClick={ (e) => this.handleDismiss(e, meetingId, userId)}>解散会议</Button>
-                                      :<Button color="danger" size="sm" onClick={ (e) => this.handleExit(e, meetingId, userId)}>退出会议</Button>
+                                      host?<Button color="danger" size="sm" onClick={ (e) => this.handleDismiss(e, meetingId)}>解散会议</Button>
+                                      :<Button color="danger" size="sm" onClick={ (e) => this.handleExit(e, meetingId)}>退出会议</Button>
                                     }
                                   </TableCell>
                                 </TableRow>
@@ -308,7 +405,6 @@ class MeetingPage extends React.Component {
                           <TableBody>
                             {attendMeetings.slice(attendMeetingsPage * attendMeetingsRowsPerPage, attendMeetingsPage * attendMeetingsRowsPerPage + attendMeetingsRowsPerPage).map(ele => {
                               let host = (userId === ele.hostId);
-                              let meetingId = ele.id;
                               if (host)
                                 return null;
                               if (ele.status !== "Pending" )
@@ -323,7 +419,7 @@ class MeetingPage extends React.Component {
                                   <TableCell align="left">{ele.date}</TableCell>
                                   <TableCell align="left">{idToTime(ele.startTime) + "~" + idToTime(ele.endTime)}</TableCell>
                                   <TableCell align="left">
-                                    <Button color="success" size="sm" onClick={ (e) => this.handleJoin(e, meetingId, userId)}>
+                                    <Button color="success" size="sm" onClick={ (e) => this.handleJoin(e, ele.attendantNum)}>
                                       加入会议
                                     </Button>
                                   </TableCell>
@@ -433,6 +529,15 @@ class MeetingPage extends React.Component {
             />
           </GridItem>
         </GridContainer>
+        <Snackbar
+          place="br"
+          color={this.state.notificationType}
+          icon={this.typeToIcon(this.state.notificationType)}
+          message={this.state.notificationMessage}
+          open={this.state.br}
+          closeNotification={() => this.setState({ br: false })}
+          close
+        />
       </div>
     )
   }
