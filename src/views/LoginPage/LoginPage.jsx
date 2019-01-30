@@ -150,7 +150,7 @@ class LoginPage extends React.Component {
             </FormControl>
             <FormControl margin="normal" required fullWidth>
               <InputLabel htmlFor="password">密码</InputLabel>
-              <Input name="password" type="password" id="password" autoComplete="current-password" />
+              <Input name="password" type="password" id="password" autoComplete="current-password" onChange={this.handleChange}/>
             </FormControl>
             <Button
               fullWidth
