@@ -19,6 +19,11 @@ const idToTime = (id) => {
       return String((id - 1 ) / 2) + ":30";
 }
 
+const timeToId = (time) => {
+  let li = time.split(':');
+  return Number(li[0]) * 2 + (Number(li[1]) === 30 ? 1 : 0);
+}
+
 const roomController = {
   "getRoom": () => (server + "/meetingroom" ),
   "getRoomByRoomId": (roomId) => (server + "/meetingroom/" + roomId),
@@ -136,6 +141,7 @@ function ScheduleDataToRows(data){
 
 module.exports = {
   idToTime,
+  timeToId,
   today,
   nextDay,
   roomController,

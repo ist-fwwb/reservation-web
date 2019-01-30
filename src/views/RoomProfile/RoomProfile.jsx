@@ -270,7 +270,8 @@ class RoomProfile extends React.Component {
     else if (firstChosen && !secondChosen){
       timeChosen = this.state.chosenDate + " " + idToTime(firstChosen[0]) + " ~ " + idToTime(firstChosen[0]+1);
     }
-    
+    let recommendMessage = this.props.recommendMessage;
+
     return (
       <div>
         <GridContainer>
@@ -443,18 +444,10 @@ class RoomProfile extends React.Component {
                             data={ScheduleDataToRows(this.state.scheduleData)} 
                             roomId={roomId} 
                             handleChange={this.handleChange}
+                            recommendMessage={recommendMessage ? recommendMessage : null}
                           />
 
                         }
-                        <Snackbar
-                          place="br"
-                          color={this.state.notificationType}
-                          icon={this.typeToIcon(this.state.notificationType)}
-                          message={this.state.notificationMessage}
-                          open={this.state.br}
-                          closeNotification={() => this.setState({ br: false })}
-                          close
-                        />
                       </Paper>
                     </CardBody>
                   </Card>

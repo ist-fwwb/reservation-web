@@ -75,7 +75,7 @@ class App extends React.Component {
 
   render() {
     const { classes, ...rest } = this.props;
-    const { userId, login } = this.state;
+    const { userId, login, recommendMessage } = this.state;
     if (!login){
       return <LoginPage handleLogin={this.handleLogin}/>;
     }
@@ -106,7 +106,7 @@ class App extends React.Component {
                   deepRoutes.map((prop, key) => {
                     if (prop.redirect)
                       return <Redirect from={prop.path} to={prop.to} key={key} />;
-                    return <Route exact path={prop.path} key={key} render={ (props) => <prop.component userId={userId} {...props}/> } />;
+                    return <Route exact path={prop.path} key={key} render={ (props) => <prop.component recommendMessage={recommendMessage} userId={userId} {...props}/> } />;
                   })
                 }
                 </Switch>

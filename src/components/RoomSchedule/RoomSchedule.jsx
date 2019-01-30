@@ -39,13 +39,54 @@ const CustomTableCell = withStyles(theme => ({
 class RoomSchedule extends React.Component{
   constructor(props) {
     super(props);
+    let preChosen = Boolean(this.props.recommendMessage);
+    let tempState = preChosen ? this.preChosenState() : {};
     this.state = {
-      scheduleData: this.props.data,
+      scheduleData: tempState.scheduleData ? tempState.scheduleData : this.props.data,
 
-      chosenDate: null,
-      firstChosen: null,
-      secondChosen: null,
+      chosenDate: tempState.chosenDate ? tempState.chosenDate : null,
+      firstChosen: tempState.firstChosen ? tempState.firstChosen : null,
+      secondChosen: tempState.secondChosen ? tempState.secondChosen : null,
+
     };
+  }
+
+  preChosenState = () => {
+    let date = this.props.recommendMessage.date;
+    let tempDay = -1;
+    let scheduleData = this.props.data;
+    for (let i = 0; i < 5; i++){
+      if (scheduleData[0][i]["date"] === date){
+        tempDay = i;
+        break;
+      }
+    }
+    if (tempDay === -1)
+      return -1;
+    let startTime = this.props.recommendMessage.startTime;
+    let endTime = this.props.recommendMessage.endTime;
+    let success = true;
+
+    for (let i = startTime; i <= endTime; i ++){
+      if (scheduleData[i][tempDay]["occupied"] === true){
+        success = false;
+        break;
+      }
+    }
+    let state = {}
+    if (success){
+      scheduleData[startTime][tempDay]["click"] = true;
+      scheduleData[endTime][tempDay]["click"] = true;
+      for (let i = startTime + 1; i < endTime; i ++){
+        scheduleData[i][tempDay]["between"] = true;
+      }
+      state.firstChosen = [startTime, tempDay];
+      state.secondChosen = [endTime, tempDay];
+      state.chosenDate = date;
+      this.props.handleChange(state);
+    }
+    state.scheduleData = scheduleData;
+    return state;
   }
 
   clearBetween = (firstChosen, secondChosen, scheduleData) => {
@@ -73,6 +114,9 @@ class RoomSchedule extends React.Component{
 
   handleClick = (e, date, x, y) => {
     e.preventDefault();
+    this.handleChosen(date, x, y);
+  }
+  handleChosen = (date, x, y) => {
     let firstChosen = this.state.firstChosen;
     let secondChosen = this.state.secondChosen;
     let scheduleData = this.state.scheduleData;
@@ -162,7 +206,7 @@ class RoomSchedule extends React.Component{
         this.props.handleChange(state);
         return;
       }
-      // check whether there're timeslice been occupied between them
+      // check whether there's timeslice been occupied between them
       let start;
       let end;
       if (firstChosen[0] > x) {
@@ -173,16 +217,22 @@ class RoomSchedule extends React.Component{
         start = firstChosen[0];
         end = x;
       }
+      // there is timeslice between them
       for (let i = start + 1; i <= end; i ++){
         if (scheduleData[i][y]["occupied"]){
+          let firstChosen = this.state.firstChosen;
+          scheduleData[firstChosen[0]][firstChosen[1]]["click"] = false;
+          scheduleData[x][y]["click"] = true;
           let state = {
-            notificationType: "danger",
-            notificationMessage: occupiedMessage
+            firstChosen: [x,y],
           };
           this.props.handleChange(state);
+          state.scheduleData = scheduleData;
+          this.setState(state);
           return;
         }
       }
+      // state 1
       scheduleData[x][y]["click"] = true;
       for (let i = start + 1; i < end; i ++){
         scheduleData[i][y]["between"] = true;
@@ -362,6 +412,7 @@ RoomSchedule.propTypes = {
   originalDate: PropTypes.string,
   originalStartTime: PropTypes.number,
   originalEndTime: PropTypes.number,
+  recommendMessage: PropTypes.object,
   urgency: PropTypes.bool,
 };
 
