@@ -193,7 +193,7 @@ class UserProfile extends React.Component {
                       label="type"
                       disabled
                       fullWidth
-                      value={type}
+                      value={loaded?type:"NULL"}
                       margin="normal"
                       variant="outlined"
                     />
