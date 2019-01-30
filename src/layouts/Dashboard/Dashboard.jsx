@@ -31,6 +31,15 @@ class App extends React.Component {
       mobileOpen: false,
       login: cookies.get("login"),
       userId: cookies.get("userId"),
+      recommendMessage: {},
+      /*
+      recommendMessage example: 
+      {
+        date: "2019-02-01",
+        startTime: 18,
+        endTime: 20,
+      }
+      */
     };
     this.resizeFunction = this.resizeFunction.bind(this);
   }
@@ -48,9 +57,21 @@ class App extends React.Component {
   pasteFunction = (event) => {
     if(event.clipboardData){
       let text = event.clipboardData.getData('text/plain');
-      alert(text);
+      try {
+        let jsonData = JSON.parse(text);
+        if (jsonData.date && jsonData.startTime && jsonData.endTime)
+          this.setState({recommendMessage: jsonData});
+        console.log(jsonData)
+      }
+      catch(e){
+        console.log(e);
+      }
     }
     
+  }
+
+  resetRecommend = () => {
+    this.setState({recommendMessage:{}});
   }
 
   componentDidMount() {
@@ -87,7 +108,7 @@ class App extends React.Component {
 
   render() {
     const { classes, ...rest } = this.props;
-    const { userId, login } = this.state;
+    const { userId, login, recommendMessage } = this.state;
     if (!login){
       return <LoginPage handleLogin={this.handleLogin}/>;
     }
@@ -118,7 +139,11 @@ class App extends React.Component {
                   deepRoutes.map((prop, key) => {
                     if (prop.redirect)
                       return <Redirect from={prop.path} to={prop.to} key={key} />;
-                    return <Route exact path={prop.path} key={key} render={ (props) => <prop.component userId={userId} {...props}/> } />;
+                    return prop.path==="/room/:roomId/profile"?
+                      <Route exact path={prop.path} key={key} render={ (props) => <prop.component resetRecommend={this.resetRecommend} recommendMessage={recommendMessage} userId={userId} {...props}/> } />
+                      :
+                      <Route exact path={prop.path} key={key} render={ (props) => <prop.component userId={userId} {...props}/> } />
+                      ;
                   })
                 }
                 </Switch>
