@@ -175,14 +175,14 @@ class RoomProfile extends React.Component {
       start = firstChosen[0];
       end = secondChosen[0]+1;
     }
-    
+    let heading = this.props.match.params.heading;
     let meeting = {
       "attendantNum": null,
       "attendants": null,
       "date": chosenDate,
       "description": "无",
       "endTime": end,
-      "heading": "Meeting-" + chosenDate + "-" + start + "-" + end ,
+      "heading": heading ? heading : "Meeting-" + chosenDate + "-" + start + "-" + end ,
       "hostId": this.props.userId,
       "location": null,
       "needSignIn": false,
@@ -250,7 +250,12 @@ class RoomProfile extends React.Component {
       tv = devices.includes("TV");
     }
 
-    let { roomId } = this.props.match.params;
+    let { roomId, date, startTime, endTime } = this.props.match.params;
+    let recommendMessage = {
+      date: date,
+      startTime: startTime,
+      endTime: endTime,
+    }
     
     let { firstChosen, secondChosen } = this.state;
     let timeChosen = "";
@@ -270,8 +275,6 @@ class RoomProfile extends React.Component {
     else if (firstChosen && !secondChosen){
       timeChosen = this.state.chosenDate + " " + idToTime(firstChosen[0]) + " ~ " + idToTime(firstChosen[0]+1);
     }
-    let recommendMessage = this.props.recommendMessage;
-
     return (
       <div>
         <GridContainer>

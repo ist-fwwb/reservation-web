@@ -20,6 +20,8 @@ import image from "assets/img/sidebar-2.jpg";
 import logo from "assets/img/reactlogo.png";
 import LoginPage from "views/LoginPage/LoginPage.jsx";
 
+import { timeToId } from "variables/general.jsx";
+
 import Cookies from 'universal-cookie';
 
 const cookies = new Cookies();
@@ -31,25 +33,48 @@ class App extends React.Component {
       mobileOpen: false,
       login: cookies.get("login"),
       userId: cookies.get("userId"),
+      /*
+      recommendMessage example: 
+      {"date": "2019-02-01","startTime": "9:00","endTime": "10:00", "roomId": "5c4e9bdac9e77c00133acdd6", "heading":"whatever"}
+      */
     };
-    this.resizeFunction = this.resizeFunction.bind(this);
   }
 
   handleDrawerToggle = () => {
     this.setState({ mobileOpen: !this.state.mobileOpen });
   };
 
-  resizeFunction() {
+  resizeFunction = () => {
     if (window.innerWidth >= 960) {
       this.setState({ mobileOpen: false });
     }
   }
+
+  pasteFunction = (event) => {
+    if(event.clipboardData){
+      let text = event.clipboardData.getData('text/plain');
+      try {
+        let jsonData = JSON.parse(text);
+        if (jsonData.date && jsonData.startTime && jsonData.endTime && jsonData.roomId && jsonData.heading){
+          jsonData.startTime = timeToId(jsonData.startTime);
+          jsonData.endTime = timeToId(jsonData.endTime);
+          window.location.href = "/room/"+jsonData.roomId+"/profile/"+jsonData.date+"/"+jsonData.startTime+"/"+jsonData.endTime+"/"+jsonData.heading;
+        }
+      }
+      catch(e){
+        console.log(e);
+      }
+    }
+    
+  }
+
   componentDidMount() {
     window.addEventListener("resize", this.resizeFunction);
+    window.addEventListener("paste", this.pasteFunction);
   }
+
   componentDidUpdate(e) {
     if (e.history.location.pathname !== e.location.pathname) {
-      this.refs.mainPanel.scrollTop = 0;
       if (this.state.mobileOpen) {
         this.setState({ mobileOpen: false });
       }
@@ -68,6 +93,7 @@ class App extends React.Component {
 
   componentWillUnmount() {
     window.removeEventListener("resize", this.resizeFunction);
+    window.removeEventListener("paste", this.pasteFunction);
     if (navigator.platform.indexOf("Win") > -1 && ps){
       ps.destroy();
     }
@@ -92,7 +118,7 @@ class App extends React.Component {
           color="blue"
           {...rest}
         />
-        <div className={classes.mainPanel} ref="mainPanel">
+        <div className={classes.mainPanel}>
           <Header
             routes={dashboardRoutes}
             handleDrawerToggle={this.handleDrawerToggle}
@@ -106,7 +132,11 @@ class App extends React.Component {
                   deepRoutes.map((prop, key) => {
                     if (prop.redirect)
                       return <Redirect from={prop.path} to={prop.to} key={key} />;
-                    return <Route exact path={prop.path} key={key} render={ (props) => <prop.component recommendMessage={recommendMessage} userId={userId} {...props}/> } />;
+                    return prop.path==="/room/:roomId/profile"?
+                      <Route exact path={prop.path} key={key} render={ (props) => <prop.component userId={userId} {...props}/> } />
+                      :
+                      <Route exact path={prop.path} key={key} render={ (props) => <prop.component userId={userId} {...props}/> } />
+                      ;
                   })
                 }
                 </Switch>

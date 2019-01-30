@@ -63,8 +63,8 @@ class RoomSchedule extends React.Component{
     }
     if (tempDay === -1)
       return -1;
-    let startTime = this.props.recommendMessage.startTime;
-    let endTime = this.props.recommendMessage.endTime;
+    let startTime = Number(this.props.recommendMessage.startTime);
+    let endTime = Number(this.props.recommendMessage.endTime);
     let success = true;
 
     for (let i = startTime; i <= endTime; i ++){

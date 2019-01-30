@@ -67,7 +67,6 @@ class HomePage extends React.Component{
   
   componentDidMount(){
     let todayApi = meetingController.getMeetingByUserIdAndDateAndStatus(this.props.userId, today, "Pending");
-    console.log(todayApi)
     fetch(todayApi, {
       credentials: 'include',
       method: 'get'
