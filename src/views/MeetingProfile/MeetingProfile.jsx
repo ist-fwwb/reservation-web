@@ -9,8 +9,6 @@ import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
 import MenuItem from '@material-ui/core/MenuItem';
 import TextField from '@material-ui/core/TextField';
-import ErrorOutline from "@material-ui/icons/ErrorOutline";
-import Done from "@material-ui/icons/Done";
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
@@ -25,6 +23,8 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 
 import Stars from '@material-ui/icons/Stars';
 import Add from '@material-ui/icons/Add';
+import Done from '@material-ui/icons/Done';
+import ErrorOutline from "@material-ui/icons/ErrorOutline";
 
 import Card from "components/Card/Card.jsx";
 import CardHeader from "components/Card/CardHeader.jsx";
@@ -46,56 +46,6 @@ const styles = {
     maxWidth: 360,
   },
 };
-
-class TagDialog extends React.Component {
-  constructor(props){
-    super(props);
-    this.state = {
-      newTag: ""
-    };
-  }
-
-  handleChange = (e) => {
-    e.preventDefault();
-    this.setState({[e.target.name]:e.target.value});
-  }
-
-  handleSubmitTag = (e) => {
-    e.preventDefault();
-    this.props.handleTagSuccess(this.state.newTag);
-    this.setState({ newTag: "" });
-  }
-
-  render() {
-    const { classes, onClose, open, newTag, ...other } = this.props;
-    return (
-      <Dialog onClose={this.props.onClose} scroll={"paper"} aria-labelledby="simple-dialog-title" open={open} {...other}>
-        <DialogTitle id="simple-dialog-title">添加标签</DialogTitle>
-        <DialogContent>
-          <TextField
-            label="标签"
-            name="newTag"
-            fullWidth
-            value={newTag}
-            margin="normal"
-            variant="outlined"
-            onChange={this.handleChange}
-          />
-        </DialogContent>
-        <DialogActions> 
-          <Button color="primary" onClick={this.props.onClose}>取消</Button>
-          <Button color="primary" onClick={(e)=>this.handleSubmitTag(e)}>确认</Button>
-        </DialogActions>
-      </Dialog>
-    );
-  }
-}
-TagDialog.propTypes = {
-  classes: PropTypes.object.isRequired,
-  handleTagSuccess: PropTypes.func,
-};
-
-const TagDialogWrapped = withStyles(styles)(TagDialog);
 
 class AttendantsDialog extends React.Component {
   constructor(props){
@@ -205,8 +155,9 @@ class MeetingProfile extends React.Component {
       confirmTimeChangeOpen: false,
       // confirm profile hange dialog
       confirmProfileChangeOpen: false,
-      // confirm tag dialog
-      openTag: false,
+      // add tag
+      newTag: false,
+      newTagValue: "",
 
       // addAttendants menu
       openAttendants: false,
@@ -228,7 +179,7 @@ class MeetingProfile extends React.Component {
       }
       else{
         this.setState({...data1})
-
+        console.log(data1.attendants)
         // get all user could be invited to this meeting
         let userApi = userController.getUser();
         let attendantsArray = this.dicToArray(data1.attendants);
@@ -536,35 +487,41 @@ class MeetingProfile extends React.Component {
     })
     .then(res => res.json())
     .then((data) => {
-      if (data.error)
+      if (data.error){
         this.warning(data.error);
+        this.setState({ confirmProfileChangeOpen: false })
+      }
       else{
         this.success(editSuccessMessage);
-        window.location.reload();
+        this.setState({ confirmProfileChangeOpen: false })
       }
     })
   }
 
   // add tags
-  handleOpenTag = () => {
-    this.setState({ openTag: true });
+  handleAddTag = () => {
+    let { newTagValue, tags } = this.state;
+    if (newTagValue === ""){
+      this.setState({ tags, newTagValue: "", newTag: false });
+      return;
+    }
+    if (tags.includes(newTagValue)){
+      this.warning("标签已存在");
+      return;
+    }
+    tags.push(newTagValue);
+
+    this.setState({ tags, newTagValue: "", newTag: false });
+  };
+
+  handleNewTag = () => {
+    this.setState({ newTag: true, newTagValue: "" });
+    //this.setState({ openTag: true });
   };
 
   handleCloseTag = () => {
     this.setState({ openTag: false });
   }
-
-  handleTagSuccess = (value) => {
-    let tags = this.state.tags;
-    if (tags.includes(value)){
-      this.warning("标签已存在");
-      return;
-    }
-    tags.push(value);
-
-    this.setState({ tags });
-    this.handleCloseTag();
-  };
 
   handleDeleteTag = (e, tag) => {
     e.preventDefault();
@@ -576,8 +533,6 @@ class MeetingProfile extends React.Component {
     }
     else
       this.warning("不存在的标签")
-    
-    
   }
 
   // add attendants
@@ -667,7 +622,6 @@ class MeetingProfile extends React.Component {
     }
     else
       inMeeting = true;
-
     return (
       <div>
         <GridContainer>
@@ -802,19 +756,29 @@ class MeetingProfile extends React.Component {
                           })
                           }
                           {
-                            disabled?null:
-                              <IconButton color="primary" className={classes.button} component="span" onClick={this.handleOpenTag}>
-                                <Add/>
-                              </IconButton>
+                            !this.state.newTag ? null :
+                              <Chip
+                                label={
+                                  <TextField
+                                  name="newTagValue"
+                                  className={classes.textField}
+                                  value={this.state.newTagValue}
+                                  onChange={this.handleChange}
+                                  margin="normal"
+                                  />
+                                }
+                                className={classes.chip}
+                              />
                           }
                           {
-                            disabled?null:
-                              <TagDialogWrapped
-                                key
-                                open={this.state.openTag}
-                                handleTagSuccess={this.handleTagSuccess}
-                                onClose={this.handleCloseTag}
-                              />
+                            disabled ? null : (! this.state.newTag ? 
+                              <IconButton color="primary" className={classes.button} component="span" onClick={this.handleNewTag}>
+                                <Add/>
+                              </IconButton> :
+                              <IconButton color="primary" className={classes.button} component="span" onClick={this.handleAddTag}>
+                                <Done/>
+                              </IconButton>
+                              )
                           }
                       </CardBody>
                     </Card>
