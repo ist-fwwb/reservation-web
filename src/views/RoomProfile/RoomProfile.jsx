@@ -17,6 +17,10 @@ import ErrorOutline from "@material-ui/icons/ErrorOutline";
 import Done from "@material-ui/icons/Done";
 
 import Icon from "@material-ui/core/Icon";
+import TextField from '@material-ui/core/TextField';
+import Paper from '@material-ui/core/Paper';
+import Fab from '@material-ui/core/Fab';
+import Divider from '@material-ui/core/Divider';
 
 import dashboardStyle from "assets/jss/material-dashboard-react/layouts/dashboardStyle.jsx";
 import airConditionerIcon from "assets/icon/airConditioner.svg";
@@ -35,17 +39,23 @@ import wireNetworkIcon from "assets/icon/wireNetwork.svg";
 import wireNetworkIcon0 from "assets/icon/wireNetwork0.svg";
 import tvIcon from "assets/icon/tv.svg";
 import tvIcon0 from "assets/icon/tv0.svg";
+
 import { roomController } from "variables/general.jsx";
 
-import { Link } from "react-router-dom";
+import RoomSchedule from "components/RoomSchedule/RoomSchedule.jsx";
+
+import { ScheduleDataToRows, timeSliceController, meetingController, idToTime } from "variables/general.jsx";
 
 function roomCategory(eng){
   if (eng === "SMALL")
-    return "小会议室";
+    return "小";
   else if (eng === "BIG")
-    return "大会议室";
-  return "中会议室";
+    return "大";
+  return "中";
 }
+
+const timeChosenMessage = "请先选择时间";
+const reservationSuccessMessage = "预约成功";
 
 class RoomProfile extends React.Component {
   state = {
@@ -61,6 +71,10 @@ class RoomProfile extends React.Component {
     wifi: false,
     wireNetwork: false,
     tv: false,
+
+    scheduleData: null,
+    firstChosen: null,
+    secondChosen: null
   }
 
   componentDidMount(){
@@ -77,6 +91,32 @@ class RoomProfile extends React.Component {
       console.log(error);
       this.setState({error: true});
     })
+
+    let timeApi = timeSliceController.getTimeSilceByRoomId(roomId);
+    fetch(timeApi, {
+      credentials: 'include',
+      method: 'get',
+    })
+    .then(res => res.json())
+    .then((data2) => {
+      if (data2.error){
+        let state = {
+          notificationType: "danger",
+          notificationMessage: data2.error
+        };
+        this.setState(state);
+      }
+      else{
+        this.setState({scheduleData: data2})
+      }
+    })
+  }
+
+  componentWillUnmount() {
+    let id = window.setTimeout(null, 0);
+    while (id--) {
+      window.clearTimeout(id);
+    }
   }
 
   showNotification = (place) => {
@@ -100,12 +140,87 @@ class RoomProfile extends React.Component {
     return null;
   }
 
+  success = (msg) => {
+    this.setState({
+      notificationType: "success",
+      notificationMessage: msg
+    })
+    this.showNotification("br");
+  }
+
   warning = (msg) => {
     this.setState({
       notificationType: "danger",
       notificationMessage: msg
     })
     this.showNotification("br");
+  }
+
+  handleSubmit = (e) => {
+    e.preventDefault();
+    let firstChosen = this.state.firstChosen;
+    let secondChosen = this.state.secondChosen;
+    if (!(this.state.firstChosen && this.state.secondChosen)){
+      this.warning(timeChosenMessage);
+      return;
+    }
+    let start;
+    let end;
+    let chosenDate = this.state.chosenDate;
+    if (!secondChosen){
+      start = firstChosen[0];
+      end = start + 1;
+    }
+    else{
+      start = firstChosen[0];
+      end = secondChosen[0]+1;
+    }
+    
+    let meeting = {
+      "attendantNum": null,
+      "attendants": null,
+      "date": chosenDate,
+      "description": "无",
+      "endTime": end,
+      "heading": "Meeting-" + chosenDate + "-" + start + "-" + end ,
+      "hostId": this.props.userId,
+      "location": null,
+      "needSignIn": false,
+      "roomId": this.props.match.params.roomId,
+      "startTime": start,
+      "type": "COMMON",
+      "tags": [],
+    }
+    meeting = JSON.stringify(meeting);
+    let api = meetingController.createMeeting();
+    fetch(api, {
+      credentials: 'include',
+      method: 'post',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: meeting
+    })
+    .then( res => res.json())
+    .then((data) => {
+      if (data.error){
+        this.warning(data.error);
+      }
+      else {
+        this.success(reservationSuccessMessage);
+        window.location.href="/meeting/"+data.id+"/profile";
+      }
+    })
+    .catch(error => {
+      this.warning(error);
+    })
+  }
+
+  handleChange = (state) => {
+    this.setState(state);
+    if (state.notificationType)
+      this.showNotification("br");
   }
 
   render(){
@@ -124,7 +239,7 @@ class RoomProfile extends React.Component {
     let wireNetwork = false;
     let tv = false;
     if (room){
-      const devices = this.state.room.utils;
+      const devices = room.utils;
       airConditioned = devices.includes("AIRCONDITIONER");
       blackBoard = devices.includes("BLACKBOARD");
       desk = devices.includes("DESK");
@@ -134,6 +249,27 @@ class RoomProfile extends React.Component {
       wireNetwork = devices.includes("WIRENETWORK");
       tv = devices.includes("TV");
     }
+
+    let { roomId } = this.props.match.params;
+    
+    let { firstChosen, secondChosen } = this.state;
+    let timeChosen = "";
+    if (firstChosen && secondChosen){
+      let start;
+      let end;
+      if (firstChosen[0] > secondChosen[0]){
+        start = secondChosen[0];
+        end = firstChosen[0];
+      }
+      else{
+        end = secondChosen[0];
+        start = firstChosen[0];
+      }
+      timeChosen = this.state.chosenDate + " " + idToTime(start) + " ~ " + idToTime(end+1);
+    }
+    else if (firstChosen && !secondChosen){
+      timeChosen = this.state.chosenDate + " " + idToTime(firstChosen[0]) + " ~ " + idToTime(firstChosen[0]+1);
+    }
     
     return (
       <div>
@@ -142,18 +278,11 @@ class RoomProfile extends React.Component {
             <Card>
               <CardBody>
                 {
-                  room ? <div>
+                  room ? 
                     <div>
-                      <h3>{room.location}</h3>
-                      <small>{roomCategory(room.size)}</small>
+                      <h2>{room.location}</h2>
                     </div>
-                    <div>
-                      <Link to={"/room/"+this.props.match.params.roomId+"/"+room.location+"/schedule"}>
-                        会议日程
-                      </Link>
-                    </div>
-                    </div>
-                    : <h3>{this.props.match.params.roomId}</h3>
+                    : <h3>{roomId}</h3>
                 }
               
               <GridContainer>
@@ -262,7 +391,7 @@ class RoomProfile extends React.Component {
                       <h2 className={classes.cardCategory} style={{color: "black"}}>容量</h2>
                     </CardHeader>
                     <CardBody>
-                      <h3>10 人</h3>
+                      <h3>{room?roomCategory(room.size):"NULL"}</h3>
                     </CardBody>
                     <CardFooter stats>
                         <div className={classes.stats}>
@@ -275,6 +404,60 @@ class RoomProfile extends React.Component {
                 <GridItem xs={12} sm={6} md={4}>
                   <br/>
                   <img src={meetingRoomImage} width={"110%"} alt="meetingroom"/>
+                </GridItem>
+                <Divider variant="middle"/>
+                <GridItem xs={12} sm={12} md={12}>
+                  <Card>
+                    <CardHeader>
+                      <table>
+                        <tbody>
+                          <tr>
+                            <td width={220}>
+                              <TextField
+                                fullWidth
+                                disabled
+                                label="预约时间"
+                                value={timeChosen}
+                                margin="normal"
+                                variant="outlined"
+                              />
+                            </td>
+                            <td>
+                              &nbsp;&nbsp;&nbsp;&nbsp;
+                            </td>
+                            <td>
+                              <Fab variant="extended" color="primary" onClick={this.handleSubmit}>
+                                <Done/>
+                                &nbsp;&nbsp;确定预约
+                              </Fab>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </CardHeader>
+                    <CardBody>
+                      <Paper>
+                        {
+                          ! this.state.scheduleData ? null :
+                          <RoomSchedule 
+                            data={ScheduleDataToRows(this.state.scheduleData)} 
+                            roomId={roomId} 
+                            handleChange={this.handleChange}
+                          />
+
+                        }
+                        <Snackbar
+                          place="br"
+                          color={this.state.notificationType}
+                          icon={this.typeToIcon(this.state.notificationType)}
+                          message={this.state.notificationMessage}
+                          open={this.state.br}
+                          closeNotification={() => this.setState({ br: false })}
+                          close
+                        />
+                      </Paper>
+                    </CardBody>
+                  </Card>
                 </GridItem>
               </GridContainer>
               </CardBody>

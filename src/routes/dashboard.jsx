@@ -7,7 +7,6 @@ import Home from "@material-ui/icons/Home";
 import RoomPage from "views/RoomPage/RoomPage.jsx";
 import MeetingPage from "views/MeetingPage/MeetingPage.jsx";
 import UserProfile from "views/UserProfile/UserProfile.jsx";
-import RoomSchedulePage from "views/RoomSchedulePage/RoomSchedulePage.jsx";
 import RoomProfile from "views/RoomProfile/RoomProfile.jsx";
 import HomePage from "views/HomePage/HomePage.jsx";
 import MeetingProfile from "views/MeetingProfile/MeetingProfile.jsx";
@@ -38,10 +37,6 @@ export const dashboardRoutes = [
 ];
 
 let routesNotInSideBar = [
-  {
-    path: "/room/:roomId/:roomLocation/schedule",
-    component: RoomSchedulePage
-  },
   {
     path: "/room/:roomId/profile",
     component: RoomProfile

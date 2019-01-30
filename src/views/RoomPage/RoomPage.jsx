@@ -9,7 +9,6 @@ import Update from "@material-ui/icons/Update";
 //import SentimentDissatisfied from "@material-ui/icons/SentimentDissatisfied";
 import SentimentVerySatisfied from "@material-ui/icons/SentimentVerySatisfied";
 import Info from "@material-ui/icons/Info";
-import Schedule from "assets/icon/schedule.svg";
 import ErrorOutline from "@material-ui/icons/ErrorOutline";
 import Done from "@material-ui/icons/Done";
 
@@ -149,8 +148,6 @@ class RoomPage extends React.Component {
                         <tbody>
                           <tr>
                             <td><Info/>&nbsp;&nbsp;<Link aligh="right" to={"/room/"+room.id+"/profile"}>基本信息</Link></td>
-                            <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
-                            <td><img src={Schedule} width="24px" alt="schedule icon"/>&nbsp;&nbsp;<Link align="left" to={"/room/"+room.id +"/"+room.location+"/schedule"}>日程安排</Link></td>
                           </tr>
                         </tbody>
                       </table>
