@@ -23,7 +23,7 @@ import LoginPage from "views/LoginPage/LoginPage.jsx";
 import Cookies from 'universal-cookie';
 
 const cookies = new Cookies();
-
+let ps;
 class App extends React.Component {
   constructor(props) {
     super(props);
@@ -59,7 +59,7 @@ class App extends React.Component {
   setPsRef = (element) => {
     this.psRef = element;
     if (navigator.platform.indexOf("Win") > -1  && element){
-      ps = new PerfectScrollbar( element, {
+     ps = new PerfectScrollbar( element, {
         suppressScrollX: true,
         suppressScrollY: false,
       })
