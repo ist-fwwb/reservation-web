@@ -45,9 +45,6 @@ class App extends React.Component {
     }
   }
   componentDidMount() {
-    if (navigator.platform.indexOf("Win") > -1) {
-      const ps = new PerfectScrollbar(this.refs.mainPanel);
-    }
     window.addEventListener("resize", this.resizeFunction);
   }
   componentDidUpdate(e) {
@@ -58,8 +55,22 @@ class App extends React.Component {
       }
     }
   }
+
+  setPsRef = (element) => {
+    this.psRef = element;
+    if (navigator.platform.indexOf("Win") > -1  && element){
+      ps = new PerfectScrollbar( element, {
+        suppressScrollX: true,
+        suppressScrollY: false,
+      })
+    }
+  }
+
   componentWillUnmount() {
     window.removeEventListener("resize", this.resizeFunction);
+    if (navigator.platform.indexOf("Win") > -1 && ps){
+      ps.destroy();
+    }
   }
 
   render() {
@@ -69,7 +80,7 @@ class App extends React.Component {
       return <LoginPage handleLogin={this.handleLogin}/>;
     }
     return (
-      <div className={classes.wrapper}>
+      <div className={classes.wrapper} ref={this.setPsRef}>
         <Sidebar
           userId={userId}
           routes={dashboardRoutes}
