@@ -39,14 +39,25 @@ class App extends React.Component {
     this.setState({ mobileOpen: !this.state.mobileOpen });
   };
 
-  resizeFunction() {
+  resizeFunction = () => {
     if (window.innerWidth >= 960) {
       this.setState({ mobileOpen: false });
     }
   }
+
+  pasteFunction = (event) => {
+    if(event.clipboardData){
+      let text = event.clipboardData.getData('text/plain');
+      alert(text);
+    }
+    
+  }
+
   componentDidMount() {
     window.addEventListener("resize", this.resizeFunction);
+    window.addEventListener("paste", this.pasteFunction);
   }
+
   componentDidUpdate(e) {
     if (e.history.location.pathname !== e.location.pathname) {
       this.refs.mainPanel.scrollTop = 0;
@@ -68,6 +79,7 @@ class App extends React.Component {
 
   componentWillUnmount() {
     window.removeEventListener("resize", this.resizeFunction);
+    window.removeEventListener("paste", this.pasteFunction);
     if (navigator.platform.indexOf("Win") > -1 && ps){
       ps.destroy();
     }
