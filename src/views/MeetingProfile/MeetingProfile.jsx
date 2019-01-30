@@ -20,6 +20,7 @@ import Checkbox from '@material-ui/core/Checkbox';
 import FormControl from '@material-ui/core/FormControl';
 import FormGroup from '@material-ui/core/FormGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Switch from '@material-ui/core/Switch';
 
 import Stars from '@material-ui/icons/Stars';
 import Add from '@material-ui/icons/Add';
@@ -179,7 +180,6 @@ class MeetingProfile extends React.Component {
       }
       else{
         this.setState({...data1})
-        console.log(data1.attendants)
         // get all user could be invited to this meeting
         let userApi = userController.getUser();
         let attendantsArray = this.dicToArray(data1.attendants);
@@ -457,6 +457,7 @@ class MeetingProfile extends React.Component {
 
   handleSubmit = (e) => {
     e.preventDefault();
+    this.setState({ confirmProfileChangeOpen: false })
     let msg = {};
     msg.attendantNum = this.state.attendantNum;
     msg.attendants = this.state.attendants;
@@ -473,9 +474,9 @@ class MeetingProfile extends React.Component {
     msg.status = this.state.status;
     msg.type = this.state.type;
     msg.tags = this.state.tags;
-
     let api = meetingController.editMeetingByMeetingId(this.props.match.params.meetingId);
     msg = JSON.stringify(msg);
+
     fetch(api, {
       credentials: 'include',
       method:'put',
@@ -489,11 +490,9 @@ class MeetingProfile extends React.Component {
     .then((data) => {
       if (data.error){
         this.warning(data.error);
-        this.setState({ confirmProfileChangeOpen: false })
       }
       else{
         this.success(editSuccessMessage);
-        this.setState({ confirmProfileChangeOpen: false })
       }
     })
   }
@@ -584,7 +583,11 @@ class MeetingProfile extends React.Component {
     this.setState({ attendantsWithName, addAttendants, attendants });
   }
 
-  
+  handleChangeSwitch = event => {
+    console.log(event.target.checked)
+    console.log(event.target.name)
+    this.setState({ [event.target.name]: event.target.checked });
+  };  
 
   render(){
     if (this.state.error){
@@ -606,7 +609,7 @@ class MeetingProfile extends React.Component {
       date, 
       description, 
       heading,
-      tags
+      tags,
     } = this.state;
     const pending = (status === "Pending");
     const disabled = !host || !pending;
@@ -725,7 +728,27 @@ class MeetingProfile extends React.Component {
                   </GridItem>
                 </GridContainer>
                 <GridContainer>
-                  <GridItem xs={12} sm={12} md={11}>
+                  <GridItem xs={12} sm={12} md={2}>
+                      <Card>
+                        <CardBody>
+                          <Typography className={classes.title} color="textSecondary" gutterBottom>
+                            签到
+                          </Typography>
+                          <FormControlLabel
+                            control={
+                              <Switch
+                                checked={loaded ? this.state.needSignIn : false}
+                                onChange={this.handleChangeSwitch}
+                                name="needSignIn"
+                                value="needSignIn"
+                                color="primary"
+                              />
+                            }
+                          />
+                        </CardBody>
+                      </Card>
+                    </GridItem>
+                  <GridItem xs={12} sm={12} md={9}>
                     <Card>
                       <CardBody>
                         <Typography className={classes.title} color="textSecondary" gutterBottom>

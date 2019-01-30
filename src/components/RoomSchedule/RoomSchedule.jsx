@@ -21,6 +21,8 @@ import { idToTime } from "variables/general.jsx";
 
 const occupiedMessage = "会议室被占用";
 
+const maxLenghtToShow = 10;
+
 const colorList = [purple[200], pink[200], orange[300], cyan[200], teal[300]]
 let colorMap = {};
 
@@ -332,7 +334,7 @@ class RoomSchedule extends React.Component{
                         : cell["occupied"] ? (
                             <div style={{background:bgcolor ,borderRadius:"15px", lineHeight:"45px" ,height:"45px", width:"92%", textAlign:"center"}}>
                               <Link to={"/meeting/"+cell["meetingid"]+"/profile"}>
-                                        {!cell["name"] ? "null" : (cell["name"].length > 5 ? cell["name"].substring(0,5)+".." : cell["name"])}
+                                        {!cell["name"] ? "null" : (cell["name"].length > maxLenghtToShow ? cell["name"].substring(0,maxLenghtToShow)+".." : cell["name"])}
                               </Link>
                             </div>
                           )
