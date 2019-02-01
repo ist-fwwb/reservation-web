@@ -1,9 +1,18 @@
 const prefix = "http://";
-const domain = "www.test.com";
+
+const lexer_domain = "localhost";
+const lexer_port = "4000";
+const lexer_server = prefix + lexer_domain + ":" + lexer_port;
+
+const lexerController = {
+  "lexer":(text) => (lexer_server + "/lexer/" + encodeURIComponent(text)),
+}
+
+const domain = "47.106.8.44";
 const port = "31000";
 const server = prefix + domain + ":" + port;
 
-const dateToString = (date) => (date.toLocaleDateString([],{year:"numeric", month:"2-digit", day:"numeric"}).replace(/\//g,'-'));
+const dateToString = (date) => (date.toLocaleDateString([],{year:"numeric", month:"2-digit", day:"2-digit"}).replace(/\//g,'-'));
 const today = dateToString(new Date());
 
 const nextDay = (day) => {
@@ -25,6 +34,14 @@ const timeToId = (time) => {
 }
 
 const roomController = {
+  "getRoomByStartTimeAndEndTimeAndDate":(startTime, endTime, date) => {
+    let startTimeStr = startTime ? "startTime="+startTime+"&" : null;
+    let endTimeStr = endTime ? "endTime="+endTime+"&" : null;
+    let dateStr = date ? "date="+date+"&" : null;
+    let api = server+"/meetingroom?"+startTimeStr+endTimeStr+dateStr;
+    api = api.substring(0, api.length-1);
+    return api;
+  },
   "getRoom": () => (server + "/meetingroom" ),
   "getRoomByRoomId": (roomId) => (server + "/meetingroom/" + roomId),
   "createRoom": () => (server + "/meetingroom"), // json params in req body
@@ -44,6 +61,7 @@ const meetingController = {
     let roomIdStr = roomId ? "roomId="+roomId+"&" : null;
     let statusStr = status ? "status="+status+"&" : null;
     let api = server + "/meeting?"+dateStr + roomIdStr + statusStr;
+    api = api.substring(0, api.length-2);
     return api;
   },
   "createMeeting": () => (server + "/meeting"), // json params in req body
@@ -150,4 +168,5 @@ module.exports = {
   userController,
   quickSort,
   ScheduleDataToRows,
+  lexerController,
 };

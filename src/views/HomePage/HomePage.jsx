@@ -20,6 +20,8 @@ import Snackbar from "components/Snackbar/Snackbar.jsx";
 import { meetingController, idToTime, today } from "variables/general.jsx";
 import { Link } from "react-router-dom";
 
+import { lexerController } from "variables/general.jsx";
+
 const slidesSettings = {
   dots: true,
   fade: true,
@@ -47,6 +49,32 @@ class HomePage extends React.Component{
     }
   }
 
+  pasteFunction = (event) => {
+    if(event.clipboardData){
+      let text = event.clipboardData.getData('text/plain');
+      let api = lexerController.lexer(text);
+      console.log(api)
+      try {
+        fetch(api, {
+          method:'get',
+        })
+        .then((res) => res.json())
+        .then((data) => {
+          if(data.error){
+            this.warning(data.error);
+          }
+          else{
+            window.location.href = "/room/"+data.roomId+"/profile/"+data.date+"/"+data.startTime+"/"+data.endTime+"/"+data.content;
+          }
+        })
+        
+      }
+      catch(e){
+        this.warning("解析错误")
+      }
+    } 
+  }
+
   JSONToArray = (jsonArray) => {
     let re = [];
     for (let i in jsonArray){
@@ -66,6 +94,8 @@ class HomePage extends React.Component{
   }
   
   componentDidMount(){
+    window.addEventListener("paste", this.pasteFunction);
+
     let todayApi = meetingController.getMeetingByUserIdAndDateAndStatus(this.props.userId, today, "Pending");
     fetch(todayApi, {
       credentials: 'include',
@@ -82,6 +112,10 @@ class HomePage extends React.Component{
         
     })
     .catch(e => console.log(e))
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener("paste", this.pasteFunction);
   }
 
   showNotification = (place) => {

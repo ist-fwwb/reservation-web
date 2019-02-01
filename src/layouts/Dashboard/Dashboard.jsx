@@ -19,9 +19,6 @@ import dashboardStyle from "assets/jss/material-dashboard-react/layouts/dashboar
 import image from "assets/img/sidebar-2.jpg";
 import logo from "assets/img/reactlogo.png";
 import LoginPage from "views/LoginPage/LoginPage.jsx";
-
-import { timeToId } from "variables/general.jsx";
-
 import Cookies from 'universal-cookie';
 
 const cookies = new Cookies();
@@ -33,10 +30,6 @@ class App extends React.Component {
       mobileOpen: false,
       login: cookies.get("login"),
       userId: cookies.get("userId"),
-      /*
-      recommendMessage example: 
-      {"date": "2019-02-01","startTime": "9:00","endTime": "10:00", "roomId": "5c4e9bdac9e77c00133acdd6", "heading":"whatever"}
-      */
     };
   }
 
@@ -50,27 +43,8 @@ class App extends React.Component {
     }
   }
 
-  pasteFunction = (event) => {
-    if(event.clipboardData){
-      let text = event.clipboardData.getData('text/plain');
-      try {
-        let jsonData = JSON.parse(text);
-        if (jsonData.date && jsonData.startTime && jsonData.endTime && jsonData.roomId && jsonData.heading){
-          jsonData.startTime = timeToId(jsonData.startTime);
-          jsonData.endTime = timeToId(jsonData.endTime);
-          window.location.href = "/room/"+jsonData.roomId+"/profile/"+jsonData.date+"/"+jsonData.startTime+"/"+jsonData.endTime+"/"+jsonData.heading;
-        }
-      }
-      catch(e){
-        console.log(e);
-      }
-    }
-    
-  }
-
   componentDidMount() {
     window.addEventListener("resize", this.resizeFunction);
-    window.addEventListener("paste", this.pasteFunction);
   }
 
   componentDidUpdate(e) {
@@ -93,7 +67,6 @@ class App extends React.Component {
 
   componentWillUnmount() {
     window.removeEventListener("resize", this.resizeFunction);
-    window.removeEventListener("paste", this.pasteFunction);
     if (navigator.platform.indexOf("Win") > -1 && ps){
       ps.destroy();
     }
