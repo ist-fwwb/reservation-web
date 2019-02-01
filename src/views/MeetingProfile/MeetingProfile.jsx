@@ -14,18 +14,23 @@ import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogActions from '@material-ui/core/DialogActions';
 import Slide from '@material-ui/core/Slide';
-import blue from '@material-ui/core/colors/blue';
 import Button from "@material-ui/core/Button";
 import Checkbox from '@material-ui/core/Checkbox';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemAvatar from '@material-ui/core/ListItemAvatar';
+import ListItemText from '@material-ui/core/ListItemText';
+import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import FormControl from '@material-ui/core/FormControl';
-import FormGroup from '@material-ui/core/FormGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Switch from '@material-ui/core/Switch';
+import Avatar from '@material-ui/core/Avatar';
 
 import Stars from '@material-ui/icons/Stars';
 import Add from '@material-ui/icons/Add';
 import Done from '@material-ui/icons/Done';
 import ErrorOutline from "@material-ui/icons/ErrorOutline";
+import PersonIcon from '@material-ui/icons/Person';
 
 import Card from "components/Card/Card.jsx";
 import CardHeader from "components/Card/CardHeader.jsx";
@@ -34,19 +39,18 @@ import CardFooter from "components/Card/CardFooter.jsx";
 import dashboardStyle from "assets/jss/material-dashboard-react/layouts/dashboardStyle.jsx";
 import Snackbar from "components/Snackbar/Snackbar.jsx";
 import RoomSchedule from "components/RoomSchedule/RoomSchedule.jsx";
+import { Link } from "react-router-dom";
 
 import { ScheduleDataToRows, timeSliceController, meetingController, idToTime, userController } from "variables/general.jsx";
 
-const styles = {
-  avatar: {
-    backgroundColor: blue[100],
-    color: blue[600],
-  },
+const styles = theme => ({
   root: {
     width: '100%',
     maxWidth: 360,
+    minWidth: 230,
+    backgroundColor: theme.palette.background.paper,
   },
-};
+});
 
 class AttendantsDialog extends React.Component {
   constructor(props){
@@ -88,23 +92,28 @@ class AttendantsDialog extends React.Component {
         <DialogTitle id="simple-dialog-title">邀请用户加入会议</DialogTitle>
         <DialogContent>
           <FormControl component="fieldset" className={classes.formControl}>
-          <FormGroup>
+            <List dense className={classes.root}>
             {addattendants.map(value => (
-              <FormControlLabel
-              key={value.id}
-              control={
-                <Checkbox
-                  checked={this.state.checked.indexOf(value) !== -1}
-                  tabIndex={-1}
-                  disableRipple
-                  onChange={this.handleChange(value)}
-                />
-              }
-              label={value.name}
-              />
+              <ListItem key={value.id}>
+                <ListItemAvatar>
+                  <Avatar className={classes.avatar}>
+                    <PersonIcon />
+                  </Avatar>
+                </ListItemAvatar>
+                <ListItemText primary={value.name}/>
+                <ListItemSecondaryAction>
+                  <Checkbox
+                    checked={this.state.checked.indexOf(value) !== -1}
+                    tabIndex={-1}
+                    disableRipple
+                    onChange={this.handleChange(value)}
+                  />
+                </ListItemSecondaryAction>
+              </ListItem>
+              
             ))}
-          </FormGroup>
-        </FormControl>
+            </List>
+          </FormControl>
         </DialogContent>
         <DialogActions> 
           <Button color="primary" onClick={this.props.onClose}>取消</Button>
@@ -163,7 +172,7 @@ class MeetingProfile extends React.Component {
       // addAttendants menu
       openAttendants: false,
   
-      host: false,
+      hostFlag: false,
     }
   }
 
@@ -200,7 +209,7 @@ class MeetingProfile extends React.Component {
           }
           delete data1.attendants;
           this.setState({
-            host: data1.hostId === this.props.userId,
+            hostFlag: data1.hostId === this.props.userId,
             addAttendants: re,
             loaded1: true,
           });
@@ -214,13 +223,18 @@ class MeetingProfile extends React.Component {
         })
         .then(res => res.json())
         .then((data2) => {
+          let hostname;
           for (let i in data2){
             if (data2[i] === null)
               data2[i] = {id: attendantsArray[i], name: "null"}
+            if (attendantsArray[i] === data1.hostId){
+              hostname = data2[i].name;
+            }
           }
           this.setState({
             attendantsWithName: data2,
-            loaded2: true
+            loaded2: true,
+            hostname
           })
         })
 
@@ -474,6 +488,7 @@ class MeetingProfile extends React.Component {
     msg.status = this.state.status;
     msg.type = this.state.type;
     msg.tags = this.state.tags;
+    msg.timestamp = this.state.timestamp;
     let api = meetingController.editMeetingByMeetingId(this.props.match.params.meetingId);
     msg = JSON.stringify(msg);
 
@@ -599,23 +614,25 @@ class MeetingProfile extends React.Component {
       loaded1, 
       loaded2, 
       attendantsWithName, 
-      host, 
-      location, 
+      hostFlag, 
+      location,
+      roomId,
       startTime, 
       endTime, 
       type, 
       status, 
       hostId, 
+      hostname,
       date, 
       description, 
       heading,
       tags,
     } = this.state;
     const pending = (status === "Pending");
-    const disabled = !host || !pending;
+    const disabled = !hostFlag || !pending;
     const loaded = loaded1 && loaded2;
     let inMeeting = false;
-    if (!host){
+    if (!hostFlag){
       for(let i in attendantsWithName){
         if (attendantsWithName[i].id === this.props.userId){
           inMeeting = true;
@@ -641,15 +658,17 @@ class MeetingProfile extends React.Component {
               <CardBody>
                 <GridContainer>
                   <GridItem xs={12} sm={12} md={4}>
-                    <TextField
-                      label="发起人"
-                      disabled
-                      fullWidth
-                      className={classes.textField}
-                      value={loaded?hostId:"NULL"}
-                      margin="normal"
-                      variant="outlined"
-                    />
+                    <Link to={"/user/"+hostId+"/profile"}>
+                      <TextField
+                        label="发起人"
+                        disabled
+                        fullWidth
+                        className={classes.textField}
+                        value={loaded?hostname:"NULL"}
+                        margin="normal"
+                        variant="outlined"
+                      />
+                    </Link>
                   </GridItem>
                   <GridItem xs={12} sm={12} md={4}>
                     <TextField
@@ -694,15 +713,17 @@ class MeetingProfile extends React.Component {
                 </GridContainer>
                 <GridContainer>
                   <GridItem xs={12} sm={12} md={4}>
-                    <TextField
-                      label="会议室"
-                      disabled
-                      fullWidth
-                      className={classes.textField}
-                      value={loaded?location:"NULL"}
-                      margin="normal"
-                      variant="outlined"
-                    />
+                    <Link to={"/room/"+roomId+"/profile"}>
+                      <TextField
+                        label="会议室"
+                        disabled
+                        fullWidth
+                        className={classes.textField}
+                        value={loaded?location:"NULL"}
+                        margin="normal"
+                        variant="outlined"
+                      />
+                    </Link>
                   </GridItem>
                   <GridItem xs={12} sm={12} md={4}>
                     <TextField
@@ -819,9 +840,9 @@ class MeetingProfile extends React.Component {
                             if (!data)
                               return null;
                             let hostIcon = <Stars/>
-                            let host = data.id===this.state.hostId;
+                            let local_hostFlag = data.id===this.state.hostId;
                             let disabled = !(this.state.hostId === this.props.userId);
-                            if (host)
+                            if (local_hostFlag)
                               return (
                                 <Chip
                                     key={key}
@@ -892,7 +913,7 @@ class MeetingProfile extends React.Component {
               </CardBody>
               {
                 !loaded || !pending ? null :
-                ( host ? 
+                ( hostFlag ? 
                     <CardFooter>
                       <GridContainer>
                         <GridItem xs={12} sm={12} md={4}>
