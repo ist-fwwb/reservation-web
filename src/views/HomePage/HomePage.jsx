@@ -13,14 +13,21 @@ import Done from "@material-ui/icons/Done";
 import Slider from "react-slick";
 import TextField from '@material-ui/core/TextField';
 import Button from "@material-ui/core/Button";
+import DialogTitle from '@material-ui/core/DialogTitle';
+import Dialog from '@material-ui/core/Dialog';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogActions from '@material-ui/core/DialogActions';
+import Slide from '@material-ui/core/Slide';
 
 import Table from "components/Table/Table.jsx";
 
 import Snackbar from "components/Snackbar/Snackbar.jsx";
-import { meetingController, idToTime, today } from "variables/general.jsx";
+import { meetingController, lexerController, idToTime, today } from "variables/general.jsx";
 import { Link } from "react-router-dom";
 
-import { lexerController } from "variables/general.jsx";
+function Transition(props) {
+  return <Slide direction="up" {...props} />;
+}
 
 const slidesSettings = {
   dots: true,
@@ -46,7 +53,66 @@ class HomePage extends React.Component{
       notificationType: null,
 
       error: false,
+      
+      confirmSmartReserveOpen: false,
     }
+  }
+
+  confirmSmartReserveOpen = () => {
+    this.setState({ confirmSmartReserveOpen: true });
+  };
+
+  confirmSmartReserveClose = () => {
+    this.setState({ confirmSmartReserveOpen: false });
+  };
+
+  reserve = (e, startTime, endTime, date, roomId, heading) => {
+    e.preventDefault();
+    let meeting = {
+      "attendantNum": null,
+      "attendants": null,
+      "date": date,
+      "description": "无",
+      "endTime": endTime,
+      "heading": heading ? heading : "Meeting-" + date + "-" + startTime + "-" + endTime ,
+      "hostId": this.props.userId,
+      "location": null,
+      "needSignIn": false,
+      "roomId": roomId,
+      "startTime": startTime,
+      "type": "COMMON",
+      "tags": [],
+    }
+    console.log(meeting)
+    meeting = JSON.stringify(meeting);
+    let api = meetingController.createMeeting();
+    console.log(api)
+    fetch(api, {
+      credentials: 'include',
+      method: 'post',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: meeting
+    })
+    .then( res => res.json())
+    .then((data) => {
+      console.log(data)
+      if (data.error){
+        this.confirmSmartReserveClose();
+        this.warning(data.error);
+      }
+      else {
+        this.success("预约成功");
+        window.location.href="/meeting/"+data.id+"/profile";
+      }
+    })
+    .catch(error => {
+      console.log(error)
+      this.confirmSmartReserveClose();
+      this.warning("智能预约失败");
+    })
   }
 
   pasteFunction = (event) => {
@@ -60,11 +126,17 @@ class HomePage extends React.Component{
         })
         .then((res) => res.json())
         .then((data) => {
+          console.log(data)
           if(data.error){
             this.warning(data.error);
           }
           else{
-            window.location.href = "/room/"+data.roomId+"/profile/"+data.date+"/"+data.startTime+"/"+data.endTime+"/"+data.content;
+            this.setState({
+              ...data,
+              confirmSmartReserveOpen: true,
+            })
+            //this.reserve(data.startTime, data.endTime, data.date, data.roomId, data.heading);
+            //window.location.href = "/room/"+data.roomId+"/profile/"+data.date+"/"+data.startTime+"/"+data.endTime+"/"+data.heading;
           }
         })
         
@@ -118,14 +190,11 @@ class HomePage extends React.Component{
     window.removeEventListener("paste", this.pasteFunction);
   }
 
-  showNotification = (place) => {
-    let x = [];
-    x[place] = true;
-    this.setState(x);
+  showNotification = () => {
+    this.setState({br: true});
     this.alertTimeout = setTimeout(
       function() {
-        x[place] = false;
-        this.setState(x);
+        this.setState({br: false});
       }.bind(this),
       6000
     );
@@ -144,7 +213,7 @@ class HomePage extends React.Component{
       notificationType: "danger",
       notificationMessage: msg
     })
-    this.showNotification("br");
+    this.showNotification();
   }
 
   success = (msg) => {
@@ -152,7 +221,7 @@ class HomePage extends React.Component{
       notificationType: "success",
       notificationMessage: msg
     })
-    this.showNotification("br");
+    this.showNotification();
   }
 
   handleChange = (e) => {
@@ -189,7 +258,7 @@ class HomePage extends React.Component{
   render(){
     if (this.state.error)
       return <h2>Network Error</h2>
-    let { todayMeetings } = this.state;
+    let { todayMeetings, startTime, endTime, date, heading, roomId, location } = this.state;
     return(
       <div>
         <GridContainer>
@@ -299,6 +368,29 @@ class HomePage extends React.Component{
           closeNotification={() => this.setState({ br: false })}
           close
         />
+        <Dialog
+          open={this.state.confirmSmartReserveOpen}
+          TransitionComponent={Transition}
+          keepMounted
+          onClose={this.confirmSmartReserveClose}
+          aria-labelledby="alert-dialog-slide-title"
+          aria-describedby="alert-dialog-slide-description"
+        >
+          <DialogTitle id="alert-dialog-slide-title">
+            {"确认预订"}
+          </DialogTitle>
+          <DialogContent>
+          {"会议室:"+location+" 日期:"+date+" 时间:"+idToTime(startTime)+"~"+idToTime(endTime)}
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={this.confirmSmartReserveClose} color="primary">
+              取消
+            </Button>
+            <Button onClick={(e) => this.reserve(e, startTime, endTime, date, roomId, heading)} color="primary">
+              确定
+            </Button>
+          </DialogActions>
+        </Dialog>
       </div>
     )
   }

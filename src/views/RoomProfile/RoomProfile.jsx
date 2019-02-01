@@ -54,9 +54,6 @@ function roomCategory(eng){
   return "中";
 }
 
-const timeChosenMessage = "请先选择时间";
-const reservationSuccessMessage = "预约成功";
-
 class RoomProfile extends React.Component {
   state = {
     br: false,
@@ -161,7 +158,7 @@ class RoomProfile extends React.Component {
     let firstChosen = this.state.firstChosen;
     let secondChosen = this.state.secondChosen;
     if (!(this.state.firstChosen && this.state.secondChosen)){
-      this.warning(timeChosenMessage);
+      this.warning("请先选择时间");
       return;
     }
     let start;
@@ -208,7 +205,7 @@ class RoomProfile extends React.Component {
         this.warning(data.error);
       }
       else {
-        this.success(reservationSuccessMessage);
+        this.success("预约成功");
         window.location.href="/meeting/"+data.id+"/profile";
       }
     })
