@@ -10,6 +10,10 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import withStyles from '@material-ui/core/styles/withStyles';
+import Tabs from '@material-ui/core/Tabs';
+import Tab from '@material-ui/core/Tab';
+import AppBar from '@material-ui/core/AppBar';
+
 
 import Snackbar from "components/Snackbar/Snackbar.jsx";
 
@@ -20,6 +24,14 @@ import { userController } from 'variables/general.jsx';
 import Cookies from 'universal-cookie';
 
 const cookies = new Cookies();
+
+function TabContainer(props) {
+  return (
+    <Typography component="div" style={{ padding: 8 * 3 }}>
+      {props.children}
+    </Typography>
+  );
+}
 
 const styles = theme => ({
   main: {
@@ -33,13 +45,14 @@ const styles = theme => ({
       marginRight: 'auto',
     },
   },
-  paper: {
+  tabcontainer: {
     marginTop: theme.spacing.unit * 8,
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
     padding: `${theme.spacing.unit * 2}px ${theme.spacing.unit * 3}px ${theme.spacing.unit * 3}px`,
   },
+
   avatar: {
     margin: theme.spacing.unit,
     backgroundColor: theme.palette.secondary.main,
@@ -63,9 +76,13 @@ class LoginPage extends React.Component {
       bc: false,
       notificationMessage: "null",
       notificationType: null,
+
+      value: 0,
     };
   }
-
+  handleTabChange = (event, value) => {
+    this.setState({ value });
+  };
   handleChange = (e) => {
     e.preventDefault();
     this.setState({[e.target.name]:e.target.value});
@@ -133,35 +150,83 @@ class LoginPage extends React.Component {
   
   render(){
     const { classes } = this.props;
+    const { value } = this.state;
     return (
       <main className={classes.main}>
         <CssBaseline />
-        <Paper className={classes.paper}>
-          <Avatar className={classes.avatar}>
-            <LockOutlinedIcon />
-          </Avatar>
-          <Typography component="h1" variant="h5">
-            智能会议室
-          </Typography>
-          <form className={classes.form}>
-            <FormControl margin="normal" required fullWidth>
-              <InputLabel htmlFor="tel">手机</InputLabel>
-              <Input id="tel" name="tel" autoComplete="tel-local" autoFocus onChange={this.handleChange}/>
-            </FormControl>
-            <FormControl margin="normal" required fullWidth>
-              <InputLabel htmlFor="password">密码</InputLabel>
-              <Input name="password" type="password" id="password" autoComplete="current-password" onChange={this.handleChange}/>
-            </FormControl>
-            <Button
-              fullWidth
-              variant="contained"
-              color="primary"
-              className={classes.submit}
-              onClick={this.handleLogin}
-            >
-              登录
-            </Button>
-          </form>
+        <Paper>
+        <AppBar position="static">
+          <Tabs value={value} onChange={this.handleTabChange} centered>
+            <Tab label="登录" />
+            <Tab label="注册" />
+          </Tabs>
+        </AppBar>
+        {value === 0 && 
+          <TabContainer className={classes.tabcontainer}>
+              <Avatar className={classes.avatar}>
+                <LockOutlinedIcon />
+              </Avatar>
+              <Typography component="h1" variant="h5">
+                智能会议室
+              </Typography>
+              <form className={classes.form}>
+                <FormControl margin="normal" required fullWidth>
+                  <InputLabel htmlFor="tel">手机</InputLabel>
+                  <Input id="tel" name="tel" autoComplete="tel-local" autoFocus onChange={this.handleChange}/>
+                </FormControl>
+                <FormControl margin="normal" required fullWidth>
+                  <InputLabel htmlFor="password">密码</InputLabel>
+                  <Input name="password" type="password" id="password" autoComplete="current-password" onChange={this.handleChange}/>
+                </FormControl>
+                <Button
+                  fullWidth
+                  variant="contained"
+                  color="primary"
+                  className={classes.submit}
+                  onClick={this.handleLogin}
+                >
+                  登录
+                </Button>
+              </form>
+          </TabContainer>
+        }
+        {value === 1 && 
+        <TabContainer className={classes.tabcontainer}>
+        <Avatar className={classes.avatar}>
+          <LockOutlinedIcon />
+        </Avatar>
+        <Typography component="h1" variant="h5">
+          智能会议室
+        </Typography>
+        <form className={classes.form}>
+          <FormControl margin="normal" required fullWidth>
+            <InputLabel >企业</InputLabel>
+            <Input id="enterpriceId" name="enterprise" autoFocus onChange={this.handleChange}/>
+          </FormControl>
+          <FormControl margin="normal" required fullWidth>
+            <InputLabel htmlFor="name">姓名</InputLabel>
+            <Input id="name" name="name" autoFocus onChange={this.handleChange}/>
+          </FormControl>
+          <FormControl margin="normal" required fullWidth>
+            <InputLabel htmlFor="tel">手机</InputLabel>
+            <Input id="tel" name="tel" autoComplete="tel-local" autoFocus onChange={this.handleChange}/>
+          </FormControl>
+          <FormControl margin="normal" required fullWidth>
+            <InputLabel>密码</InputLabel>
+            <Input name="re_password" type="password" id="re_password" onChange={this.handleChange}/>
+          </FormControl>
+          <Button
+            fullWidth
+            variant="contained"
+            color="primary"
+            className={classes.submit}
+            onClick={this.handleRegister}
+          >
+            注册
+          </Button>
+        </form>
+    </TabContainer>
+        }
         </Paper>
         <Snackbar
           place="bc"
