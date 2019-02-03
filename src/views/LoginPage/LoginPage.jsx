@@ -11,6 +11,10 @@ import withStyles from '@material-ui/core/styles/withStyles';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import AppBar from '@material-ui/core/AppBar';
+import Table from '@material-ui/core/Table';
+import TableBody from '@material-ui/core/TableBody';
+import TableCell from '@material-ui/core/TableCell';
+import TableRow from '@material-ui/core/TableRow';
 
 import ErrorOutline from "@material-ui/icons/ErrorOutline";
 import Done from "@material-ui/icons/Done";
@@ -19,7 +23,6 @@ import { userController } from 'variables/general.jsx';
 import Cookies from 'universal-cookie';
 import { ossClient, faceFileDir } from 'variables/oss.jsx';
 import Snackbar from 'components/Snackbar/Snackbar.jsx';
-
 
 const cookies = new Cookies();
 
@@ -38,7 +41,7 @@ const styles = theme => ({
     marginLeft: theme.spacing.unit * 3,
     marginRight: theme.spacing.unit * 3,
     [theme.breakpoints.up(400 + theme.spacing.unit * 3 * 2)]: {
-      width: 600,
+      width: 400,
       marginLeft: 'auto',
       marginRight: 'auto',
     },
@@ -50,7 +53,10 @@ const styles = theme => ({
     alignItems: 'center',
     padding: `${theme.spacing.unit * 2}px ${theme.spacing.unit * 3}px ${theme.spacing.unit * 3}px`,
   },
-
+  userAvatar: {
+    width: 100,
+    height: 100,
+  },
   avatar: {
     margin: theme.spacing.unit,
     backgroundColor: theme.palette.secondary.main,
@@ -61,6 +67,9 @@ const styles = theme => ({
   },
   submit: {
     marginTop: theme.spacing.unit * 3,
+  },
+  input: {
+    display: 'none',
   },
 });
 
@@ -75,8 +84,8 @@ class LoginPage extends React.Component {
       notificationMessage: "null",
       notificationType: null,
 
+      selectedFile: null,
       preview: null,
-      src: null,
       // tab value
       value: 0,
     };
@@ -151,24 +160,36 @@ class LoginPage extends React.Component {
 
   handleRegister = (e) => {
     e.preventDefault();
-    let { files, enterpriceId, name, re_tel, re_password } = this.state;
-    if (!files){
-      this.warning("请上传头像");
-      return;
-    }
-    if (! enterpriceId || ! name || ! re_tel || ! re_password){
+    let { selectedFile, enterpriseId, name, re_tel, re_password } = this.state;
+    if (! enterpriseId || ! name || ! re_tel || ! re_password){
       this.warning("请完整填写信息");
       return;
     }
-    let file = files[0];
-    let storeAs =  faceFileDir + "/" + enterpriceId + re_tel;
-    let faceFile = storeAs + ".jpg";
-    let featureFile = storeAs;
+    if (!selectedFile){
+      this.warning("请上传头像");
+      return;
+    }
+    let extensions;
+    if (selectedFile.type === "image/jpeg"){
+      extensions = ".jpg";
+    }
+    else if (selectedFile.type === "image/png"){
+      extensions = ".png";
+    }
+    else{
+      this.warning("仅支持 JPG 和 PNG 格式图片");
+      return
+    }
+    let fileName = enterpriseId + re_tel;
+    let path =  faceFileDir + "/" + fileName;
+    
+    let faceFile = path + extensions;
+    let featureFile = path;
 
-    ossClient.multipartUpload(faceFile, file)
+    ossClient.multipartUpload(faceFile, selectedFile)
     .then((result) => {
       console.log(result);
-      let api = userController.register(enterpriceId, re_tel, re_password, name, faceFile, featureFile);
+      let api = userController.register(enterpriseId, re_tel, re_password, name, faceFile, featureFile);
 			fetch(api, {
         method:'post'
       })
@@ -191,30 +212,18 @@ class LoginPage extends React.Component {
 		});
   }
 
-  onClose = () => {
-    this.setState({preview: null})
-  }
-  
-  onCrop = (preview) => {
-    this.setState({preview})
-  }
- 
-  onBeforeFileLoad = (elem) => {
-    if(elem.target.files[0].size > 71680){
-      alert("File is too big!");
-      elem.target.value = "";
-    };
+  handleAvatar = (e) => {
+    let selectedFile = e.target.files[0];
+    let reader = new FileReader();
+    reader.readAsDataURL(selectedFile);
+    reader.onloadend =  () => {
+        this.setState({ preview: reader.result, selectedFile });
+    }
   }
   
   render(){
     const { classes } = this.props;
     const { value } = this.state;
-    const uploadButton = (
-      <div>
-        <Icon type={this.state.loading ? 'loading' : 'plus'} />
-        <div className="ant-upload-text">Upload</div>
-      </div>
-    );
     return (
       <main className={classes.main}>
         <CssBaseline />
@@ -259,14 +268,43 @@ class LoginPage extends React.Component {
         <form className={classes.form}>
           <FormControl margin="normal" required fullWidth>
             <InputLabel >企业</InputLabel>
-            <Input id="enterpriceId" name="enterprise" autoFocus onChange={this.handleChange}/>
+            <Input id="enterpriseId" name="enterpriseId" autoFocus onChange={this.handleChange}/>
           </FormControl>
           <FormControl margin="normal" required fullWidth>
             <InputLabel htmlFor="name">姓名</InputLabel>
             <Input id="name" name="name" autoFocus onChange={this.handleChange}/>
           </FormControl>
           <FormControl margin="normal" required fullWidth>
-
+            <input
+              accept="image/*"
+              className={classes.input}
+              id="contained-button-file"
+              multiple
+              type="file"
+              onChange={this.handleAvatar}
+            />
+            
+            <Table>
+              <TableBody>
+                <TableRow>
+                  <TableCell>
+                    <label htmlFor="contained-button-file">
+                    <Button variant="contained" component="span" className={classes.button}>
+                      <div>
+                      上传头像
+                      </div>
+                    </Button>
+                    </label>
+                    
+                  </TableCell>
+                  <TableCell>
+                    {
+                      this.state.preview ? <img className={classes.userAvatar} src={this.state.preview} alt="preview"/>:null
+                    }
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
           </FormControl>
           <FormControl margin="normal" required fullWidth>
             <InputLabel htmlFor="tel">手机</InputLabel>
