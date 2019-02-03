@@ -1,12 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import FormControl from '@material-ui/core/FormControl';
 import Input from '@material-ui/core/Input';
 import InputLabel from '@material-ui/core/InputLabel';
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import withStyles from '@material-ui/core/styles/withStyles';
@@ -14,14 +12,14 @@ import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import AppBar from '@material-ui/core/AppBar';
 
-
-import Snackbar from "components/Snackbar/Snackbar.jsx";
-
 import ErrorOutline from "@material-ui/icons/ErrorOutline";
 import Done from "@material-ui/icons/Done";
 
 import { userController } from 'variables/general.jsx';
 import Cookies from 'universal-cookie';
+import { ossClient, faceFileDir } from 'variables/oss.jsx';
+import Snackbar from 'components/Snackbar/Snackbar.jsx';
+
 
 const cookies = new Cookies();
 
@@ -40,7 +38,7 @@ const styles = theme => ({
     marginLeft: theme.spacing.unit * 3,
     marginRight: theme.spacing.unit * 3,
     [theme.breakpoints.up(400 + theme.spacing.unit * 3 * 2)]: {
-      width: 400,
+      width: 600,
       marginLeft: 'auto',
       marginRight: 'auto',
     },
@@ -77,6 +75,9 @@ class LoginPage extends React.Component {
       notificationMessage: "null",
       notificationType: null,
 
+      preview: null,
+      src: null,
+      // tab value
       value: 0,
     };
   }
@@ -147,10 +148,73 @@ class LoginPage extends React.Component {
     });
     this.showNotification();
   }
+
+  handleRegister = (e) => {
+    e.preventDefault();
+    let { files, enterpriceId, name, re_tel, re_password } = this.state;
+    if (!files){
+      this.warning("请上传头像");
+      return;
+    }
+    if (! enterpriceId || ! name || ! re_tel || ! re_password){
+      this.warning("请完整填写信息");
+      return;
+    }
+    let file = files[0];
+    let storeAs =  faceFileDir + "/" + enterpriceId + re_tel;
+    let faceFile = storeAs + ".jpg";
+    let featureFile = storeAs;
+
+    ossClient.multipartUpload(faceFile, file)
+    .then((result) => {
+      console.log(result);
+      let api = userController.register(enterpriceId, re_tel, re_password, name, faceFile, featureFile);
+			fetch(api, {
+        method:'post'
+      })
+      .then(res => res.json)
+      .then((data) => {
+        if (data.error){
+          console.log("register error:"+data.error);
+          this.warning("注册失败");
+          return;
+        }
+        this.success("注册成功");
+        cookies.set('login', true, { path: '/' });
+        cookies.set('userId', data.id, { path: '/' });
+        window.location.href = "/";
+      })
+    })
+    .catch((err) => {
+      console.log("oss error: "+err);
+			this.warning("注册失败");
+		});
+  }
+
+  onClose = () => {
+    this.setState({preview: null})
+  }
+  
+  onCrop = (preview) => {
+    this.setState({preview})
+  }
+ 
+  onBeforeFileLoad = (elem) => {
+    if(elem.target.files[0].size > 71680){
+      alert("File is too big!");
+      elem.target.value = "";
+    };
+  }
   
   render(){
     const { classes } = this.props;
     const { value } = this.state;
+    const uploadButton = (
+      <div>
+        <Icon type={this.state.loading ? 'loading' : 'plus'} />
+        <div className="ant-upload-text">Upload</div>
+      </div>
+    );
     return (
       <main className={classes.main}>
         <CssBaseline />
@@ -163,9 +227,6 @@ class LoginPage extends React.Component {
         </AppBar>
         {value === 0 && 
           <TabContainer className={classes.tabcontainer}>
-              <Avatar className={classes.avatar}>
-                <LockOutlinedIcon />
-              </Avatar>
               <Typography component="h1" variant="h5">
                 智能会议室
               </Typography>
@@ -192,9 +253,6 @@ class LoginPage extends React.Component {
         }
         {value === 1 && 
         <TabContainer className={classes.tabcontainer}>
-        <Avatar className={classes.avatar}>
-          <LockOutlinedIcon />
-        </Avatar>
         <Typography component="h1" variant="h5">
           智能会议室
         </Typography>
@@ -208,8 +266,11 @@ class LoginPage extends React.Component {
             <Input id="name" name="name" autoFocus onChange={this.handleChange}/>
           </FormControl>
           <FormControl margin="normal" required fullWidth>
+
+          </FormControl>
+          <FormControl margin="normal" required fullWidth>
             <InputLabel htmlFor="tel">手机</InputLabel>
-            <Input id="tel" name="tel" autoComplete="tel-local" autoFocus onChange={this.handleChange}/>
+            <Input id="re_tel" name="re_tel" autoComplete="tel-local" autoFocus onChange={this.handleChange}/>
           </FormControl>
           <FormControl margin="normal" required fullWidth>
             <InputLabel>密码</InputLabel>

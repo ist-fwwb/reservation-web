@@ -86,7 +86,7 @@ const userController = {
     return api;
   },
   "getUser": (type=null) => (type?(server + "/user?type=" + type):(server + "/user")),
-  "register": () => (server + "/user"), //json params in req body
+  "register": (enterpriceId, phone, password, name, faceFile, featureFile, ) => (server + "/user?enterpriceId="+enterpriceId+"&name="+name+"&phone="+phone+"&password="+password+"&faceFile="+faceFile+"&featureFile="+featureFile), //json params in req body
   "login": (tel, password) => (server + "/user/login?phone=" + tel + "&password=" + password),
   "getUserByUserId": (userId) => (server + "/user/" + userId),
   "editUser": (userId) => (server + "/user/" + userId),
