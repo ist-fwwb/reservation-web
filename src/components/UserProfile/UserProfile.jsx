@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from 'prop-types';
 // @material-ui/core components
 import withStyles from "@material-ui/core/styles/withStyles";
 import TextField from '@material-ui/core/TextField';
@@ -39,10 +40,12 @@ const styles = {
 
 const editSuccessMessage = "修改成功";
 
+let _users_cache = {};
 class UserProfile extends React.Component {
   constructor(props){
     super(props);
     this.state={
+      userId: this.props.userId,
       loaded: false,
 
       br: false,
@@ -51,8 +54,13 @@ class UserProfile extends React.Component {
     };
   }
 
+  _loadData = () => {
+    let _user = _users_cache[this.props.userId];
+    if (_user){
+      this.setState({..._user, loaded: true});
+      return;
+    }
 
-  componentDidMount(){
     let api = userController.getUserByUserId(this.props.userId);
     fetch(api,{
       credentials: 'include',
@@ -63,6 +71,7 @@ class UserProfile extends React.Component {
       if (data.error)
         this.warning(data.error);
       else{
+        _users_cache[this.props.userId] = data;
         this.setState({
           ...data,
           loaded: true
@@ -75,6 +84,16 @@ class UserProfile extends React.Component {
     })
   }
 
+  componentDidUpdate(prevProps){
+    if (prevProps.userId !== this.props.userId) {
+      this._loadData();
+    }
+  }
+
+  componentDidMount(){
+    this._loadData();
+  }
+
   handleChange = (e) => {
     e.preventDefault();
     this.setState({[e.target.name]:e.target.value});
@@ -83,7 +102,7 @@ class UserProfile extends React.Component {
   handleSubmit = (e) => {
     e.preventDefault();
     let msg = JSON.stringify(this.state);    
-    let api = userController.editUser(this.props.match.params.userId);
+    let api = userController.editUser(this.state.userId);
     fetch(api, {
       credentials: 'include',
       method:'put',
@@ -140,9 +159,8 @@ class UserProfile extends React.Component {
   }
 
   render(){
-    const { classes } = this.props;
+    const { classes, disabled } = this.props;
     const { loaded, enterpriceId, phone, name, type } = this.state;
-    const disabled = !(this.props.userId === this.props.match.params.userId);
     return (
       <div>
         <GridContainer>
@@ -258,5 +276,10 @@ class UserProfile extends React.Component {
     );
   }
 }
+
+UserProfile.propTypes = {
+  classes: PropTypes.object.isRequired,
+  disabled: PropTypes.bool.isRequired,
+};
 
 export default withStyles(styles)(UserProfile);

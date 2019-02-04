@@ -2,15 +2,16 @@
 import Dashboard from "@material-ui/icons/Dashboard";
 import Work from "@material-ui/icons/Work";
 import Home from "@material-ui/icons/Home";
+import Book from "@material-ui/icons/Book";
 
 // core components/views
 import RoomPage from "views/RoomPage/RoomPage.jsx";
 import MeetingPage from "views/MeetingPage/MeetingPage.jsx";
-import UserProfile from "views/UserProfile/UserProfile.jsx";
+import UserProfilePage from "views/UserProfilePage/UserProfilePage.jsx";
 import RoomProfile from "views/RoomProfile/RoomProfile.jsx";
 import HomePage from "views/HomePage/HomePage.jsx";
 import MeetingProfile from "views/MeetingProfile/MeetingProfile.jsx";
-
+import AddressBook from "views/AddressBook/AddressBook.jsx";
 export const dashboardRoutes = [
   {
     path: "/home",
@@ -33,6 +34,13 @@ export const dashboardRoutes = [
     icon: Work,
     component: MeetingPage
   },
+  {
+    path: "/addressbook",
+    sidebarName: "通讯录",
+    navbarName: "通讯录",
+    icon:Book,
+    component: AddressBook,
+  },
   { redirect: true, path: "/", to: "/home", navbarName: "Redirect" }
 ];
 
@@ -51,7 +59,7 @@ let routesNotInSideBar = [
   },
   {
     path: "/user/:userId/profile",
-    component: UserProfile
+    component: UserProfilePage
   },
 ];
 
