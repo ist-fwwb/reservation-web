@@ -188,22 +188,29 @@ class LoginPage extends React.Component {
 
     ossClient.multipartUpload(faceFile, selectedFile)
     .then((result) => {
-      console.log(result);
+      console.log("oss result:"+result);
       let api = userController.register(enterpriseId, re_tel, re_password, name, faceFile, featureFile);
 			fetch(api, {
         method:'post'
       })
-      .then(res => res.json)
+      .then(res => res.json())
       .then((data) => {
         if (data.error){
           console.log("register error:"+data.error);
           this.warning("注册失败");
           return;
         }
-        this.success("注册成功");
-        cookies.set('login', true, { path: '/' });
-        cookies.set('userId', data.id, { path: '/' });
-        window.location.href = "/";
+        else if (data.id){
+          this.success("注册成功");
+          cookies.set('login', true, { path: '/' });
+          cookies.set('userId', data.id, { path: '/' });
+          window.location.href = "/";
+          return;
+        }
+        else{
+          this.warning("未知错误")
+          console.log(data)
+        }
       })
     })
     .catch((err) => {
