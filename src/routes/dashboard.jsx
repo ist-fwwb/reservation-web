@@ -3,6 +3,7 @@ import Dashboard from "@material-ui/icons/Dashboard";
 import Work from "@material-ui/icons/Work";
 import Home from "@material-ui/icons/Home";
 import Book from "@material-ui/icons/Book";
+import CloudQueue from "@material-ui/icons/CloudQueue";
 
 // core components/views
 import RoomPage from "views/RoomPage/RoomPage.jsx";
@@ -12,6 +13,8 @@ import RoomProfile from "views/RoomProfile/RoomProfile.jsx";
 import HomePage from "views/HomePage/HomePage.jsx";
 import MeetingProfile from "views/MeetingProfile/MeetingProfile.jsx";
 import AddressBook from "views/AddressBook/AddressBook.jsx";
+import SmartReservationPage from "views/SmartReservationPage/SmartReservationPage.jsx";
+
 export const dashboardRoutes = [
   {
     path: "/home",
@@ -33,6 +36,13 @@ export const dashboardRoutes = [
     navbarName: "查看会议",
     icon: Work,
     component: MeetingPage
+  },
+  {
+    path: "/smart-reserve",
+    sidebarName: "智能预定",
+    navbarName: "智能预定",
+    icon: CloudQueue,
+    component: SmartReservationPage
   },
   {
     path: "/addressbook",
