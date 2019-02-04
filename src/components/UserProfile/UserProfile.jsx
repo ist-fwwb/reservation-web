@@ -181,7 +181,7 @@ class UserProfile extends React.Component {
                       variant="outlined"
                     />
                   </GridItem>
-                  <GridItem xs={12} sm={12} md={3}>
+                  <GridItem xs={12} sm={12} md={4}>
                     <TextField
                       label="手机号"
                       disabled
@@ -192,7 +192,7 @@ class UserProfile extends React.Component {
                       variant="outlined"
                     />
                   </GridItem>
-                  <GridItem xs={12} sm={12} md={4}>
+                  <GridItem xs={12} sm={12} md={3}>
                     <TextField
                       label="姓名"
                       disabled={disabled}
@@ -216,7 +216,7 @@ class UserProfile extends React.Component {
                       variant="outlined"
                     />
                   </GridItem>
-                  <GridItem xs={12} sm={12} md={3}>
+                  <GridItem xs={12} sm={12} md={4}>
                     <TextField
                       label="whatever"
                       disabled={disabled}
