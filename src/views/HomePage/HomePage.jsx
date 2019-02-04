@@ -66,15 +66,15 @@ class HomePage extends React.Component{
     this.setState({ confirmSmartReserveOpen: false });
   };
 
-  reserve = (e, startTime, endTime, date, roomId, heading) => {
+  reserve = (e, startTime, endTime, date, roomId, discription) => {
     e.preventDefault();
     let meeting = {
       "attendantNum": null,
       "attendants": null,
       "date": date,
-      "description": "无",
+      "description": discription,
       "endTime": endTime,
-      "heading": heading ? heading : "Meeting-" + date + "-" + startTime + "-" + endTime ,
+      "heading": "Meeting-" + date + "-" + startTime + "-" + endTime ,
       "hostId": this.props.userId,
       "location": null,
       "needSignIn": false,
@@ -83,10 +83,10 @@ class HomePage extends React.Component{
       "type": "COMMON",
       "tags": [],
     }
-    console.log(meeting)
     meeting = JSON.stringify(meeting);
     let api = meetingController.createMeeting();
-    console.log(api)
+    this.confirmSmartReserveClose();
+    this.success("预定中");
     fetch(api, {
       credentials: 'include',
       method: 'post',
@@ -100,7 +100,7 @@ class HomePage extends React.Component{
     .then((data) => {
       console.log(data)
       if (data.error){
-        this.confirmSmartReserveClose();
+        
         this.warning(data.error);
       }
       else {
@@ -110,8 +110,7 @@ class HomePage extends React.Component{
     })
     .catch(error => {
       console.log(error)
-      this.confirmSmartReserveClose();
-      this.warning("智能预约失败");
+      this.warning("预约失败");
     })
   }
 
@@ -120,31 +119,41 @@ class HomePage extends React.Component{
       let text = event.clipboardData.getData('text/plain');
       let api = lexerController.lexer(text);
       console.log(api)
-      try {
-        fetch(api, {
-          method:'get',
-        })
-        .then((res) => res.json())
-        .then((data) => {
-          console.log(data)
-          if(data.error){
-            this.warning(data.error);
-          }
-          else{
-            this.setState({
-              ...data,
-              confirmSmartReserveOpen: true,
-            })
-            //this.reserve(data.startTime, data.endTime, data.date, data.roomId, data.heading);
-            //window.location.href = "/room/"+data.roomId+"/profile/"+data.date+"/"+data.startTime+"/"+data.endTime+"/"+data.heading;
-          }
-        })
-        
-      }
-      catch(e){
+      this.success("解析中")
+      fetch(api, {
+        method:'get',
+      })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data)
+        if(data.error){
+          console.log(data.error);
+          this.warning("解析错误");
+          return;
+        }
+        else if (data.startTime=== -1 || data.endTime===-1 || data.date===-1){
+          this.warning("解析错误");
+          return;
+        }
+        else{
+          this.setState({
+            discription: text,
+            ...data,
+            confirmSmartReserveOpen: true,
+          });
+          this.success("解析成功");
+        }
+      })
+      .catch((error) => {
         this.warning("解析错误")
-      }
+        console.log(error);
+      })
     } 
+  }
+
+  changeSmartReserveTime = () => {
+    let { roomId, date, startTime, endTime, discription } = this.state
+    window.location.href = "/room/"+roomId+"/profile/"+date+"/"+startTime+"/"+endTime+"/"+discription;
   }
 
   JSONToArray = (jsonArray) => {
@@ -258,7 +267,7 @@ class HomePage extends React.Component{
   render(){
     if (this.state.error)
       return <h2>Network Error</h2>
-    let { todayMeetings, startTime, endTime, date, heading, roomId, location } = this.state;
+    let { todayMeetings, startTime, endTime, date, roomId, location, discription } = this.state;
     return(
       <div>
         <GridContainer>
@@ -383,10 +392,13 @@ class HomePage extends React.Component{
           {"会议室:"+location+" 日期:"+date+" 时间:"+idToTime(startTime)+"~"+idToTime(endTime)}
           </DialogContent>
           <DialogActions>
-            <Button onClick={this.confirmSmartReserveClose} color="primary">
+            <Button onClick={this.confirmSmartReserveClose} color="secondary">
               取消
             </Button>
-            <Button onClick={(e) => this.reserve(e, startTime, endTime, date, roomId, heading)} color="primary">
+            <Button onClick={this.changeSmartReserveTime} color="primary">
+              修改时间
+            </Button>
+            <Button onClick={(e) => this.reserve(e, startTime, endTime, date, roomId, discription)} color="primary">
               确定
             </Button>
           </DialogActions>

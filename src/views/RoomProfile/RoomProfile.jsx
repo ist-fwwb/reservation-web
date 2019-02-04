@@ -172,14 +172,14 @@ class RoomProfile extends React.Component {
       start = firstChosen[0];
       end = secondChosen[0]+1;
     }
-    let heading = this.props.match.params.heading;
+    let discription = this.props.match.params.discription;
     let meeting = {
       "attendantNum": null,
       "attendants": null,
       "date": chosenDate,
-      "description": "无",
+      "description": discription ? discription : "无",
       "endTime": end,
-      "heading": heading ? heading : "Meeting-" + chosenDate + "-" + start + "-" + end ,
+      "heading": "Meeting-" + chosenDate + "-" + start + "-" + end ,
       "hostId": this.props.userId,
       "location": null,
       "needSignIn": false,
