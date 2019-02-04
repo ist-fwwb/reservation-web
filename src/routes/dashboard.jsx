@@ -60,7 +60,7 @@ let routesNotInSideBar = [
     component: RoomProfile
   },
   {
-    path: "/room/:roomId/profile/:date/:startTime/:endTime/:discription",
+    path: "/room/:roomId/profile/:date/:startTime/:endTime/:description",
     component: RoomProfile
   },
   {

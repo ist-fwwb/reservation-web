@@ -66,13 +66,13 @@ class HomePage extends React.Component{
     this.setState({ confirmSmartReserveOpen: false });
   };
 
-  reserve = (e, startTime, endTime, date, roomId, discription) => {
+  reserve = (e, startTime, endTime, date, roomId, description) => {
     e.preventDefault();
     let meeting = {
       "attendantNum": null,
       "attendants": null,
       "date": date,
-      "description": discription,
+      "description": description,
       "endTime": endTime,
       "heading": "Meeting-" + date + "-" + startTime + "-" + endTime ,
       "hostId": this.props.userId,
@@ -137,7 +137,7 @@ class HomePage extends React.Component{
         }
         else{
           this.setState({
-            discription: text,
+            description: text,
             ...data,
             confirmSmartReserveOpen: true,
           });
@@ -152,8 +152,8 @@ class HomePage extends React.Component{
   }
 
   changeSmartReserveTime = () => {
-    let { roomId, date, startTime, endTime, discription } = this.state
-    window.location.href = "/room/"+roomId+"/profile/"+date+"/"+startTime+"/"+endTime+"/"+discription;
+    let { roomId, date, startTime, endTime, description } = this.state
+    window.location.href = "/room/"+roomId+"/profile/"+date+"/"+startTime+"/"+endTime+"/"+description;
   }
 
   JSONToArray = (jsonArray) => {
@@ -267,7 +267,7 @@ class HomePage extends React.Component{
   render(){
     if (this.state.error)
       return <h2>Network Error</h2>
-    let { todayMeetings, startTime, endTime, date, roomId, location, discription } = this.state;
+    let { todayMeetings, startTime, endTime, date, roomId, location, description } = this.state;
     return(
       <div>
         <GridContainer>
@@ -398,7 +398,7 @@ class HomePage extends React.Component{
             <Button onClick={this.changeSmartReserveTime} color="primary">
               修改时间
             </Button>
-            <Button onClick={(e) => this.reserve(e, startTime, endTime, date, roomId, discription)} color="primary">
+            <Button onClick={(e) => this.reserve(e, startTime, endTime, date, roomId, description)} color="primary">
               确定
             </Button>
           </DialogActions>
