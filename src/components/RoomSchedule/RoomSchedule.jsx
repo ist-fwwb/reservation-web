@@ -407,7 +407,6 @@ class RoomSchedule extends React.Component{
 
 RoomSchedule.propTypes = {
   data: PropTypes.array.isRequired,
-  roomId: PropTypes.string.isRequired,
   handleChange: PropTypes.func.isRequired,
   originalDate: PropTypes.string,
   originalStartTime: PropTypes.number,

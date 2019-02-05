@@ -265,27 +265,6 @@ class MeetingProfile extends React.Component {
     })
   }
 
-  showNotification = (place) => {
-    let x = [];
-    x[place] = true;
-    this.setState(x);
-    this.alertTimeout = setTimeout(
-      function() {
-        x[place] = false;
-        this.setState(x);
-      }.bind(this),
-      6000
-    );
-  }
-
-  typeToIcon = (type) => {
-    if (type === "success")
-      return Done;
-    if (type === "danger")
-      return ErrorOutline;
-    return null;
-  }
-
   warning = (msg) => {
     this.setState({
       notificationType: "danger",
@@ -599,8 +578,6 @@ class MeetingProfile extends React.Component {
   }
 
   handleChangeSwitch = event => {
-    console.log(event.target.checked)
-    console.log(event.target.name)
     this.setState({ [event.target.name]: event.target.checked });
   };  
 
@@ -685,7 +662,7 @@ class MeetingProfile extends React.Component {
                   </GridItem>
                   <GridItem xs={12} sm={12} md={3}>
                     <TextField
-                      error={this.state.type==="URGENT"}
+                      error={this.state.type==="URGENCY"}
                       select
                       disabled={disabled}
                       fullWidth
@@ -734,6 +711,7 @@ class MeetingProfile extends React.Component {
                       value={loaded?date:"NULL"}
                       margin="normal"
                       variant="outlined"
+                      onClick={this.confirmTimeChangeClickOpen}
                     />
                   </GridItem>
                   <GridItem xs={12} sm={12} md={3}>
@@ -745,6 +723,7 @@ class MeetingProfile extends React.Component {
                       value={loaded?(idToTime(startTime) + "~" + idToTime(endTime)):"NULL"}
                       margin="normal"
                       variant="outlined"
+                      onClick={this.confirmTimeChangeClickOpen}
                     />
                   </GridItem>
                 </GridContainer>
@@ -896,7 +875,7 @@ class MeetingProfile extends React.Component {
                 <GridContainer>
                   <GridItem xs={12} sm={12} md={11}>
                     <TextField
-                      label="会议简介"
+                      label="会议内容"
                       disabled={disabled}
                       multiline
                       fullWidth
