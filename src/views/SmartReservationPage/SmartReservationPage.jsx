@@ -23,411 +23,103 @@ import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogActions from '@material-ui/core/DialogActions';
 import Slide from '@material-ui/core/Slide';
+import CircularProgress from '@material-ui/core/CircularProgress';
+import Button from "@material-ui/core/Button";
 
 import Snackbar from "components/Snackbar/Snackbar.jsx";
 import RoomSchedule from "components/RoomSchedule/RoomSchedule.jsx";
-import { meetingController, idToTime, today, nextDay, ScheduleDataToRows } from "variables/general.jsx";
-import { Button } from "@material-ui/core";
+import { meetingController, lexerController, idToTime, today, ScheduleDataToRows, emptyTimeSlice } from "variables/general.jsx";
 
-const style = theme => {};
+const styles = theme => ({
+  root: {
+    backgroundColor: "transparent"
+  },
+  paper: {
+    width: 300,
+  },
+  progress: {
+    margin: theme.spacing.unit * 2,
+  },
+});
+
+const utils_list = {
+  tv: "TV",
+  airconditioner: "AIRCONDITIONER",
+  blackboard: "BLACKBOARD",
+  table: "TABLE",
+  wifi: "WIFI",
+  network: "NETWORK",
+  projector: "PROJECTOR",
+  power: "POWER"
+}
 
 function Transition(props) {
   return <Slide direction="up" {...props} />;
 }
 
-const emptyTimeSlice = [
-  {
-    "timeSlice": [
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
-    ],
-    "date": today,
-  },
-  {
-    "timeSlice": [
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
-    ],
-    "date": nextDay(today),
-  },
-  {
-    "timeSlice": [
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
-    ],
-    "date": nextDay(nextDay(today)),
-  },
-  {
-    "timeSlice": [
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
-    ],
-    "date": nextDay(nextDay(nextDay(today))),
-  },
-  {
-    "timeSlice": [
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
-    ],
-    "date": nextDay(nextDay(nextDay(nextDay(today)))),
-  },
-  {
-    "timeSlice": [
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
-    ],
-    "date": nextDay(nextDay(nextDay(nextDay(nextDay(today))))),
-  },
-  {
-    "timeSlice": [
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
-    ],
-    "date": nextDay(nextDay(nextDay(nextDay(nextDay(nextDay(today)))))),
-  }
-]
 class SmartReservationPage extends React.Component{
   constructor(props){
     super(props);
     this.roomSchedule = React.createRef();
-    let p_heading = this.props.match.params.heading;
-    let p_date = this.props.match.params.date;
-    let p_startTime = this.props.match.params.startTime;
-    let p_endTime = this.props.match.params.endTime;
-    let p_description = this.props.match.params.description;
     this.state={
-
-      heading: p_heading ? p_heading : "",
+      loading: this.props.match.params.text ? true : false,
+      heading: "Meeting-" + today + "-0-0",
       type: "COMMON",
-      date: p_date ? p_date : today,
-      startTime: p_startTime ? p_startTime : null,
-      endTime: p_endTime ? p_endTime : null,
+      date: today,
+      startTime: null,
+      endTime: null,
       needSignIn: false,
-      description: p_description ? p_description : "",
+      description: "无",
 
+      confirmTimeChangeOpen: false,
       utils: [],
     };
+  }
+  
+  componentDidMount(){
+    let text = this.props.match.params.text;
+    if (!this.state.loading){
+      return;
+    }
+    let api = lexerController.lexer(text);
+    fetch(api, {
+      method:'get',
+    })
+    .then((res) => res.json())
+    .then((data) => {
+      console.log(data)
+      this.setState({loading: false});
+      if(data.error){
+        console.log(data.error);
+        this.warning("解析错误");
+        return;
+      }
+
+      if (data.startTime=== -1){
+        data.startTime = null;
+      }
+      if (data.endTime===-1){
+        data.endTime = null;
+      }
+      if (data.date===-1){
+        data.date = today;
+      }
+
+      this.setState({
+        description: text,
+        startTime: data.startTime,
+        endTime: data.endTime,
+        date: data.date,
+        heading: "Meeting-" + data.date + "-" + data.startTime + "-" + data.endTime,
+        utils: data.utils,
+      });
+      this.success("解析成功");
+    })
+    .catch((error) => {
+      this.setState({loading: false})
+      this.warning("解析错误")
+      console.log(error);
+    })
   }
 
   showNotification = (place) => {
@@ -524,11 +216,41 @@ class SmartReservationPage extends React.Component{
     this.setState({ [event.target.name]: event.target.checked });
   }; 
 
+  handleChangeCheckBox = event => {
+    event.preventDefault();
+    let { utils } = this.state;
+    if (event.target.checked){
+      utils.push(event.target.name);
+    }
+    else{
+      utils.splice(utils.indexOf(event.target.name), 1);
+    }
+    this.setState({ utils });
+  }; 
+
+  handleClose = () => {
+    this.setState({loading: false});
+  }
+
   render(){
     const { classes } = this.props;
-    const { heading, type, date, startTime, endTime, needSignIn, description } = this.state;
+    const { loading, utils, heading, type, date, startTime, endTime, needSignIn, description } = this.state;
     return(
       <div>
+      <Dialog
+        className={classes.dialog}
+        open={loading}
+        onClose={this.handleClose}
+        PaperProps ={{
+          classes: {
+          root: classes.paper
+          }
+        }}
+      >
+      <DialogTitle>
+        <CircularProgress size={25} className={classes.progress} /> 正在智能分析...
+      </DialogTitle>
+    </Dialog>
       <GridContainer>
           <GridItem xs={12} sm={12} md={12}>
             <Card>
@@ -648,9 +370,9 @@ class SmartReservationPage extends React.Component{
                                 <FormControlLabel
                                   control={
                                     <Checkbox
-                                      name={"AIRCONDITIONER"}
-                                      checked={this.state.AIRCONDITIONER}
-                                      onChange={this.handleChangeSwitch}
+                                      name={utils_list.airconditioner}
+                                      checked={utils.includes(utils_list.airconditioner)}
+                                      onChange={this.handleChangeCheckBox}
                                       color="primary"
                                     />
                                   }
@@ -659,9 +381,9 @@ class SmartReservationPage extends React.Component{
                                 <FormControlLabel
                                   control={
                                     <Checkbox
-                                      name={"BLACKBOARD"}
-                                      checked={this.state.BLACKBOARD}
-                                      onChange={this.handleChangeSwitch}
+                                      name={utils_list.blackboard}
+                                      checked={utils.includes(utils_list.blackboard)}
+                                      onChange={this.handleChangeCheckBox}
                                       color="primary"
                                     />
                                   }
@@ -670,9 +392,9 @@ class SmartReservationPage extends React.Component{
                                 <FormControlLabel
                                   control={
                                     <Checkbox
-                                      name={"TABLE"}
-                                      checked={this.state.TABLE}
-                                      onChange={this.handleChangeSwitch}
+                                      name={utils_list.table}
+                                      checked={utils.includes(utils_list.table)}
+                                      onChange={this.handleChangeCheckBox}
                                       color="primary"
                                     />
                                   }
@@ -681,9 +403,9 @@ class SmartReservationPage extends React.Component{
                                 <FormControlLabel
                                   control={
                                     <Checkbox
-                                      name={"PROJECTOR"}
-                                      checked={this.state.PROJECTOR}
-                                      onChange={this.handleChangeSwitch}
+                                      name={utils_list.projector}
+                                      checked={utils.includes(utils_list.projector)}
+                                      onChange={this.handleChangeCheckBox}
                                       color="primary"
                                     />
                                   }
@@ -696,9 +418,9 @@ class SmartReservationPage extends React.Component{
                             <FormControlLabel
                                   control={
                                     <Checkbox
-                                      name={"POWER"}
-                                      checked={this.state.POWER}
-                                      onChange={this.handleChangeSwitch}
+                                      name={utils_list.power}
+                                      checked={utils.includes(utils_list.power)}
+                                      onChange={this.handleChangeCheckBox}
                                       color="primary"
                                     />
                                   }
@@ -707,9 +429,9 @@ class SmartReservationPage extends React.Component{
                             <FormControlLabel
                                 control={
                                   <Checkbox
-                                    name={"WIFI"}
-                                    checked={this.state.airConditioned}
-                                    onChange={this.handleChangeSwitch}
+                                    name={utils_list.wifi}
+                                    checked={utils.includes(utils_list.wifi)}
+                                    onChange={this.handleChangeCheckBox}
                                     color="primary"
                                   />
                                 }
@@ -718,9 +440,9 @@ class SmartReservationPage extends React.Component{
                             <FormControlLabel
                               control={
                                 <Checkbox
-                                  name={"NETWORK"}
-                                  checked={this.state.NETWORK}
-                                  onChange={this.handleChangeSwitch}
+                                  name={utils_list.network}
+                                  checked={utils.includes(utils_list.network)}
+                                  onChange={this.handleChangeCheckBox}
                                   color="primary"
                                 />
                               }
@@ -729,9 +451,9 @@ class SmartReservationPage extends React.Component{
                             <FormControlLabel
                               control={
                                 <Checkbox
-                                  name={"TV"}
-                                  checked={this.state.TV}
-                                  onChange={this.handleChangeSwitch}
+                                  name={utils_list.tv}
+                                  checked={utils.includes(utils_list.tv)}
+                                  onChange={this.handleChangeCheckBox}
                                   color="primary"
                                 />
                               }
@@ -782,6 +504,9 @@ class SmartReservationPage extends React.Component{
               </CardBody>               
             </Card>
           </GridItem>
+          <GridItem xs={12} sm={12} md={2}>
+            <Button variant="contained" color="primary">确认预订</Button>
+          </GridItem>
         </GridContainer>
         <Snackbar
           place="br"
@@ -796,4 +521,4 @@ class SmartReservationPage extends React.Component{
     );
   }
 }
-export default withStyles(style)(SmartReservationPage);
+export default withStyles(styles)(SmartReservationPage);

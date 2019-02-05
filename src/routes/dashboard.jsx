@@ -56,6 +56,10 @@ export const dashboardRoutes = [
 
 let routesNotInSideBar = [
   {
+    path: "/smart-reserve/:text",
+    component: SmartReservationPage
+  },
+  {
     path: "/room/:roomId/profile",
     component: RoomProfile
   },
