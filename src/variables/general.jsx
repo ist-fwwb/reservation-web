@@ -530,6 +530,16 @@ const emptyTimeSlice = [
   }
 ]
 
+const utils_list = {
+  tv: "TV",
+  airconditioner: "AIRCONDITIONER",
+  blackboard: "BLACKBOARD",
+  table: "TABLE",
+  wifi: "WIFI",
+  network: "NETWORK",
+  projector: "PROJECTOR",
+  power: "POWER"
+}
 
 module.exports = {
   idToTime,
@@ -544,5 +554,7 @@ module.exports = {
   lexerController,
 
   ScheduleDataToRows,
-  emptyTimeSlice
+  emptyTimeSlice,
+
+  utils_list,
 };

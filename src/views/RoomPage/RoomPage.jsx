@@ -22,6 +22,8 @@ import CardBody from "components/Card/CardBody.jsx";
 import CardIcon from "components/Card/CardIcon.jsx";
 import CardFooter from "components/Card/CardFooter.jsx";
 import Snackbar from "components/Snackbar/Snackbar.jsx";
+import SearchBar from "components/SearchBar/SearchBar.jsx";
+
 import { roomController } from "variables/general.jsx";
 
 import dashboardStyle from "assets/jss/material-dashboard-react/views/dashboardStyle.jsx";
@@ -125,6 +127,9 @@ class RoomPage extends React.Component {
     return (
       <div>
         <GridContainer>
+          <GridItem xs={12} sm={12} md={12}>
+            <SearchBar/>
+          </GridItem>
           {
             rooms.map((room) => {
               return (

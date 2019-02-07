@@ -28,7 +28,7 @@ import Button from "@material-ui/core/Button";
 
 import Snackbar from "components/Snackbar/Snackbar.jsx";
 import RoomSchedule from "components/RoomSchedule/RoomSchedule.jsx";
-import { meetingController, lexerController, idToTime, today, ScheduleDataToRows, emptyTimeSlice } from "variables/general.jsx";
+import { meetingController, utils_list,lexerController, idToTime, today, ScheduleDataToRows, emptyTimeSlice } from "variables/general.jsx";
 
 const styles = theme => ({
   root: {
@@ -41,17 +41,6 @@ const styles = theme => ({
     margin: theme.spacing.unit * 2,
   },
 });
-
-const utils_list = {
-  tv: "TV",
-  airconditioner: "AIRCONDITIONER",
-  blackboard: "BLACKBOARD",
-  table: "TABLE",
-  wifi: "WIFI",
-  network: "NETWORK",
-  projector: "PROJECTOR",
-  power: "POWER"
-}
 
 function Transition(props) {
   return <Slide direction="up" {...props} />;
