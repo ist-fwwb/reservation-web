@@ -138,6 +138,10 @@ class MeetingPage extends React.Component {
     .then(res => res.json())
     .then((data) => {
       // delete the meetings that he has joined
+      if (data.error){
+        this.warning(data.error);
+        return;
+      }
       if (this.state.loaded1){
         let {meetings} = this.state;
         for (let i in meetings){
@@ -300,6 +304,7 @@ class MeetingPage extends React.Component {
     }
     const { classes } = this.props;
     const { meetingsRowsPerPage, meetingsPage, attendMeetingsRowsPerPage, attendMeetingsPage, historyMeetingsRowsPerPage, historyMeetingsPage } = this.state;
+    console.log(attendMeetings)
     return (
       <div>
         <GridContainer>

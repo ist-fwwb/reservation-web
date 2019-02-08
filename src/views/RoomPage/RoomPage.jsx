@@ -2,6 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 // @material-ui/core
 import withStyles from "@material-ui/core/styles/withStyles";
+
 // @material-ui/icons
 
 import Update from "@material-ui/icons/Update";
@@ -34,15 +35,6 @@ function roomCategory(eng){
   else if (eng === "BIG")
     return "大会议室";
   return "中会议室";
-}
-
-function roomStatus(status){
-  if (status === 0)
-    return "空闲";
-  else if (status === 1)
-    return "已预定";
-  else if (status === 2)
-    return "开会中";
 }
 
 /*
@@ -105,6 +97,14 @@ class RoomPage extends React.Component {
     this.showNotification("br");
   }
 
+  success = (msg) => {
+    this.setState({
+      notificationType: "success",
+      notificationMessage: msg
+    })
+    this.showNotification("br");
+  }
+
   componentDidMount(){
     fetch(roomController.getRoom()+"/",{
         credentials: 'include',
@@ -119,16 +119,22 @@ class RoomPage extends React.Component {
       });
   }
 
+  handleSearchChange = (data) => {
+    this.setState({rooms: data});
+    this.success("搜索成功");
+  }
+
   render() {
     const { classes } = this.props;
     const rooms = this.state.rooms;
+    console.log(rooms)
     if (!rooms)
       return null;
     return (
       <div>
         <GridContainer>
-          <GridItem xs={12} sm={12} md={12}>
-            <SearchBar/>
+          <GridItem xs={12} sm={12} md={10}>
+            <SearchBar handleSearchChange={this.handleSearchChange} handleError={this.warning}/>
           </GridItem>
           {
             rooms.map((room) => {
@@ -139,7 +145,6 @@ class RoomPage extends React.Component {
                       <CardIcon color="success">
                         {<SentimentVerySatisfied/>}
                       </CardIcon>
-                      <p className={classes.cardCategory}>{roomStatus(room.status)}</p>
                       <h3 className={classes.cardTitle}>
                       {room.location}
                       <br/> 

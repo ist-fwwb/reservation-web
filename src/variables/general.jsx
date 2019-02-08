@@ -34,10 +34,21 @@ const timeToId = (time) => {
 }
 
 const roomController = {
+  "searchRoomByLocationAndSizeAndUtils":(location, size, utils) => {
+    let locationStr = location ? "location="+location+"&" : "";
+    let sizeStr = size ? "size="+size+"&" : "";
+    let utilsStr = "";
+    for (let i in utils){
+      utilsStr += ("utils=" + utils[i] + "&");
+    }
+    let api = server+"/meetingroom?"+locationStr+sizeStr+utilsStr;
+    api = api.substring(0, api.length-1);
+    return api;
+  },
   "getRoomByStartTimeAndEndTimeAndDate":(startTime, endTime, date) => {
-    let startTimeStr = startTime ? "startTime="+startTime+"&" : null;
-    let endTimeStr = endTime ? "endTime="+endTime+"&" : null;
-    let dateStr = date ? "date="+date+"&" : null;
+    let startTimeStr = startTime ? "startTime="+startTime+"&" : "";
+    let endTimeStr = endTime ? "endTime="+endTime+"&" : "";
+    let dateStr = date ? "date="+date+"&" : "";
     let api = server+"/meetingroom?"+startTimeStr+endTimeStr+dateStr;
     api = api.substring(0, api.length-1);
     return api;
@@ -57,11 +68,11 @@ const meetingController = {
   "getMeeting": () => (server + "/meeting"),
   "getMeetingByMeetingId": (meetingId) => (server + "/meeting/" + meetingId),
   "getMeetingByDateAndRoomIdAndStatus": (date, roomId, status) => {
-    let dateStr = date ? "date="+date+"&" : null;
-    let roomIdStr = roomId ? "roomId="+roomId+"&" : null;
-    let statusStr = status ? "status="+status+"&" : null;
+    let dateStr = date ? "date="+date+"&" : "";
+    let roomIdStr = roomId ? "roomId="+roomId+"&" : "";
+    let statusStr = status ? "status="+status+"&" : "";
     let api = server + "/meeting?"+dateStr + roomIdStr + statusStr;
-    api = api.substring(0, api.length-2);
+    api = api.substring(0, api.length-1);
     return api;
   },
   "createMeeting": () => (server + "/meeting"), // json params in req body
@@ -538,7 +549,7 @@ const utils_list = {
   wifi: "WIFI",
   network: "NETWORK",
   projector: "PROJECTOR",
-  power: "POWER"
+  power: "POWERSUPPLY"
 }
 
 module.exports = {
