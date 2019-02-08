@@ -28,7 +28,7 @@ import Button from "@material-ui/core/Button";
 
 import Snackbar from "components/Snackbar/Snackbar.jsx";
 import RoomSchedule from "components/RoomSchedule/RoomSchedule.jsx";
-import { meetingController, utils_list,lexerController, idToTime, today, ScheduleDataToRows, emptyTimeSlice } from "variables/general.jsx";
+import { meetingController, utils_list, lexerController, idToTime, today, ScheduleDataToRows, emptyTimeSlice } from "variables/general.jsx";
 
 const styles = theme => ({
   root: {
