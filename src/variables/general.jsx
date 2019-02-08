@@ -12,7 +12,37 @@ const domain = "47.106.8.44";
 const port = "31000";
 const server = prefix + domain + ":" + port;
 
+// 向未来取整
+const formatTimeCeiling = (time) => {
+	let array = time.split(':');
+	let hour = Number(array[0]);
+    let minute = Number(array[1]);
+	if (minute < 0 || minute > 60){
+        return -1;
+    }
+	if ( minute < 30){
+		minute = "30";
+	}
+	else {
+		minute = "00";
+		if (hour === 23){
+			hour = "00";
+		}
+		else{
+			hour += 1;
+		}
+  }
+  if (hour < 10){
+      hour = "0" + String(hour);
+  }
+	let result = hour + ":" + minute;
+	return result;
+}
+
 const dateToString = (date) => (date.toLocaleDateString([],{year:"numeric", month:"2-digit", day:"2-digit"}).replace(/\//g,'-'));
+const nowTime = () => (new Date()).toLocaleTimeString([],{hour12: false, hour:'2-digit', minute:'2-digit'});
+
+
 const today = dateToString(new Date());
 
 const nextDay = (day) => {
@@ -555,7 +585,11 @@ const utils_list = {
 module.exports = {
   idToTime,
   timeToId,
+
+  formatTimeCeiling,
+
   today,
+  nowTime,
   nextDay,
   
   roomController,

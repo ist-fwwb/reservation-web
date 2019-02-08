@@ -17,7 +17,7 @@ import teal from '@material-ui/core/colors/teal';
 import green from '@material-ui/core/colors/green';
 
 import { Link } from "react-router-dom";
-import { idToTime } from "variables/general.jsx";
+import { idToTime, timeToId, today, formatTimeCeiling, nowTime } from "variables/general.jsx";
 
 const occupiedMessage = "会议室被占用";
 
@@ -123,7 +123,8 @@ class RoomSchedule extends React.Component{
     let currentCell = scheduleData[x][y];
     // The user click for the third time, after he has chosen the start and the end
     if (firstChosen && secondChosen){
-      // state 2 -> state 0
+      // state 2 -> state 0 
+      // 点击两次后，再点一次，重新选择
       if (currentCell["click"] || currentCell["between"]){
         scheduleData = this.clearBetween(firstChosen, secondChosen, scheduleData);
         let state = {
@@ -162,16 +163,28 @@ class RoomSchedule extends React.Component{
     }
     // The user click for the first time
     // The following situaiton is impossible:
-    //    firstChosen is null but secondChosen isn't
+    //  firstChosen is null but secondChosen isn't
 
     else if (!firstChosen){
-      if (scheduleData[x][y]["occupied"]){
+      let nowTimeIdCeiling = timeToId(formatTimeCeiling(nowTime()));
+      if ( x < nowTimeIdCeiling && scheduleData[x][y].date === today){
+        let state = {
+          notificationType: "danger",
+          notificationMessage: "时间已过"
+        }
+        this.props.handleChange(state);
+        return;
+      }
+      else if (scheduleData[x][y]["occupied"]){
         let state = {
           notificationType: "danger",
           notificationMessage: occupiedMessage
         };
         this.props.handleChange(state);
         return;
+      }
+      else if (scheduleData[x][y].date === today ){
+
       }
       // state 0 -> state 1
       scheduleData[x][y]["click"] = true;
