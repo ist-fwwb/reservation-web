@@ -758,8 +758,8 @@ class MeetingProfile extends React.Component {
                           tags.map((data, key) => {
                             if (!data)
                               return null;
-                            let disabled = !(this.props.userId ===this.state.hostId);
-                            if (disabled)
+                            let local_disabled = !(this.props.userId ===this.state.hostId) || disabled;
+                            if (local_disabled)
                               return (
                                 <Chip
                                     key={key}
@@ -820,7 +820,7 @@ class MeetingProfile extends React.Component {
                               return null;
                             let hostIcon = <Stars/>
                             let local_hostFlag = data.id===this.state.hostId;
-                            let disabled = !(this.state.hostId === this.props.userId);
+                            let local_disabled = !(this.state.hostId === this.props.userId) || disabled;
                             if (local_hostFlag)
                               return (
                                 <Chip
@@ -831,7 +831,7 @@ class MeetingProfile extends React.Component {
                                   />
                               )
                             else{
-                              if (disabled)
+                              if (local_disabled)
                                 return (
                                   <Chip
                                     key={key}
