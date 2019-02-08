@@ -189,6 +189,7 @@ class MeetingProfile extends React.Component {
       }
       else{
         this.setState({...data1})
+        console.log(data1)
         // get all user could be invited to this meeting
         let userApi = userController.getUser();
         let attendantsArray = this.dicToArray(data1.attendants);
@@ -754,7 +755,7 @@ class MeetingProfile extends React.Component {
                         <Typography className={classes.title} color="textSecondary" gutterBottom>
                           标签分类
                         </Typography>
-                          {!loaded? null :
+                          {!loaded || !tags? null :
                           tags.map((data, key) => {
                             if (!data)
                               return null;
@@ -762,10 +763,10 @@ class MeetingProfile extends React.Component {
                             if (local_disabled)
                               return (
                                 <Chip
-                                    key={key}
-                                    label={data}
-                                    className={classes.chip}
-                                  />
+                                  key={key}
+                                  label={data}
+                                  className={classes.chip}
+                                />
                               )
                             else
                               return (
