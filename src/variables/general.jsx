@@ -168,6 +168,7 @@ const quickSort = (origArray, valueName=null) => {
 
 function ScheduleDataToRows(data){
   let re = [];
+  let nowTimeIdCeiling = timeToId(formatTimeCeiling(nowTime()));
   for (let i in data){
     let ele = data[i];
     let nameMap = ele.meetingNames;
@@ -175,24 +176,34 @@ function ScheduleDataToRows(data){
     if (day === 6 || day === 0)
       continue;
     let timeSlice = ele.timeSlice;
+
     for (let j in timeSlice){
       if (!re[j])
         re[j] = [0,0,0,0,0];
       if (!re[j][day-1])
         re[j][day-1] = {};
+      let currentCell = re[j][day-1];
       if (timeSlice[j]===null){
-        re[j][day-1]["occupied"] = false;
-        re[j][day-1]["meetingid"] = null;
+        currentCell["occupied"] = false;
+        currentCell["meetingid"] = null;
       }
       else {
-        re[j][day-1]["occupied"] = true;
-        re[j][day-1]["meetingid"] = timeSlice[j];
-        re[j][day-1]["name"] = nameMap[timeSlice[j]];
+        currentCell["occupied"] = true;
+        currentCell["meetingid"] = timeSlice[j];
+        currentCell["name"] = nameMap[timeSlice[j]];
       }
-      re[j][day-1]["date"] = ele.date;
-      re[j][day-1]["click"] = false;
-      re[j][day-1]["between"] = false;
-      re[j][day-1]["original"] = false;
+
+      if (ele.date === today && j < nowTimeIdCeiling){
+        currentCell["expired"] = true;
+      }
+      else {
+        currentCell["expired"] = false;
+      }
+
+      currentCell["date"] = ele.date;
+      currentCell["click"] = false;
+      currentCell["between"] = false;
+      currentCell["original"] = false;
     }
   }
   return re;
@@ -585,7 +596,7 @@ const utils_list = {
 module.exports = {
   idToTime,
   timeToId,
-
+  
   formatTimeCeiling,
 
   today,

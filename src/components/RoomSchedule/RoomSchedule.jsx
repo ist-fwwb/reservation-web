@@ -13,17 +13,19 @@ import pink from '@material-ui/core/colors/pink';
 import orange from '@material-ui/core/colors/orange';
 import purple from '@material-ui/core/colors/purple';
 import cyan from '@material-ui/core/colors/cyan';
+import brown from '@material-ui/core/colors/brown';
 import teal from '@material-ui/core/colors/teal';
 import green from '@material-ui/core/colors/green';
+import grey from '@material-ui/core/colors/grey';
 
 import { Link } from "react-router-dom";
-import { idToTime, timeToId, today, formatTimeCeiling, nowTime } from "variables/general.jsx";
+import { idToTime, today } from "variables/general.jsx";
 
 const occupiedMessage = "会议室被占用";
 
 const maxLenghtToShow = 10;
 
-const colorList = [purple[200], pink[200], orange[300], cyan[200], teal[300]]
+const colorList = [purple[200], pink[200], orange[300], brown[400], teal[300]]
 let colorMap = {};
 
 const CustomTableCell = withStyles(theme => ({
@@ -125,7 +127,15 @@ class RoomSchedule extends React.Component{
     if (firstChosen && secondChosen){
       // state 2 -> state 0 
       // 点击两次后，再点一次，重新选择
-      if (currentCell["click"] || currentCell["between"]){
+      if ( scheduleData[x][y].expired){
+        let state = {
+          notificationType: "danger",
+          notificationMessage: "时间已过"
+        }
+        this.props.handleChange(state);
+        return;
+      }
+      else if (currentCell["click"] || currentCell["between"]){
         scheduleData = this.clearBetween(firstChosen, secondChosen, scheduleData);
         let state = {
           firstChosen: null,
@@ -166,8 +176,7 @@ class RoomSchedule extends React.Component{
     //  firstChosen is null but secondChosen isn't
 
     else if (!firstChosen){
-      let nowTimeIdCeiling = timeToId(formatTimeCeiling(nowTime()));
-      if ( x < nowTimeIdCeiling && scheduleData[x][y].date === today){
+      if ( scheduleData[x][y].expired){
         let state = {
           notificationType: "danger",
           notificationMessage: "时间已过"
@@ -210,8 +219,16 @@ class RoomSchedule extends React.Component{
       return;
     }
     else if (firstChosen[1] === y){
+      if ( scheduleData[x][y].expired){
+        let state = {
+          notificationType: "danger",
+          notificationMessage: "时间已过"
+        }
+        this.props.handleChange(state);
+        return;
+      }
       // state 1 -> state 2
-      if (scheduleData[x][y]["occupied"]){
+      else if (scheduleData[x][y]["occupied"]){
         let state = {
           notificationType: "danger",
           notificationMessage: occupiedMessage
@@ -261,6 +278,15 @@ class RoomSchedule extends React.Component{
       return;
     }
     else{
+      if ( scheduleData[x][y].expired){
+        let state = {
+          notificationType: "danger",
+          notificationMessage: "时间已过"
+        }
+        this.props.handleChange(state);
+        return;
+      }
+
       if (scheduleData[x][y]["occupied"]){
         let state = {
           notificationType: "danger",
@@ -377,8 +403,14 @@ class RoomSchedule extends React.Component{
                       bgcolor = colorMap[currentid];
                     }
                     else {
-                      if (cell["click"] || cell["between"]){
+                      if (cell["expired"]){
+                        bgcolor = grey[200];
+                      }
+                      else if (cell["click"] || cell["between"]){
                         bgcolor = green[400];
+                      }
+                      else {
+                        bgcolor = cyan[50];
                       }
                     }
                     return (
@@ -401,9 +433,13 @@ class RoomSchedule extends React.Component{
                               </Link>
                             </div>
                           )
-                          :
-                          <div style={{background:bgcolor ,borderRadius:"15px", lineHeight:"45px" ,height:"45px", width:"92%", textAlign:"center"}}>
-                          </div>
+                          : cell["expired"] ?
+                            <div style={{background:bgcolor ,borderRadius:"15px", lineHeight:"45px" ,height:"45px", width:"92%", textAlign:"center"}}>
+                            </div> 
+                            : 
+                            <div style={{background:bgcolor ,borderRadius:"15px", lineHeight:"45px" ,height:"45px", width:"92%", textAlign:"center"}}>
+                            </div>
+                        
                       }
                       </CustomTableCell>
                     )
