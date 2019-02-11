@@ -1,6 +1,6 @@
 const prefix = "http://";
 
-const lexer_domain = "localhost";
+const lexer_domain = "47.106.8.44";
 const lexer_port = "4000";
 const lexer_server = prefix + lexer_domain + ":" + lexer_port;
 
