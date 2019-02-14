@@ -54,7 +54,7 @@ class SmartReservationPage extends React.Component{
       loading: this.props.match.params.text ? true : false,
       heading: "Meeting-" + today + "-0-0",
       type: "COMMON",
-      date: today,
+      date: null,
       startTime: null,
       endTime: null,
       needSignIn: false,
@@ -91,7 +91,7 @@ class SmartReservationPage extends React.Component{
         data.endTime = null;
       }
       if (data.date===-1){
-        data.date = today;
+        data.date = null;
       }
 
       this.setState({
@@ -295,7 +295,7 @@ class SmartReservationPage extends React.Component{
                       disabled
                       fullWidth
                       className={classes.textField}
-                      value={date}
+                      value={date?date: "null"}
                       margin="normal"
                       variant="outlined"
                       onClick={this.confirmTimeChangeClickOpen}
@@ -326,16 +326,27 @@ class SmartReservationPage extends React.Component{
                       {"修改时间"}
                     </DialogTitle>
                     <DialogContent>
-                      <RoomSchedule 
-                        ref={this.roomSchedule}
-                        data={ScheduleDataToRows(emptyTimeSlice)} 
-                        originalDate={this.state.date} 
-                        originalStartTime={this.state.startTime} 
-                        originalEndTime={this.state.endTime} 
-                        roomId={this.state.roomId} 
-                        handleChange={this.handleTimeChange} 
-                        urgency={this.state.status==="URGENCY"}
-                      />
+                      {
+                        this.state.date ? 
+                        <RoomSchedule 
+                          ref={this.roomSchedule}
+                          data={ScheduleDataToRows(emptyTimeSlice)} 
+                          originalDate={this.state.date} 
+                          originalStartTime={this.state.startTime} 
+                          originalEndTime={this.state.endTime} 
+                          roomId={this.state.roomId} 
+                          handleChange={this.handleTimeChange} 
+                          urgency={this.state.status==="URGENCY"}
+                        /> :
+                        <RoomSchedule 
+                          ref={this.roomSchedule}
+                          data={ScheduleDataToRows(emptyTimeSlice)} 
+                          roomId={this.state.roomId} 
+                          handleChange={this.handleTimeChange} 
+                          urgency={this.state.status==="URGENCY"}
+                        />
+                      }
+                      
                     </DialogContent>
                     <DialogActions>
                     <Button onClick={this.confirmTimeChangeClose} color="primary">
