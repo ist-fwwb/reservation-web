@@ -52,6 +52,17 @@ const styles = theme => ({
   },
 });
 
+function convertToZhStatus(status){
+  if (status === "Pending")
+    return "等待中"
+  else if ( status === "Running")
+    return "开会中"
+  else if ( status === "Cancelled")
+    return "已取消"
+  else if ( status === "Stopped")
+    return "已结束"
+}
+
 class AttendantsDialog extends React.Component {
   constructor(props){
     super(props);
@@ -630,8 +641,8 @@ class MeetingProfile extends React.Component {
                 color="danger"
               >
                 <h4 className={classes.cardTitleWhite}>{this.state.heading}</h4>
-                <p className={classes.cardCategoryWhite}>{this.props.match.params.meetingId}</p>
-                <p>{"状态: " + status}</p>
+                <p className={"内容: " + classes.cardCategoryWhite}>{this.state.description}</p>
+                <p>{"状态: " + convertToZhStatus(status)}</p>
               </CardHeader>
               <CardBody>
                 <GridContainer>
