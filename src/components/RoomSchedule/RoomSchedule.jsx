@@ -330,13 +330,15 @@ class RoomSchedule extends React.Component{
   markOriginalData = (scheduleData, originalDate, originalStartTime, originalEndTime) => {
     let tempDay = -1;
     for (let i = 0; i < 5; i++){
+      console.log("originalDate: "+ originalDate)
+      console.log("tempDate: "+ scheduleData[0][i]["date"])
       if (scheduleData[0][i]["date"] === originalDate){
         tempDay = i;
         break;
       }
     }
     if (tempDay === -1)
-      return -1;
+      return scheduleData;
     for (let i = originalStartTime; i < originalEndTime; i++){
       scheduleData[i][tempDay]["original"] = true;
       scheduleData[i][tempDay]["occupied"] = false;
@@ -354,6 +356,7 @@ class RoomSchedule extends React.Component{
         scheduleData = this.markOriginalData(scheduleData, originalDate, originalStartTime, originalEndTime);
       }
     }
+    console.log(scheduleData)
     return(
       <Table>
         <TableHead>
