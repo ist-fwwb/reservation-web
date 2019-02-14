@@ -22,6 +22,8 @@ import TablePagination from '@material-ui/core/TablePagination';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 
+import Warning from '@material-ui/icons/Warning';
+
 import { Link } from "react-router-dom";
 import { meetingController, idToTime } from 'variables/general.jsx';
 
@@ -36,6 +38,9 @@ const styles = theme => ({
   tableWrapper: {
     overflowX: 'auto',
   },
+  icon: {
+    verticalAlign: 'middle'
+  }
 });
 
 class MeetingPage extends React.Component {
@@ -341,7 +346,14 @@ class MeetingPage extends React.Component {
                               return (
                                 <TableRow key={ele.id}>
                                   <TableCell align="left">
-                                    <Link to={"/meeting/"+ele.id+"/profile"}>{ele.heading?ele.heading: "null"}</Link>
+                                    <Link to={"/meeting/"+ele.id+"/profile"}>
+                                    <span>
+                                    {ele.heading?ele.heading: "null"}
+                                    {
+                                      ele.type === "URGENCY" ? <Warning color="secondary" className={classes.icon}/> : null
+                                    }
+                                    </span>
+                                    </Link>
                                   </TableCell>
                                   <TableCell align="left"><Link to={"/user/"+ele.hostId+"/profile"}>{ele.hostId}</Link></TableCell>
                                   <TableCell align="left"><Link to={"/room/"+ele.id+"/profile"}>{ele.location}</Link></TableCell>
