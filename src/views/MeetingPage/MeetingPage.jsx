@@ -355,7 +355,7 @@ class MeetingPage extends React.Component {
                                     </span>
                                     </Link>
                                   </TableCell>
-                                  <TableCell align="left"><Link to={"/user/"+ele.hostId+"/profile"}>{ele.hostId}</Link></TableCell>
+                                  <TableCell align="left"><Link to={"/user/"+ele.hostId+"/profile"}>{ele.host.name}</Link></TableCell>
                                   <TableCell align="left"><Link to={"/room/"+ele.id+"/profile"}>{ele.location}</Link></TableCell>
                                   <TableCell align="left">{ele.date}</TableCell>
                                   <TableCell align="left">{idToTime(ele.startTime) + "~" + idToTime(ele.endTime)}</TableCell>
@@ -501,7 +501,7 @@ class MeetingPage extends React.Component {
                                   <TableCell align="left">
                                     <Link to={"/meeting/"+ele.id+"/profile"}>{ele.heading ? ele.heading: "null"}</Link>
                                   </TableCell>
-                                  <TableCell align="left"><Link to={"/user/"+ele.hostId+"/profile"}>{ele.hostId}</Link></TableCell>
+                                  <TableCell align="left"><Link to={"/user/"+ele.hostId+"/profile"}>{ele.host.name}</Link></TableCell>
                                   <TableCell align="left"><Link to={"/room/"+ele.id+"/profile"}>{ele.location}</Link></TableCell>
                                   <TableCell align="left">{ele.date}</TableCell>
                                   <TableCell align="left">{idToTime(ele.startTime) + "~" + idToTime(ele.endTime)}</TableCell>
