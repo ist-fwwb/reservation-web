@@ -95,6 +95,15 @@ const timeSliceController = {
 };
 
 const meetingController = {
+  "smartReserve":(utils) => {
+    let utilsStr = "";
+    for (let i in utils){
+      utilsStr += ("utils=" + utils[i] + "&");
+    }
+    let api = server + "/meeting/intelligent?"+utilsStr;
+    api = api.substring(0, api.length-1);
+    return api;
+  },
   "getMeeting": () => (server + "/meeting"),
   "getMeetingByMeetingId": (meetingId) => (server + "/meeting/" + meetingId),
   "getMeetingByDateAndRoomIdAndStatus": (date, roomId, status) => {

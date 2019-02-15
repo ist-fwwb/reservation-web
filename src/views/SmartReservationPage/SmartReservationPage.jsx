@@ -52,7 +52,7 @@ class SmartReservationPage extends React.Component{
     this.roomSchedule = React.createRef();
     this.state={
       loading: this.props.match.params.text ? true : false,
-      heading: "Meeting-" + today + "-0-0",
+      heading: "智能预定会议",
       type: "COMMON",
       date: null,
       startTime: null,
@@ -95,12 +95,7 @@ class SmartReservationPage extends React.Component{
       }
 
       this.setState({
-        description: text,
-        startTime: data.startTime,
-        endTime: data.endTime,
-        date: data.date,
-        heading: "Meeting-" + data.date + "-" + data.startTime + "-" + data.endTime,
-        utils: data.utils,
+        ...data
       });
       this.success("解析成功");
     })
@@ -219,6 +214,48 @@ class SmartReservationPage extends React.Component{
 
   handleClose = () => {
     this.setState({loading: false});
+  }
+
+  handleSmartReserve = () => {
+    let message = {
+      "attendantNum": "string",
+      "attendants": {},
+      "date": this.state.date,
+      "description": this.state.description,
+      "endTime": this.state.endTime,
+      "heading": this.state.heading,
+      "hostId": this.props.userId,
+      "id": "string",
+      "location": "string",
+      "needSignIn": this.state.needSignIn,
+      "roomId": "string",
+      "startTime": this.state.startTime,
+      "status": "Pending",
+      "tags": [],
+      "timestamp": 0,
+      "type": this.state.type
+    }
+    let api = meetingController.smartReserve(this.state.utils);
+    fetch(api, {
+      method: 'post',
+      credentials: 'include',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(message)
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (!data || data.error){
+        this.warning("预定失败")
+        return
+      }
+      else {
+        this.success("预订成功")
+        window.location.href = "/meeting/" + data.id + "/profile"
+      }
+    })
   }
 
   render(){
@@ -505,7 +542,7 @@ class SmartReservationPage extends React.Component{
             </Card>
           </GridItem>
           <GridItem xs={12} sm={12} md={2}>
-            <Button variant="contained" color="primary">确认预订</Button>
+            <Button variant="contained" color="primary" onClick={this.handleSmartReserve}>确认预订</Button>
           </GridItem>
         </GridContainer>
         <Snackbar
