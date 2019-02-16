@@ -30,7 +30,6 @@ import Stars from '@material-ui/icons/Stars';
 import Add from '@material-ui/icons/Add';
 import Done from '@material-ui/icons/Done';
 import ErrorOutline from "@material-ui/icons/ErrorOutline";
-import PersonIcon from '@material-ui/icons/Person';
 
 import Card from "components/Card/Card.jsx";
 import CardHeader from "components/Card/CardHeader.jsx";
@@ -40,6 +39,7 @@ import dashboardStyle from "assets/jss/material-dashboard-react/layouts/dashboar
 import Snackbar from "components/Snackbar/Snackbar.jsx";
 import RoomSchedule from "components/RoomSchedule/RoomSchedule.jsx";
 import { Link } from "react-router-dom";
+import { filepath } from 'variables/oss.jsx';
 
 import { ScheduleDataToRows, timeSliceController, meetingController, idToTime, userController } from "variables/general.jsx";
 
@@ -107,9 +107,7 @@ class AttendantsDialog extends React.Component {
             {addattendants.map(value => (
               <ListItem key={value.id}>
                 <ListItemAvatar>
-                  <Avatar className={classes.avatar}>
-                    <PersonIcon />
-                  </Avatar>
+                  <Avatar className={classes.avatar} src={filepath + '/' + value.faceFile}/>
                 </ListItemAvatar>
                 <ListItemText primary={value.name}/>
                 <ListItemSecondaryAction>
@@ -217,6 +215,7 @@ class MeetingProfile extends React.Component {
               continue;
             ele.id = data2[i].id;
             ele.name = data2[i].name; 
+            ele.faceFile = data2[i].faceFile;
             re.push(ele);
           }
           delete data1.attendants;
@@ -751,6 +750,7 @@ class MeetingProfile extends React.Component {
                               <Switch
                                 checked={loaded ? this.state.needSignIn : false}
                                 onChange={this.handleChangeSwitch}
+                                disabled={disabled}
                                 name="needSignIn"
                                 value="needSignIn"
                                 color="primary"

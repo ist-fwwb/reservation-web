@@ -9,9 +9,8 @@ import Avatar from '@material-ui/core/Avatar';
 import ListItemText from '@material-ui/core/ListItemText';
 import Grid from '@material-ui/core/Grid';
 
-import Person from '@material-ui/icons/Person';
-
 import { userController } from 'variables/general.jsx';
+import { filepath } from 'variables/oss.jsx';
 import UserProfile from 'components/UserProfile/UserProfile.jsx';
 
 const styles = theme => ({
@@ -106,16 +105,14 @@ class AddressBook extends React.Component {
                 </Typography>
                 <List className={classes.list}>
                   { !this.state.loaded || !this.state.users || !this.state.selectedId ? null : 
-                    this.state.users.map(({ id, name, phone }) => (
+                    this.state.users.map(({ id, name, phone, faceFile }) => (
                     <Fragment key={id}>
                       <ListItem 
                         button 
                         onClick={event => this.handleListItemClick(event, id)}
                         selected={this.state.selectedId === id}
                         >
-                        <Avatar alt="Profile Picture">
-                          <Person/>
-                        </Avatar>
+                        <Avatar alt="Profile Picture" src={ filepath + '/' + faceFile}/>
                         <ListItemText primary={name} secondary={phone} />
                       </ListItem>
                     </Fragment>
