@@ -233,6 +233,9 @@ class LoginPage extends React.Component {
     const { value } = this.state;
     return (
       <main className={classes.main}>
+        <br/>
+        <br/>
+        <br/>
         <CssBaseline />
         <Paper>
         <AppBar position="static">
