@@ -28,7 +28,7 @@ import Button from "@material-ui/core/Button";
 
 import Snackbar from "components/Snackbar/Snackbar.jsx";
 import RoomSchedule from "components/RoomSchedule/RoomSchedule.jsx";
-import { meetingController, utils_list, lexerController, idToTime, today, ScheduleDataToRows, emptyTimeSlice } from "variables/general.jsx";
+import { queueNodeController, meetingController, utils_list, lexerController, idToTime, today, ScheduleDataToRows, emptyTimeSlice } from "variables/general.jsx";
 
 const styles = theme => ({
   root: {
@@ -62,6 +62,8 @@ class SmartReservationPage extends React.Component{
 
       confirmTimeChangeOpen: false,
       utils: [],
+
+      confirmQueueOpen: false,
     };
   }
   
@@ -236,6 +238,7 @@ class SmartReservationPage extends React.Component{
       "type": this.state.type
     }
     let api = meetingController.smartReserve(this.state.utils);
+    
     fetch(api, {
       method: 'post',
       credentials: 'include',
@@ -248,15 +251,64 @@ class SmartReservationPage extends React.Component{
     .then(res => res.json())
     .then(data => {
       if (!data || data.error){
-        this.warning("预定失败")
+        this.warning("预定错误")
         return
       }
-      else {
+      else if (data.id) {
         this.success("预订成功")
         window.location.href = "/meeting/" + data.id + "/profile"
       }
+      else {
+        this.setState({ confirmQueueOpen: true})
+      }
+    })
+    
+   //this.setState({confirmQueueOpen: true})
+  }
+
+  handleQueue = () => {
+    let message = {
+      "date": this.state.date,
+      "description": this.state.description,
+      "heading": this.state.heading,
+      "id": "string",
+      "meetingRoomUtilsList": this.state.utils,
+      "needSignIn": this.state.needSignIn,
+      "roomId": 1,
+      "size": "BIG",
+      "timeRange": {
+        "end": this.state.endTime,
+        "start": this.state.startTime
+      },
+      "userId": this.props.userId
+    }
+    let api = queueNodeController.createQueueNode();
+    fetch(api, {
+      method: 'post',
+      credentials: 'include',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(message)
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.id){
+        this.success("排队成功");
+        this.confirmQueueClose();
+      }
+      else{
+        this.warning("排队失败");
+        this.confirmQueueClose();
+        console.log(data)
+      }
     })
   }
+
+  confirmQueueClose = () => {
+    this.setState({ confirmQueueOpen: false });
+  };
 
   render(){
     const { classes } = this.props;
@@ -545,6 +597,26 @@ class SmartReservationPage extends React.Component{
             <Button variant="contained" color="primary" onClick={this.handleSmartReserve}>确认预订</Button>
           </GridItem>
         </GridContainer>
+        <Dialog
+          open={this.state.confirmQueueOpen}
+          TransitionComponent={Transition}
+          keepMounted
+          onClose={this.confirmQueueClose}
+          aria-labelledby="alert-dialog-slide-title"
+          aria-describedby="alert-dialog-slide-description"
+        >
+          <DialogTitle>
+            {"预定失败，是否排队?"}
+          </DialogTitle>
+          <DialogActions>
+            <Button onClick={this.confirmQueueClose} color="primary">
+              取消
+            </Button>
+            <Button onClick={this.handleQueue} color="primary">
+              确定
+            </Button>
+          </DialogActions>
+        </Dialog>
         <Snackbar
           place="br"
           color={this.state.notificationType}

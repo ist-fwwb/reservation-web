@@ -142,6 +142,19 @@ const userController = {
   "editUser": (userId) => (server + "/user/" + userId),
 };
 
+const queueNodeController = {
+  "getQueueNodeByUserIdAndRoomIdAndDate": (userId=null, roomId=null, date=null) => {
+    let userIdStr = userId ? "userId="+userId+"&":"";
+    let roomIdStr = roomId ? "roomId="+roomId+"&":"";
+    let dateStr = date ? "date="+date+"&":"";
+    let api = server+"/QueueNode?"+userIdStr+roomIdStr+dateStr;
+    api = api = api.substring(0, api.length-1);
+    return api;
+  },
+  "createQueueNode": () => (server+"/QueueNode"),
+  "getQueueNodeById": (id) => (server+"/QueueNode/"+id),
+}
+
 const quickSort = (origArray, valueName=null) => {
 	if (origArray.length <= 1) { 
 		return origArray;
@@ -617,6 +630,7 @@ module.exports = {
   meetingController,
   userController,
   lexerController,
+  queueNodeController,
 
   ScheduleDataToRows,
   emptyTimeSlice,

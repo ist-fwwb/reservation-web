@@ -4,6 +4,7 @@ import Work from "@material-ui/icons/Work";
 import Home from "@material-ui/icons/Home";
 import Book from "@material-ui/icons/Book";
 import CloudQueue from "@material-ui/icons/CloudQueue";
+import ClearAll from "@material-ui/icons/ClearAll";
 
 // core components/views
 import RoomPage from "views/RoomPage/RoomPage.jsx";
@@ -14,6 +15,7 @@ import HomePage from "views/HomePage/HomePage.jsx";
 import MeetingProfile from "views/MeetingProfile/MeetingProfile.jsx";
 import AddressBook from "views/AddressBook/AddressBook.jsx";
 import SmartReservationPage from "views/SmartReservationPage/SmartReservationPage.jsx";
+import QueueNodePage from "views/QueueNodePage/QueueNodePage.jsx";
 
 export const dashboardRoutes = [
   {
@@ -50,6 +52,13 @@ export const dashboardRoutes = [
     navbarName: "通讯录",
     icon:Book,
     component: AddressBook,
+  },
+  {
+    path: "/queue",
+    sidebarName: "排队情况",
+    navbarName: "排队情况",
+    icon: ClearAll,
+    component: QueueNodePage,
   },
   { redirect: true, path: "/", to: "/home", navbarName: "Redirect" }
 ];
