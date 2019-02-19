@@ -615,6 +615,7 @@ class MeetingProfile extends React.Component {
       description, 
       heading,
       tags,
+      attendantNum
     } = this.state;
     const pending = (status === "Pending");
     const disabled = !hostFlag || !pending;
@@ -640,7 +641,10 @@ class MeetingProfile extends React.Component {
                 color="danger"
               >
                 <h4 className={classes.cardTitleWhite}>{this.state.heading}</h4>
-                <p className={"内容: " + classes.cardCategoryWhite}>{this.state.description}</p>
+                {
+                  pending ? <p className={classes.cardCategoryWhite}>{"快速加入: " + this.state.attendantNum}</p>
+                  : null
+                }
                 <p>{"状态: " + convertToZhStatus(status)}</p>
               </CardHeader>
               <CardBody>
