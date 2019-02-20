@@ -150,7 +150,6 @@ class RoomPage extends React.Component {
                       <br/> 
                       <small>{roomCategory(room.size)}</small>
                       <br/>
-                      <small>{"容量:"+10}</small>
                       </h3>
                     </CardHeader>
                     <CardBody>
