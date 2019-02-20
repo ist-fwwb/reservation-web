@@ -642,7 +642,7 @@ class MeetingProfile extends React.Component {
               >
                 <h4 className={classes.cardTitleWhite}>{this.state.heading}</h4>
                 {
-                  pending ? <p className={classes.cardCategoryWhite}>{"快速加入: " + this.state.attendantNum}</p>
+                  pending ? <p className={classes.cardCategoryWhite}>{"快速加入: " + attendantNum}</p>
                   : null
                 }
                 <p>{"状态: " + convertToZhStatus(status)}</p>

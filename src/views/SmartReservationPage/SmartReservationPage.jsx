@@ -1,5 +1,4 @@
 import React from "react";
-import PropTypes from 'prop-types';
 
 import Done from '@material-ui/icons/Done';
 import ErrorOutline from "@material-ui/icons/ErrorOutline";
@@ -28,7 +27,7 @@ import Button from "@material-ui/core/Button";
 
 import Snackbar from "components/Snackbar/Snackbar.jsx";
 import RoomSchedule from "components/RoomSchedule/RoomSchedule.jsx";
-import { queueNodeController, meetingController, utils_list, lexerController, idToTime, today, ScheduleDataToRows, emptyTimeSlice } from "variables/general.jsx";
+import { queueNodeController, meetingController, utils_list, lexerController, idToTime, ScheduleDataToRows, emptyTimeSlice } from "variables/general.jsx";
 
 const styles = theme => ({
   root: {

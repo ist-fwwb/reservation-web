@@ -151,7 +151,6 @@ class queueNodePage extends React.Component {
   }
 
   render() {
-    let userId = this.props.userId;
     let { queueNode } = this.state;
 
     const { classes } = this.props;
