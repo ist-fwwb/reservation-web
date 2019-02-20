@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 // @material-ui/core components
 import withStyles from "@material-ui/core/styles/withStyles";
 import TextField from '@material-ui/core/TextField';
-import Snackbar from "components/Snackbar/Snackbar.jsx";
+import Avatar from '@material-ui/core/Avatar';
 
 import ErrorOutline from "@material-ui/icons/ErrorOutline";
 import Done from "@material-ui/icons/Done";
@@ -16,8 +16,10 @@ import Card from "components/Card/Card.jsx";
 import CardHeader from "components/Card/CardHeader.jsx";
 import CardBody from "components/Card/CardBody.jsx";
 import CardFooter from "components/Card/CardFooter.jsx";
-import { userController } from "variables/general.jsx";
+import Snackbar from "components/Snackbar/Snackbar.jsx";
 
+import { userController } from "variables/general.jsx";
+import { filepath } from 'variables/oss.jsx';
 
 const styles = {
   cardCategoryWhite: {
@@ -35,7 +37,26 @@ const styles = {
     fontFamily: "'Roboto', 'Helvetica', 'Arial', sans-serif",
     marginBottom: "3px",
     textDecoration: "none"
-  }
+  },
+  cardTitle: {
+    color: "#3C4858",
+    marginTop: "0px",
+    minHeight: "auto",
+    fontWeight: "300",
+    fontFamily: "'Roboto', 'Helvetica', 'Arial', sans-serif",
+    marginBottom: "3px",
+    textDecoration: "none",
+    "& small": {
+      color: "#777",
+      fontWeight: "400",
+      lineHeight: "1"
+    }
+  },
+  bigAvatar: {
+    margin: 10,
+    width: 60,
+    height: 60,
+  },
 };
 
 const editSuccessMessage = "修改成功";
@@ -171,7 +192,7 @@ class UserProfile extends React.Component {
               </CardHeader>
               <CardBody>
                 <GridContainer>
-                  <GridItem xs={12} sm={12} md={3}>
+                  <GridItem xs={12} sm={12} md={2}>
                     <TextField
                       label="公司"
                       disabled
@@ -181,7 +202,7 @@ class UserProfile extends React.Component {
                       variant="outlined"
                     />
                   </GridItem>
-                  <GridItem xs={12} sm={12} md={4}>
+                  <GridItem xs={12} sm={12} md={3}>
                     <TextField
                       label="手机号"
                       disabled
@@ -204,9 +225,7 @@ class UserProfile extends React.Component {
                       variant="outlined"
                     />
                   </GridItem>
-                </GridContainer>
-                <GridContainer>
-                  <GridItem xs={12} sm={12} md={3}>
+                  <GridItem xs={12} sm={12} md={2}>
                     <TextField
                       label="type"
                       disabled
@@ -216,25 +235,8 @@ class UserProfile extends React.Component {
                       variant="outlined"
                     />
                   </GridItem>
-                  <GridItem xs={12} sm={12} md={4}>
-                    <TextField
-                      label="whatever"
-                      disabled={disabled}
-                      fullWidth
-                      value="whatever"
-                      margin="normal"
-                      variant="outlined"
-                    />
-                  </GridItem>
-                  <GridItem xs={12} sm={12} md={3}>
-                    <TextField
-                      label="whatever"
-                      disabled={disabled}
-                      fullWidth
-                      value="whatever"
-                      margin="normal"
-                      variant="outlined"
-                    />
+                  <GridItem xs={12} sm={12} md={2}>
+                    <Avatar alt="avatar" src={filepath + '/' + this.state.faceFile} className={classes.bigAvatar} />
                   </GridItem>
                 </GridContainer>
                 <GridContainer>
