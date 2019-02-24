@@ -5,6 +5,7 @@ import Home from "@material-ui/icons/Home";
 import Book from "@material-ui/icons/Book";
 import CloudQueue from "@material-ui/icons/CloudQueue";
 import ClearAll from "@material-ui/icons/ClearAll";
+import Note from "@material-ui/icons/Note";
 
 // core components/views
 import RoomPage from "views/RoomPage/RoomPage.jsx";
@@ -16,6 +17,8 @@ import MeetingProfile from "views/MeetingProfile/MeetingProfile.jsx";
 import AddressBook from "views/AddressBook/AddressBook.jsx";
 import SmartReservationPage from "views/SmartReservationPage/SmartReservationPage.jsx";
 import QueueNodePage from "views/QueueNodePage/QueueNodePage.jsx";
+import NotePage from "views/NotePage/NotePage.jsx";
+import NoteProfile from "views/NoteProfile/NoteProfile.jsx";
 
 export const dashboardRoutes = [
   {
@@ -54,6 +57,13 @@ export const dashboardRoutes = [
     component: AddressBook,
   },
   {
+    path: "/note",
+    sidebarName: "会议笔记",
+    navbarName: "会议笔记",
+    icon: Note,
+    component: NotePage,
+  },
+  {
     path: "/queue",
     sidebarName: "排队情况",
     navbarName: "排队情况",
@@ -83,6 +93,10 @@ let routesNotInSideBar = [
   {
     path: "/user/:userId/profile",
     component: UserProfilePage
+  },
+  {
+    path: "/note/:noteId/profile",
+    component: NoteProfile,
   },
 ];
 
