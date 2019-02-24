@@ -40,7 +40,6 @@ import Snackbar from "components/Snackbar/Snackbar.jsx";
 import RoomSchedule from "components/RoomSchedule/RoomSchedule.jsx";
 import { Link } from "react-router-dom";
 import { filepath } from 'variables/oss.jsx';
-
 import { ScheduleDataToRows, timeSliceController, meetingController, idToTime, userController } from "variables/general.jsx";
 
 const styles = theme => ({
@@ -148,6 +147,8 @@ function Transition(props) {
 class MeetingProfile extends React.Component {
   constructor(props){
     super(props);
+    this.editorResult = '';
+    this.timer = null;
     this.roomSchedule = React.createRef();
     this.state = {
       // edit schedule
@@ -182,8 +183,10 @@ class MeetingProfile extends React.Component {
       openAttendants: false,
   
       hostFlag: false,
-    }
+    };
   }
+
+  
 
   componentDidMount() {
     let meetingApi = meetingController.getMeetingByMeetingId(this.props.match.params.meetingId);
@@ -905,6 +908,18 @@ class MeetingProfile extends React.Component {
                     />
                   </GridItem>
                 </GridContainer>
+                <GridContainer>
+                  <GridItem xs={12} sm={12} md={2}>
+                    <Button variant="outlined">
+                      会议笔记
+                    </Button>
+                  </GridItem>
+                  <GridItem xs={12} sm={12} md={2}>
+                    <Button variant="outlined">
+                      我的笔记
+                    </Button>
+                  </GridItem>
+                </GridContainer>
               </CardBody>
               {
                 !loaded || !pending ? null :
@@ -1004,6 +1019,12 @@ class MeetingProfile extends React.Component {
                     </CardFooter>
                   : ( inMeeting ? 
                     <CardFooter>
+                      <Button variant="outlined">
+                        会议笔记
+                      </Button>
+                      <Button variant="outlined">
+                        我的笔记
+                      </Button>
                       <Button variant="outlined" color="secondary" onClick={this.confirmExitClickOpen}>退出会议</Button>
                       <Dialog
                         open={this.state.confirmExitOpen}

@@ -11,12 +11,15 @@ import GridItem from "components/Grid/GridItem.jsx";
 import GridContainer from "components/Grid/GridContainer.jsx";
 
 import { Link } from "react-router-dom";
+import wangeditor from 'wangeditor';
 
 const styles = {
-  
+  editor: {
+    width: '100%'
+  },
 };
 
-class NoteProfile extends React.Component {
+class NoteEditPage extends React.Component {
   constructor(props){
     super(props);
     this.state = {
@@ -29,17 +32,22 @@ class NoteProfile extends React.Component {
   }
 
   componentDidMount(){
+    this.editor = new wangeditor('#div1');
+    this.editor.customConfig.showLinkImg = true;
+    this.editor.customConfig.uploadImgShowBase64 = true;
+    this.editor.create();
 
     let {meetingId, userId} = this.props.match.params;
-    
     // 获取笔记
+    let content = "<p><span style=\"font-weight: bold;\">咋回事</span></p>";
     this.setState({
       loaded: true,
       meetingHeading:"会议标题",
       heading:"笔记标题",
       author: true,
-      content: "<p><span style=\"font-weight: bold;\">咋回事</span></p>"
+      content,
     })
+    this.editor.txt.html(content);
   }
 
   handleChange = (e) => {
@@ -47,10 +55,19 @@ class NoteProfile extends React.Component {
     this.setState({[e.target.name]:e.target.value});
   }
 
+  handleSubmit = (e) => {
+    e.preventDefault();
+    console.log(this.editor.txt.html());
+  }
+
   render(){
     const {classes} = this.props;
     const {loaded, heading, author } = this.state;
     let {meetingId, userId} = this.props.match.params;
+    if (author === false){
+        window.location.href = "/note/" + meetingId + "/" + userId + "/profile";
+        return null;
+    }
     return (
       <GridContainer>
           <GridItem xs={12} sm={12} md={12}>
@@ -66,10 +83,19 @@ class NoteProfile extends React.Component {
               <CardBody>
                 <GridContainer>
                 <GridItem xs={12} sm={12} md={11}>
-                  <h3>{this.state.heading}</h3>
+                  <TextField
+                    label="笔记标题"
+                    name="heading"
+                    fullWidth
+                    onChange={this.handleChange}
+                    className={classes.textField}
+                    value={loaded ? heading : "null"}
+                    margin="normal"
+                    variant="outlined"
+                  />
                 </GridItem>
                   <GridItem xs={12} sm={12} md={11}>
-                    <div dangerouslySetInnerHTML={{ __html: this.state.content }}>
+                    <div id="div1" className={classes.editor}>
                     </div>
                   </GridItem>
                 </GridContainer>
@@ -77,11 +103,11 @@ class NoteProfile extends React.Component {
             </Card>
           </GridItem>
           <GridItem xs={12} sm={12} md={2}>
-            <Button variant="contained" color="primary" onClick={() => { window.location.href="/note/"+meetingId+"/"+userId+"/edit"; }}>编辑笔记</Button>
+            <Button variant="contained" color="primary" onClick={this.handleSubmit}>确认修改</Button>
           </GridItem>
         </GridContainer>
       
     )
   }
 }
-export default withStyles(styles)(NoteProfile);
+export default withStyles(styles)(NoteEditPage);

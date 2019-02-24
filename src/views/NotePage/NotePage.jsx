@@ -88,22 +88,28 @@ class NotePage extends React.Component {
     this.setState({
       notes:[{
         id: "1111",
+        meetingId: "5c6531e3c9e77c0013607eec",
+        userId:"5c504daec9e77c0013ef1793",
         meetingHeading: "测试1",
         heading:"测试2",
-        favorite: false,
+        favorite: true,
         time: "2019-02-10"
       }],
       othersNotes:[{
         id: "1112",
+        meetingId: "5c6531e3c9e77c0013607eec",
+        userId:"5c504daec9e77c0013ef1794",
         meetingHeading: "测试a",
         heading:"测试b",
         favorite: false,
         time: "2019-02-10"
       }],
       favoriteNotes:[{
-        id: "11",
-        meetingHeading: "测试x",
-        heading:"测试y",
+        id: "1111",
+        meetingId: "5c6531e3c9e77c0013607eec",
+        userId:"5c504daec9e77c0013ef1793",
+        meetingHeading: "测试1",
+        heading:"测试2",
         favorite: true,
         time: "2019-02-10"
       }]
@@ -213,7 +219,7 @@ class NotePage extends React.Component {
                                     </Link>
                                   </TableCell>
                                   <TableCell align="left">
-                                    <Link to={"/note/"+ele.id+"/profile"}>
+                                    <Link to={"/note/"+ele.meetingId+"/"+ele.userId+"/profile"}>
                                     {ele.heading}
                                     </Link>
                                   </TableCell>
@@ -221,7 +227,7 @@ class NotePage extends React.Component {
                                     {ele.time}
                                   </TableCell>
                                   <TableCell align="left">
-                                      <IconButton className={classes.iconButton} onClick={() => { window.location.href="/note/"+ele.id+"/profile";}}>
+                                      <IconButton className={classes.iconButton} onClick={() => { window.location.href="/note/"+ele.meetingId+"/"+ele.userId+"/edit";}}>
                                         <Edit/>
                                       </IconButton>
                                       <IconButton color={ele.favorite ? "secondary" : "default"} className={classes.iconButton} onClick={(e) => this.handleFavorite(e, ele.id)}>
@@ -293,7 +299,7 @@ class NotePage extends React.Component {
                                     </Link>
                                   </TableCell>
                                   <TableCell align="left">
-                                    <Link to={"/note/"+ele.id+"/profile"}>
+                                    <Link to={"/note/"+ele.meetingId+"/"+ele.userId+"/profile"}>
                                     {ele.heading}
                                     </Link>
                                   </TableCell>
@@ -301,7 +307,7 @@ class NotePage extends React.Component {
                                     {ele.time}
                                   </TableCell>
                                   <TableCell align="left">
-                                      <IconButton className={classes.iconButton} onClick={() => { window.location.href="/note/"+ele.id+"/profile";}}>
+                                      <IconButton className={classes.iconButton} onClick={() => { window.location.href="/note/"+ele.meetingId+"/"+ele.userId+"/profile";}}>
                                         <Search/>
                                       </IconButton>
                                       <IconButton color={ele.favorite ? "secondary" : "default"} className={classes.iconButton} onClick={(e) => this.handleOthersFavorite(e, ele.id)}>
@@ -370,7 +376,7 @@ class NotePage extends React.Component {
                                     </Link>
                                   </TableCell>
                                   <TableCell align="left">
-                                    <Link to={"/note/"+ele.id+"/profile"}>
+                                    <Link to={"/note/"+ele.meetingId+"/"+ele.userId+"/profile"}>
                                     {ele.heading}
                                     </Link>
                                   </TableCell>

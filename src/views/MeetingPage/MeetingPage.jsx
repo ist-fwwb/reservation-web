@@ -309,7 +309,6 @@ class MeetingPage extends React.Component {
     }
     const { classes } = this.props;
     const { meetingsRowsPerPage, meetingsPage, attendMeetingsRowsPerPage, attendMeetingsPage, historyMeetingsRowsPerPage, historyMeetingsPage } = this.state;
-    console.log(attendMeetings)
     return (
       <div>
         <GridContainer>
@@ -484,7 +483,7 @@ class MeetingPage extends React.Component {
                     <Paper className={classes.root}>
                       <div className={classes.tableWrapper}>
                       {! historyLoaded ? null : 
-                        <Table className={classes.table} fixedHeader={false} style={{ width: "auto", tableLayout: "auto" }}>
+                        <Table className={classes.table}>
                           <TableHead>
                             <TableRow>
                               <TableCell align="left">会议名称</TableCell>

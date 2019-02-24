@@ -19,6 +19,7 @@ import SmartReservationPage from "views/SmartReservationPage/SmartReservationPag
 import QueueNodePage from "views/QueueNodePage/QueueNodePage.jsx";
 import NotePage from "views/NotePage/NotePage.jsx";
 import NoteProfile from "views/NoteProfile/NoteProfile.jsx";
+import NoteEditPage from "views/NoteEditPage/NoteEditPage.jsx";
 
 export const dashboardRoutes = [
   {
@@ -95,8 +96,12 @@ let routesNotInSideBar = [
     component: UserProfilePage
   },
   {
-    path: "/note/:noteId/profile",
+    path: "/note/:meetingId/:userId/profile",
     component: NoteProfile,
+  },
+  {
+    path: "/note/:meetingId/:userId/edit",
+    component: NoteEditPage,
   },
 ];
 
