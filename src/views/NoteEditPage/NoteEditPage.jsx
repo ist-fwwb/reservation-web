@@ -12,11 +12,15 @@ import GridContainer from "components/Grid/GridContainer.jsx";
 import { Link } from "react-router-dom";
 import wangeditor from 'wangeditor';
 
-const styles = {
+const styles = theme => ({
   editor: {
     width: '100%'
   },
-};
+  link: {
+    color: '#FFF',
+  },
+});
+
 
 class NoteEditPage extends React.Component {
   constructor(props){
@@ -76,7 +80,7 @@ class NoteEditPage extends React.Component {
                 color="danger"
               >
                 <h4 className={classes.cardTitleWhite}>
-                  {"会议标题:"}<Link to={"/meeting/"+this.state.meetingId}>{this.state.meetingHeading}</Link>
+                  {"会议标题:"}<Link className={classes.link} to={"/meeting/"+this.state.meetingId}>{this.state.meetingHeading}</Link>
                 </h4>
               </CardHeader>
               <CardBody>

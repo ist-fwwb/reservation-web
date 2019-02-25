@@ -10,9 +10,11 @@ import GridContainer from "components/Grid/GridContainer.jsx";
 
 import { Link } from "react-router-dom";
 
-const styles = {
-  
-};
+const styles = theme => ({
+  link: {
+    color: '#FFF',
+  },
+});
 
 class NoteProfile extends React.Component {
   constructor(props){
@@ -59,7 +61,7 @@ class NoteProfile extends React.Component {
                 color="danger"
               >
                 <h4 className={classes.cardTitleWhite}>
-                  {"会议名称:"}<Link to={"/meeting/"+this.state.meetingId}>{this.state.meetingHeading}</Link>
+                  {"会议名称:"}<Link to={"/meeting/"+this.state.meetingId} className={classes.link}>{this.state.meetingHeading}</Link>
                 </h4>
               </CardHeader>
               <CardBody>

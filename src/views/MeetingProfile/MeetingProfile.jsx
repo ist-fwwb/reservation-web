@@ -118,7 +118,7 @@ class NotesDialog extends React.Component {
                       <IconButton className={classes.iconButton} onClick={() => { window.location.href="/note/"+ele.meetingId+"/"+ele.userId+"/profile";}}>
                         <Search/>
                       </IconButton>
-                      <IconButton color={ele.favorite ? "secondary" : "default"} className={classes.iconButton} onClick={(e) => this.handleOthersFavorite(e, ele.id)}>
+                      <IconButton color={ele.favorite ? "secondary" : "default"} className={classes.iconButton} onClick={(e) => this.props.handleFavorite(e, ele.id)}>
                         <FavoriteIcon/>
                       </IconButton>
                   </TableCell>
@@ -140,6 +140,7 @@ NotesDialog.propTypes = {
   classes: PropTypes.object.isRequired,
   notes: PropTypes.array.isRequired,
   onClose: PropTypes.func,
+  handleFavorite: PropTypes.func,
 };
 const NotesDialogWrapped = withStyles(styles)(NotesDialog);
 
@@ -232,6 +233,8 @@ class MeetingProfile extends React.Component {
     this.timer = null;
     this.roomSchedule = React.createRef();
     this.state = {
+      notes: [],
+
       // edit schedule
       lastDate: "",
       lastStartTime: -1,
@@ -267,7 +270,17 @@ class MeetingProfile extends React.Component {
     };
   }
 
-  
+  handleFavorite = (e, id) => {
+    e.preventDefault();
+    let { notes } = this.state;
+    for (let i in notes){
+      if (notes[i].id === id){
+        notes[i].favorite = !notes[i].favorite;
+        this.setState({ notes });
+        break;
+      }
+    }
+  }
 
   componentDidMount() {
     this.setState({notes: [{
@@ -1010,6 +1023,7 @@ class MeetingProfile extends React.Component {
                       open={this.state.openNotes}
                       onClose={() => {this.setState({ openNotes: false })}}
                       notes={notes}
+                      handleFavorite={this.handleFavorite}
                     />
                   </GridItem>
                   <GridItem xs={12} sm={12} md={2}>
