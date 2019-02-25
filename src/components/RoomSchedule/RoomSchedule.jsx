@@ -356,6 +356,7 @@ class RoomSchedule extends React.Component{
         scheduleData = this.markOriginalData(scheduleData, originalDate, originalStartTime, originalEndTime);
       }
     }
+    console.log(this.state.firstChosen)
     return(
       <Table>
         <TableHead>

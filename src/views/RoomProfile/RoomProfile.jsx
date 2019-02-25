@@ -157,7 +157,7 @@ class RoomProfile extends React.Component {
     e.preventDefault();
     let firstChosen = this.state.firstChosen;
     let secondChosen = this.state.secondChosen;
-    if (!(this.state.firstChosen && this.state.secondChosen)){
+    if (!this.state.firstChosen){
       this.warning("请先选择时间");
       return;
     }
