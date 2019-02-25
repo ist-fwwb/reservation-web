@@ -23,6 +23,8 @@ import TableCell from '@material-ui/core/TableCell';
 import TableFooter from '@material-ui/core/TableFooter';
 import TablePagination from '@material-ui/core/TablePagination';
 import TableRow from '@material-ui/core/TableRow';
+import TextField from '@material-ui/core/TextField';
+import Button from '@material-ui/core/Button';
 
 import { Link } from "react-router-dom";
 
@@ -49,6 +51,9 @@ class NotePage extends React.Component {
   constructor(props){
     super(props);
     this.state = {
+      meetingHeading: '',
+      noteHeading: '',
+
       notesPage: 0,
       notesRowsPerPage: 5,
 
@@ -92,6 +97,7 @@ class NotePage extends React.Component {
         userId:"5c504daec9e77c0013ef1793",
         meetingHeading: "测试1",
         heading:"测试2",
+        name: "皮皮盘",
         favorite: true,
         time: "2019-02-10"
       }],
@@ -101,6 +107,7 @@ class NotePage extends React.Component {
         userId:"5c504daec9e77c0013ef1794",
         meetingHeading: "测试a",
         heading:"测试b",
+        name: "皮皮盼",
         favorite: false,
         time: "2019-02-10"
       }],
@@ -110,6 +117,7 @@ class NotePage extends React.Component {
         userId:"5c504daec9e77c0013ef1793",
         meetingHeading: "测试1",
         heading:"测试2",
+        name: "皮皮盘",
         favorite: true,
         time: "2019-02-10"
       }]
@@ -179,6 +187,10 @@ class NotePage extends React.Component {
     }
   }
 
+  handleChange = (e) => {
+    this.setState({[e.target.name]:e.target.value})
+  }
+
   render(){
     let { notes, othersNotes, favoriteNotes } = this.state;
     const { classes } = this.props;
@@ -197,7 +209,57 @@ class NotePage extends React.Component {
                   tabName: "我的笔记",
                   tabIcon: FormatListNumbered,
                   tabContent: (
-                    <Paper className={classes.root}>
+                    <div>
+                      <table>
+                        <tbody>
+                          <tr>
+                            <td>
+                            <TextField
+                              label="会议名称"
+                              name="meetingHeading"
+                              fullWidth
+                              onChange={this.handleChange}
+                              className={classes.textField}
+                              value={this.state.meetingHeading}
+                              margin="normal"
+                              variant="outlined"
+                            />
+                            </td>
+                            <td>&nbsp;&nbsp;</td>
+                            <td>
+                            <TextField
+                              label="笔记名称"
+                              name="noteHeading"
+                              fullWidth
+                              onChange={this.handleChange}
+                              className={classes.textField}
+                              value={this.state.noteHeading}
+                              margin="normal"
+                              variant="outlined"
+                            />
+                            </td>
+                            <td>&nbsp;&nbsp;</td>
+                            <td>
+                            <TextField
+                              label="作者"
+                              name="name"
+                              fullWidth
+                              onChange={this.handleChange}
+                              className={classes.textField}
+                              value={this.state.name}
+                              margin="normal"
+                              variant="outlined"
+                            />
+                            </td>
+                            <td>&nbsp;&nbsp;</td>
+                            <td>
+                              <Button color="primary" variant="contained">搜索</Button>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                      <br></br>
+                      <Paper className={classes.root}>
                       <div className={classes.tableWrapper}>
                       {! notes ? null : 
                         <Table className={classes.table} fixedHeader={false}>
@@ -205,6 +267,7 @@ class NotePage extends React.Component {
                             <TableRow>
                               <TableCell align="left">会议名称</TableCell>
                               <TableCell align="left">笔记标题</TableCell>
+                              <TableCell align="left">作者</TableCell>
                               <TableCell align="left">更新时间</TableCell>
                               <TableCell align="left">操作</TableCell>
                             </TableRow>
@@ -222,6 +285,9 @@ class NotePage extends React.Component {
                                     <Link to={"/note/"+ele.meetingId+"/"+ele.userId+"/profile"}>
                                     {ele.heading}
                                     </Link>
+                                  </TableCell>
+                                  <TableCell>
+                                    {ele.name}
                                   </TableCell>
                                   <TableCell>
                                     {ele.time}
@@ -271,12 +337,63 @@ class NotePage extends React.Component {
                       }
                       </div>
                     </Paper>
+                    </div>
                   )
                 },
                 {
                   tabName: "他人笔记",
                   tabIcon: InsertDriveFile,
                   tabContent: (
+                    <div>
+                      <table>
+                        <tbody>
+                          <tr>
+                            <td>
+                            <TextField
+                              label="会议名称"
+                              name="othersMeetingHeading"
+                              fullWidth
+                              onChange={this.handleChange}
+                              className={classes.textField}
+                              value={this.state.othersMeetingHeading}
+                              margin="normal"
+                              variant="outlined"
+                            />
+                            </td>
+                            <td>&nbsp;&nbsp;</td>
+                            <td>
+                            <TextField
+                              label="笔记名称"
+                              name="othersNoteHeading"
+                              fullWidth
+                              onChange={this.handleChange}
+                              className={classes.textField}
+                              value={this.state.othersNoteHeading}
+                              margin="normal"
+                              variant="outlined"
+                            />
+                            </td>
+                            <td>&nbsp;&nbsp;</td>
+                            <td>
+                            <TextField
+                              label="作者"
+                              name="othersName"
+                              fullWidth
+                              onChange={this.handleChange}
+                              className={classes.textField}
+                              value={this.state.othersName}
+                              margin="normal"
+                              variant="outlined"
+                            />
+                            </td>
+                            <td>&nbsp;&nbsp;</td>
+                            <td>
+                              <Button color="primary" variant="contained">搜索</Button>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                      <br></br>
                     <Paper className={classes.root}>
                       <div className={classes.tableWrapper}>
                       {! notes ? null : 
@@ -285,6 +402,7 @@ class NotePage extends React.Component {
                             <TableRow>
                               <TableCell align="left">会议名称</TableCell>
                               <TableCell align="left">笔记标题</TableCell>
+                              <TableCell align="left">作者</TableCell>
                               <TableCell align="left">更新时间</TableCell>
                               <TableCell align="left">操作</TableCell>
                             </TableRow>
@@ -304,6 +422,9 @@ class NotePage extends React.Component {
                                     </Link>
                                   </TableCell>
                                   <TableCell>
+                                    {ele.name}
+                                  </TableCell>
+                                  <TableCell>
                                     {ele.time}
                                   </TableCell>
                                   <TableCell align="left">
@@ -317,16 +438,6 @@ class NotePage extends React.Component {
                                 </TableRow>
                               )
                             })}
-                            {
-                              () => {
-                                const othersNotesEmptyRows = othersNotesRowsPerPage - Math.min(othersNotesRowsPerPage, othersNotes.length - othersNotesPage * othersNotesRowsPerPage);
-                                return othersNotesEmptyRows > 0 && (
-                                  <TableRow style={{ height: 48 * othersNotesEmptyRows }}>
-                                    <TableCell colSpan={6} />
-                                  </TableRow>
-                                )
-                              }
-                            }
                           </TableBody>
                           <TableFooter>
                             <TableRow>
@@ -348,12 +459,63 @@ class NotePage extends React.Component {
                       }
                       </div>
                     </Paper>
+                    </div>
                   )
                 },
                 {
                   tabName: "收藏笔记",
                   tabIcon: Bookmark,
                   tabContent: (
+                    <div>
+                      <table>
+                        <tbody>
+                          <tr>
+                            <td>
+                            <TextField
+                              label="会议名称"
+                              name="favoriteMeetingHeading"
+                              fullWidth
+                              onChange={this.handleChange}
+                              className={classes.textField}
+                              value={this.state.favoriteMeetingHeading}
+                              margin="normal"
+                              variant="outlined"
+                            />
+                            </td>
+                            <td>&nbsp;&nbsp;</td>
+                            <td>
+                            <TextField
+                              label="笔记名称"
+                              name="favoriteNoteHeading"
+                              fullWidth
+                              onChange={this.handleChange}
+                              className={classes.textField}
+                              value={this.state.favoriteNoteHeading}
+                              margin="normal"
+                              variant="outlined"
+                            />
+                            </td>
+                            <td>&nbsp;&nbsp;</td>
+                            <td>
+                            <TextField
+                              label="作者"
+                              name="favoriteName"
+                              fullWidth
+                              onChange={this.handleChange}
+                              className={classes.textField}
+                              value={this.state.favoriteName}
+                              margin="normal"
+                              variant="outlined"
+                            />
+                            </td>
+                            <td>&nbsp;&nbsp;</td>
+                            <td>
+                              <Button color="primary" variant="contained">搜索</Button>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                      <br></br>
                     <Paper className={classes.root}>
                       <div className={classes.tableWrapper}>
                       {! notes ? null : 
@@ -362,6 +524,7 @@ class NotePage extends React.Component {
                             <TableRow>
                               <TableCell align="left">会议名称</TableCell>
                               <TableCell align="left">笔记标题</TableCell>
+                              <TableCell align="left">作者</TableCell>
                               <TableCell align="left">更新时间</TableCell>
                               <TableCell align="left">操作</TableCell>
                             </TableRow>
@@ -379,6 +542,9 @@ class NotePage extends React.Component {
                                     <Link to={"/note/"+ele.meetingId+"/"+ele.userId+"/profile"}>
                                     {ele.heading}
                                     </Link>
+                                  </TableCell>
+                                  <TableCell>
+                                    {ele.name}
                                   </TableCell>
                                   <TableCell>
                                     {ele.time}
@@ -422,6 +588,7 @@ class NotePage extends React.Component {
                       }
                       </div>
                     </Paper>
+                    </div>
                   )
                 }
               ]}

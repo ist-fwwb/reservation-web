@@ -35,8 +35,9 @@ class NoteProfile extends React.Component {
     // 获取笔记
     this.setState({
       loaded: true,
-      meetingHeading:"会议标题",
+      meetingHeading:"会议名称",
       heading:"笔记标题",
+      name: "皮皮盘",
       author: true,
       content: "<p><span style=\"font-weight: bold;\">咋回事</span></p>"
     })
@@ -60,7 +61,7 @@ class NoteProfile extends React.Component {
                 color="danger"
               >
                 <h4 className={classes.cardTitleWhite}>
-                  {"会议标题:"}<Link to={"/meeting/"+this.state.meetingId}>{this.state.meetingHeading}</Link>
+                  {"会议名称:"}<Link to={"/meeting/"+this.state.meetingId}>{this.state.meetingHeading}</Link>
                 </h4>
               </CardHeader>
               <CardBody>

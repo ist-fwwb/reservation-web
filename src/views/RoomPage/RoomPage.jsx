@@ -127,7 +127,6 @@ class RoomPage extends React.Component {
   render() {
     const { classes } = this.props;
     const rooms = this.state.rooms;
-    console.log(rooms)
     if (!rooms)
       return null;
     return (

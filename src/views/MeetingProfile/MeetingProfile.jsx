@@ -25,11 +25,18 @@ import FormControl from '@material-ui/core/FormControl';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Switch from '@material-ui/core/Switch';
 import Avatar from '@material-ui/core/Avatar';
+import Table from '@material-ui/core/Table';
+import TableHead from '@material-ui/core/TableHead';
+import TableBody from '@material-ui/core/TableBody';
+import TableCell from '@material-ui/core/TableCell';
+import TableRow from '@material-ui/core/TableRow';
 
 import Stars from '@material-ui/icons/Stars';
 import Add from '@material-ui/icons/Add';
 import Done from '@material-ui/icons/Done';
 import ErrorOutline from "@material-ui/icons/ErrorOutline";
+import Search from '@material-ui/icons/Search';
+import FavoriteIcon from '@material-ui/icons/Favorite';
 
 import Card from "components/Card/Card.jsx";
 import CardHeader from "components/Card/CardHeader.jsx";
@@ -48,7 +55,7 @@ const styles = theme => ({
     maxWidth: 360,
     minWidth: 230,
     backgroundColor: theme.palette.background.paper,
-  },
+  }
 });
 
 function convertToZhStatus(status){
@@ -61,6 +68,80 @@ function convertToZhStatus(status){
   else if ( status === "Stopped")
     return "已结束"
 }
+
+class NotesDialog extends React.Component {
+  render() {
+    const { classes, onClose, open, notes, ...other } = this.props;
+    return (
+      <Dialog 
+       maxWidth="md"
+       fullWidth={true}
+       onClose={this.props.onClose} 
+       scroll={"paper"} 
+       aria-labelledby="simple-dialog-title" 
+       open={open} 
+       {...other}
+       >
+        <DialogTitle id="simple-dialog-title">会议笔记</DialogTitle>
+        <DialogContent>
+          <Table className={classes.table}>
+              <TableHead>
+                <TableRow>
+                  <TableCell align="left">会议名称</TableCell>
+                  <TableCell align="left">笔记标题</TableCell>
+                  <TableCell align="left">作者</TableCell>
+                  <TableCell align="left">更新时间</TableCell>
+                  <TableCell align="left">操作</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+            { !notes ? null : notes.map(ele => 
+              (
+                <TableRow key={ele.id}>
+                  <TableCell align="left">
+                    <Link to={"/meeting/"+ele.meetingId+"/profile"}>
+                    {ele.meetingHeading}
+                    </Link>
+                  </TableCell>
+                  <TableCell align="left">
+                    <Link to={"/note/"+ele.meetingId+"/"+ele.userId+"/profile"}>
+                    {ele.heading}
+                    </Link>
+                  </TableCell>
+                  <TableCell>
+                    {ele.name}
+                  </TableCell>
+                  <TableCell>
+                    {ele.time}
+                  </TableCell>
+                  <TableCell align="left">
+                      <IconButton className={classes.iconButton} onClick={() => { window.location.href="/note/"+ele.meetingId+"/"+ele.userId+"/profile";}}>
+                        <Search/>
+                      </IconButton>
+                      <IconButton color={ele.favorite ? "secondary" : "default"} className={classes.iconButton} onClick={(e) => this.handleOthersFavorite(e, ele.id)}>
+                        <FavoriteIcon/>
+                      </IconButton>
+                  </TableCell>
+                </TableRow>
+              )
+              
+            )}
+            </TableBody>
+          </Table>
+        </DialogContent>
+        <DialogActions> 
+          <Button color="primary" onClick={this.props.onClose}>关闭</Button>
+        </DialogActions>
+      </Dialog>
+    );
+  }
+}
+NotesDialog.propTypes = {
+  classes: PropTypes.object.isRequired,
+  notes: PropTypes.array.isRequired,
+  onClose: PropTypes.func,
+};
+const NotesDialogWrapped = withStyles(styles)(NotesDialog);
 
 class AttendantsDialog extends React.Component {
   constructor(props){
@@ -103,7 +184,7 @@ class AttendantsDialog extends React.Component {
         <DialogContent>
           <FormControl component="fieldset" className={classes.formControl}>
             <List dense className={classes.root}>
-            {addattendants.map(value => (
+            { !addattendants ? null : addattendants.map(value => (
               <ListItem key={value.id}>
                 <ListItemAvatar>
                   <Avatar className={classes.avatar} src={filepath + '/' + value.faceFile}/>
@@ -189,6 +270,17 @@ class MeetingProfile extends React.Component {
   
 
   componentDidMount() {
+    this.setState({notes: [{
+      id: "1111",
+      meetingId: "5c6531e3c9e77c0013607eec",
+      userId:"5c504daec9e77c0013ef1793",
+      meetingHeading: "测试1",
+      heading:"测试2",
+      name: "皮皮盘",
+      favorite: true,
+      time: "2019-02-10"
+    }]})
+
     let meetingApi = meetingController.getMeetingByMeetingId(this.props.match.params.meetingId);
     fetch(meetingApi,{
       credentials: 'include',
@@ -618,7 +710,8 @@ class MeetingProfile extends React.Component {
       description, 
       heading,
       tags,
-      attendantNum
+      attendantNum,
+      notes
     } = this.state;
     const pending = (status === "Pending");
     const disabled = !hostFlag || !pending;
@@ -910,12 +1003,17 @@ class MeetingProfile extends React.Component {
                 </GridContainer>
                 <GridContainer>
                   <GridItem xs={12} sm={12} md={2}>
-                    <Button variant="outlined">
+                    <Button variant="outlined" onClick={() => { this.setState({ openNotes: true }); }}>
                       会议笔记
                     </Button>
+                    <NotesDialogWrapped
+                      open={this.state.openNotes}
+                      onClose={() => {this.setState({ openNotes: false })}}
+                      notes={notes}
+                    />
                   </GridItem>
                   <GridItem xs={12} sm={12} md={2}>
-                    <Button variant="outlined">
+                    <Button variant="outlined" onClick={() => { window.location.href="/note/"+this.props.match.params.meetingId+"/"+this.props.userId+"/profile" ;}}>
                       我的笔记
                     </Button>
                   </GridItem>
@@ -1019,12 +1117,6 @@ class MeetingProfile extends React.Component {
                     </CardFooter>
                   : ( inMeeting ? 
                     <CardFooter>
-                      <Button variant="outlined">
-                        会议笔记
-                      </Button>
-                      <Button variant="outlined">
-                        我的笔记
-                      </Button>
                       <Button variant="outlined" color="secondary" onClick={this.confirmExitClickOpen}>退出会议</Button>
                       <Dialog
                         open={this.state.confirmExitOpen}
