@@ -397,6 +397,13 @@ class MeetingProfile extends React.Component {
     this.setState({[e.target.name]:e.target.value});
   }
 
+  componentWillUnmount() {
+    var id = window.setTimeout(null, 0);
+    while (id--) {
+      window.clearTimeout(id);
+    }
+  }
+
   showNotification = (place) => {
     let x = [];
     x[place] = true;

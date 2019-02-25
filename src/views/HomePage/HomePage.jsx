@@ -97,6 +97,10 @@ class HomePage extends React.Component{
 
   componentWillUnmount() {
     window.removeEventListener("paste", this.pasteFunction);
+    var id = window.setTimeout(null, 0);
+    while (id--) {
+      window.clearTimeout(id);
+    }
   }
 
   showNotification = () => {

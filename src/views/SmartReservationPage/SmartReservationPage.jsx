@@ -107,8 +107,11 @@ class SmartReservationPage extends React.Component{
     })
   }
 
-  componentWillUnmount(){
-    clearTimeout(this.alertTimeout);
+  componentWillUnmount() {
+    var id = window.setTimeout(null, 0);
+    while (id--) {
+      window.clearTimeout(id);
+    }
   }
 
   showNotification = (place) => {

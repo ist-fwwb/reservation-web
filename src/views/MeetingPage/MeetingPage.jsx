@@ -70,6 +70,13 @@ class MeetingPage extends React.Component {
     }
   }
 
+  componentWillUnmount() {
+    var id = window.setTimeout(null, 0);
+    while (id--) {
+      window.clearTimeout(id);
+    }
+  }
+
   showNotification = (place) => {
     let x = [];
     x[place] = true;
