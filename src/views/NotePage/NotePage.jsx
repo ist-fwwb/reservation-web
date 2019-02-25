@@ -1,5 +1,4 @@
 import React from "react";
-import PropTypes, { node } from 'prop-types';
 import withStyles from "@material-ui/core/styles/withStyles";
 
 import CustomTabs from "components/CustomTabs/CustomTabs.jsx";

@@ -1,7 +1,5 @@
 import React from "react";
-import PropTypes from 'prop-types';
 import withStyles from "@material-ui/core/styles/withStyles";
-import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 
 import Card from "components/Card/Card.jsx";
@@ -30,7 +28,7 @@ class NoteProfile extends React.Component {
 
   componentDidMount(){
 
-    let {meetingId, userId} = this.props.match.params;
+    //let {meetingId, userId} = this.props.match.params;
     
     // 获取笔记
     this.setState({
@@ -50,7 +48,7 @@ class NoteProfile extends React.Component {
 
   render(){
     const {classes} = this.props;
-    const {loaded, heading, author } = this.state;
+    //const {loaded, heading, author } = this.state;
     let {meetingId, userId} = this.props.match.params;
     return (
       <GridContainer>
