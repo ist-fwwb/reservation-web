@@ -21,8 +21,20 @@ const cookies = new Cookies();
 class HeaderLinks extends React.Component {
   state = {
     open: false,
-    notificationNumber: 3
+    notificationNumber: 0
   };
+
+  componentDidMount(){
+    let Notification = [{
+      id: "1112",
+      heading: "已读消息",
+      sender: "系统",
+      read: true,
+      time: "2019-02-12",
+    }];
+    this.setState({notificationNumber: Notification.length});
+  }
+
   handleToggle = () => {
     this.setState(state => ({ open: !state.open }));
   };

@@ -7,12 +7,9 @@ import GridContainer from "components/Grid/GridContainer.jsx";
 
 import IconButton from '@material-ui/core/IconButton';
 import DeleteIcon from '@material-ui/icons/Delete';
-import Edit from '@material-ui/icons/Edit';
-import Search from '@material-ui/icons/Search';
-import FavoriteIcon from '@material-ui/icons/Favorite';
 import FormatListNumbered from '@material-ui/icons/FormatListNumbered';
-import InsertDriveFile from '@material-ui/icons/InsertDriveFile';
-import Bookmark from '@material-ui/icons/Bookmark';
+import MailOutlined from '@material-ui/icons/MailOutlined';
+import DraftsOutlined from '@material-ui/icons/DraftsOutlined';
 
 import Paper from '@material-ui/core/Paper';
 import Table from '@material-ui/core/Table';
@@ -22,8 +19,6 @@ import TableCell from '@material-ui/core/TableCell';
 import TableFooter from '@material-ui/core/TableFooter';
 import TablePagination from '@material-ui/core/TablePagination';
 import TableRow from '@material-ui/core/TableRow';
-import TextField from '@material-ui/core/TextField';
-import Button from '@material-ui/core/Button';
 
 import { Link } from "react-router-dom";
 
@@ -74,6 +69,12 @@ class NotificationPage extends React.Component {
         sender: "系统",
         read: false,
         time: "2019-02-10",
+      },{
+        id: "1112",
+        heading: "已读消息",
+        sender: "系统",
+        read: true,
+        time: "2019-02-12",
       }]
     });
   }
@@ -111,7 +112,7 @@ class NotificationPage extends React.Component {
                       <Paper className={classes.root}>
                       <div className={classes.tableWrapper}>
                       {! Notification ? null : 
-                        <Table className={classes.table} fixedHeader={false}>
+                        <Table className={classes.table}>
                           <TableHead>
                             <TableRow>
                               <TableCell align="left">消息标题</TableCell>
@@ -125,9 +126,16 @@ class NotificationPage extends React.Component {
                               return (
                                 <TableRow key={ele.id}>
                                   <TableCell align="left">
-                                    <Link to={"/notification/"+ele.id+"/profile"}>
+                                    <span>
+                                    {
+                                      ele.read ? <DraftsOutlined className={classes.icon}/> 
+                                      : <MailOutlined className={classes.icon}/>
+                                    }
+                                    &nbsp;
+                                    <Link className={classes.icon} to={"/notification/"+ele.id+"/profile"}>
                                     {ele.heading}
                                     </Link>
+                                    </span>
                                   </TableCell>
                                   <TableCell align="left">
                                     {ele.sender}
