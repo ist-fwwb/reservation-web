@@ -29,6 +29,11 @@ import { roomController } from "variables/general.jsx";
 
 import dashboardStyle from "assets/jss/material-dashboard-react/views/dashboardStyle.jsx";
 
+let styles = dashboardStyle;
+styles.icon = {
+  verticalAlign: 'middle'
+};
+
 function roomCategory(eng){
   if (eng === "SMALL")
     return "小会议室";
@@ -162,7 +167,7 @@ class RoomPage extends React.Component {
                       <table>
                         <tbody>
                           <tr>
-                            <td><Info/>&nbsp;&nbsp;<Link aligh="right" to={"/room/"+room.id+"/profile"}>基本信息</Link></td>
+                            <td><Info className={classes.icon}/>&nbsp;&nbsp;<Link aligh="right" to={"/room/"+room.id+"/profile"}>基本信息</Link></td>
                           </tr>
                         </tbody>
                       </table>
@@ -197,4 +202,4 @@ RoomPage.propTypes = {
   classes: PropTypes.object.isRequired
 };
 
-export default withStyles(dashboardStyle)(RoomPage);
+export default withStyles(styles)(RoomPage);
