@@ -105,11 +105,9 @@ class App extends React.Component {
                   deepRoutes.map((prop, key) => {
                     if (prop.redirect)
                       return <Redirect from={prop.path} to={prop.to} key={key} />;
-                    return prop.path==="/room/:roomId/profile"?
-                      <Route exact path={prop.path} key={key} render={ (props) => <prop.component userId={userId} {...props}/> } />
-                      :
-                      <Route exact path={prop.path} key={key} render={ (props) => <prop.component userId={userId} {...props}/> } />
-                      ;
+                    else
+                      return <Route exact path={prop.path} key={key} render={ (props) => <prop.component userId={userId} {...props}/> } />
+
                   })
                 }
                 </Switch>
