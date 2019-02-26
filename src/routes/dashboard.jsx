@@ -20,6 +20,8 @@ import QueueNodePage from "views/QueueNodePage/QueueNodePage.jsx";
 import NotePage from "views/NotePage/NotePage.jsx";
 import NoteProfile from "views/NoteProfile/NoteProfile.jsx";
 import NoteEditPage from "views/NoteEditPage/NoteEditPage.jsx";
+import NotificationPage from 'views/NotificationPage/NotificationPage.jsx';
+import NotificationProfile from "views/NotificationProfile/NotificationProfile.jsx";
 
 export const dashboardRoutes = [
   {
@@ -103,6 +105,14 @@ let routesNotInSideBar = [
     path: "/note/:meetingId/:userId/edit",
     component: NoteEditPage,
   },
+  {
+    path: "/notification",
+    component: NotificationPage,
+  },
+  {
+    path: "/notification/:notificationId/profile",
+    component: NotificationProfile
+  }
 ];
 
 export const deepRoutes = routesNotInSideBar.concat(dashboardRoutes);

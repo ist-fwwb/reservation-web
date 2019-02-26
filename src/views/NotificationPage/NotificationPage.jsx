@@ -70,86 +70,12 @@ class NotificationPage extends React.Component {
     this.setState({
       Notification:[{
         id: "1111",
-        meetingId: "5c6531e3c9e77c0013607eec",
-        userId:"5c504daec9e77c0013ef1793",
-        meetingHeading: "测试1",
-        heading:"测试2",
-        name: "皮皮盘",
-        favorite: true,
-        time: "2019-02-10"
-      }],
-      othersNotification:[{
-        id: "1112",
-        meetingId: "5c6531e3c9e77c0013607eec",
-        userId:"5c504daec9e77c0013ef1794",
-        meetingHeading: "测试a",
-        heading:"测试b",
-        name: "皮皮盼",
-        favorite: false,
-        time: "2019-02-10"
-      }],
-      favoriteNotification:[{
-        id: "1111",
-        meetingId: "5c6531e3c9e77c0013607eec",
-        userId:"5c504daec9e77c0013ef1793",
-        meetingHeading: "测试1",
-        heading:"测试2",
-        name: "皮皮盘",
-        favorite: true,
-        time: "2019-02-10"
+        heading: "系统消息",
+        sender: "系统",
+        read: false,
+        time: "2019-02-10",
       }]
-    })
-    // 获取自己的笔记
-    // 获取他人的笔记
-    // 获取收藏的笔记
-  }
-
-  handleFavoriteFavorite = (e, id) => {
-    e.preventDefault();
-    let { favoriteNotification } = this.state;
-    for (let i in favoriteNotification){
-      if (favoriteNotification[i].id === id){
-        favoriteNotification[i].favorite = !favoriteNotification[i].favorite;
-        this.setState({ favoriteNotification });
-        break;
-      }
-    }
-  }
-
-  handleOthersFavorite = (e, id) => {
-    e.preventDefault();
-    let { othersNotification, favoriteNotification } = this.state;
-    for (let i in othersNotification){
-      if (othersNotification[i].id === id){
-        othersNotification[i].favorite = !othersNotification[i].favorite;
-        this.setState({ othersNotification, favoriteNotification });
-        break;
-      }
-    }
-  }
-
-  handleOthersDelete = (e, id) => {
-    e.preventDefault();
-    let { othersNotification } = this.state;
-    for (let i in othersNotification){
-      if (othersNotification[i].id === id){
-        othersNotification.splice(i, 1);
-        this.setState({ othersNotification });
-        break;
-      }
-    }
-  }
-
-  handleFavorite = (e, id) => {
-    e.preventDefault();
-    let { Notification } = this.state;
-    for (let i in Notification){
-      if (Notification[i].id === id){
-        Notification[i].favorite = !Notification[i].favorite;
-        this.setState({ Notification });
-        break;
-      }
-    }
+    });
   }
 
   handleDelete = (e, id) => {
@@ -164,16 +90,11 @@ class NotificationPage extends React.Component {
     }
   }
 
-  handleChange = (e) => {
-    this.setState({[e.target.name]:e.target.value})
-  }
 
   render(){
-    let { Notification, othersNotification, favoriteNotification } = this.state;
+    let { Notification } = this.state;
     const { classes } = this.props;
     const { NotificationRowsPerPage, NotificationPage  } = this.state;
-    const { othersNotificationRowsPerPage, othersNotificationPage  } = this.state;
-    const { favoriteNotificationRowsPerPage, favoriteNotificationPage  } = this.state;
     return (
       <GridContainer>
           <GridItem xs={12} sm={12} md={12}>
@@ -183,68 +104,18 @@ class NotificationPage extends React.Component {
               headerColor="danger"
               tabs={[
                 {
-                  tabName: "我的笔记",
+                  tabName: "消息列表",
                   tabIcon: FormatListNumbered,
                   tabContent: (
                     <div>
-                      <table>
-                        <tbody>
-                          <tr>
-                            <td>
-                            <TextField
-                              label="会议名称"
-                              name="meetingHeading"
-                              fullWidth
-                              onChange={this.handleChange}
-                              className={classes.textField}
-                              value={this.state.meetingHeading}
-                              margin="normal"
-                              variant="outlined"
-                            />
-                            </td>
-                            <td>&nbsp;&nbsp;</td>
-                            <td>
-                            <TextField
-                              label="笔记名称"
-                              name="noteHeading"
-                              fullWidth
-                              onChange={this.handleChange}
-                              className={classes.textField}
-                              value={this.state.noteHeading}
-                              margin="normal"
-                              variant="outlined"
-                            />
-                            </td>
-                            <td>&nbsp;&nbsp;</td>
-                            <td>
-                            <TextField
-                              label="作者"
-                              name="name"
-                              fullWidth
-                              onChange={this.handleChange}
-                              className={classes.textField}
-                              value={this.state.name}
-                              margin="normal"
-                              variant="outlined"
-                            />
-                            </td>
-                            <td>&nbsp;&nbsp;</td>
-                            <td>
-                              <Button color="primary" variant="contained">搜索</Button>
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>
-                      <br></br>
                       <Paper className={classes.root}>
                       <div className={classes.tableWrapper}>
                       {! Notification ? null : 
                         <Table className={classes.table} fixedHeader={false}>
                           <TableHead>
                             <TableRow>
-                              <TableCell align="left">会议名称</TableCell>
-                              <TableCell align="left">笔记标题</TableCell>
-                              <TableCell align="left">作者</TableCell>
+                              <TableCell align="left">消息标题</TableCell>
+                              <TableCell align="left">发送者</TableCell>
                               <TableCell align="left">更新时间</TableCell>
                               <TableCell align="left">操作</TableCell>
                             </TableRow>
@@ -254,28 +125,17 @@ class NotificationPage extends React.Component {
                               return (
                                 <TableRow key={ele.id}>
                                   <TableCell align="left">
-                                    <Link to={"/meeting/"+ele.meetingId+"/profile"}>
-                                    {ele.meetingHeading}
-                                    </Link>
-                                  </TableCell>
-                                  <TableCell align="left">
-                                    <Link to={"/note/"+ele.meetingId+"/"+ele.userId+"/profile"}>
+                                    <Link to={"/notification/"+ele.id+"/profile"}>
                                     {ele.heading}
                                     </Link>
                                   </TableCell>
-                                  <TableCell>
-                                    {ele.name}
+                                  <TableCell align="left">
+                                    {ele.sender}
                                   </TableCell>
                                   <TableCell>
                                     {ele.time}
                                   </TableCell>
                                   <TableCell align="left">
-                                      <IconButton className={classes.iconButton} onClick={() => { window.location.href="/note/"+ele.meetingId+"/"+ele.userId+"/edit";}}>
-                                        <Edit/>
-                                      </IconButton>
-                                      <IconButton color={ele.favorite ? "secondary" : "default"} className={classes.iconButton} onClick={(e) => this.handleFavorite(e, ele.id)}>
-                                        <FavoriteIcon/>
-                                      </IconButton>
                                       <IconButton className={classes.iconButton} onClick={(e) => this.handleDelete(e, ele.id)}>
                                         <DeleteIcon/>
                                       </IconButton>
