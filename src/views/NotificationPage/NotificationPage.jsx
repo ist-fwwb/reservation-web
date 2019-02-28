@@ -10,6 +10,7 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import FormatListNumbered from '@material-ui/icons/FormatListNumbered';
 import MailOutlined from '@material-ui/icons/MailOutlined';
 import DraftsOutlined from '@material-ui/icons/DraftsOutlined';
+import Search from '@material-ui/icons/Search';
 
 import Paper from '@material-ui/core/Paper';
 import Table from '@material-ui/core/Table';
@@ -20,7 +21,7 @@ import TableFooter from '@material-ui/core/TableFooter';
 import TablePagination from '@material-ui/core/TablePagination';
 import TableRow from '@material-ui/core/TableRow';
 
-import { Link } from "react-router-dom";
+import { Link, Redirect } from "react-router-dom";
 
 const styles = theme => ({
   root: {
@@ -45,6 +46,9 @@ class NotificationPage extends React.Component {
   constructor(props){
     super(props);
     this.state = {
+
+      redirect: false,
+      redirect_url: "/",
 
       NotificationPage: 0,
       NotificationRowsPerPage: 5,
@@ -93,6 +97,9 @@ class NotificationPage extends React.Component {
 
 
   render(){
+    if (this.state.redirect){
+      return <Redirect to={this.state.redirect_url}/>
+    }
     let { Notification } = this.state;
     const { classes } = this.props;
     const { NotificationRowsPerPage, NotificationPage  } = this.state;
@@ -144,9 +151,12 @@ class NotificationPage extends React.Component {
                                     {ele.time}
                                   </TableCell>
                                   <TableCell align="left">
-                                      <IconButton className={classes.iconButton} onClick={(e) => this.handleDelete(e, ele.id)}>
-                                        <DeleteIcon/>
-                                      </IconButton>
+                                    <IconButton className={classes.iconButton} onClick={() => { this.setState({redirect: true, redirect_url:"/notification/"+ele.id+"/profile"});}}>
+                                      <Search/>
+                                    </IconButton>
+                                    <IconButton className={classes.iconButton} onClick={(e) => this.handleDelete(e, ele.id)}>
+                                      <DeleteIcon/>
+                                    </IconButton>
                                   </TableCell>
                                 </TableRow>
                               )
