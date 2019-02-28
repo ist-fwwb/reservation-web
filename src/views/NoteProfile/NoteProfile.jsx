@@ -17,10 +17,10 @@ import GridItem from "components/Grid/GridItem.jsx";
 import GridContainer from "components/Grid/GridContainer.jsx";
 import Snackbar from "components/Snackbar/Snackbar.jsx";
 
-import { Link } from "react-router-dom";
+import { noteController } from "variables/general.jsx";
+import { Link, Redirect } from "react-router-dom";
 import * as jsPDF from "jspdf";
 import * as html2canvas from "html2canvas";
-import { Icon } from "@material-ui/core";
 
 const styles = theme => ({
   link: {
@@ -39,6 +39,9 @@ class NoteProfile extends React.Component {
   constructor(props){
     super(props);
     this.state = {
+      redirect: false,
+      redirect_url: '/',
+
       loaded: false,
 
       br: false,
@@ -97,21 +100,33 @@ class NoteProfile extends React.Component {
 
   componentDidMount(){
 
-    //let {meetingId, userId} = this.props.match.params;
-    
-    // 获取笔记
-    let content = "<p><ol><li><span style=\"font-weight: bold;\">咋回事</span></li><li>嘿嘿嘿</li></ol><blockquote><ol><li><span style=\"font-weight: bold;\">啊哦</span></li></ol></blockquote></p><p><span style=\"font-size: large; font-style: italic; text-decoration-line: underline;\"><span style=\"color: rgb(194, 79, 74);\">我</span>操 </span><span style=\"font-weight: bold; font-size: small; background-color: rgb(238, 236, 224);\">这可<span style=\"color: rgb(70, 172, 200);\">怎么</span>办</span></p><p><span style=\"font-weight: bold; font-size: small; background-color: rgb(238, 236, 224);\"><br></span></p>"
-    this.setState({
-      loaded: true,
-      id: "111",
-      meetingHeading:"会议名称",
-      heading:"笔记标题",
-      name: "皮皮盘",
-      author: true,
-      content: content,
-      favorite: true
+    let { meetingId, ownerId } = this.props.match.params;
+    let { userId } = this.props;
+    let api = noteController.getNoteByOwnerIdByMeetingId(userId, ownerId, meetingId);
+    fetch(api, {
+      method: 'get',
+      credentials: 'include'
     })
-
+    .then(res => res.json())
+    .then(res => res[0])
+    .then(res => {
+      if (res.error){
+        console.log(res.error);
+        return;
+      }
+      else {
+        console.log(res)
+        this.setState({
+          loaded: true,
+          id: res.meetingNote.id,
+          heading: res.meetingNote.title,
+          meetingHeading: meetingId,
+          name: ownerId,
+          content: res.meetingNote.note,
+          favorite: res.collected,
+        })
+      }
+    })
   }
 
   exportPDF = (e) => {
@@ -143,12 +158,39 @@ class NoteProfile extends React.Component {
     e.preventDefault();
     let favorite = !this.state.favorite;
     this.setState({ favorite });
-    if (favorite){
-      this.success("收藏成功");
+    let api = noteController.handleFavorite(this.state.id);
+    let method = favorite ? 'post' : 'delete';
+    let message = {
+      userId: this.props.userId
     }
-    else{
-      this.success("取消收藏");
-    }
+    
+    fetch(api, {
+      method: method,
+      credentials: 'include',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(message)
+    })
+    .then(res => res.json())
+    .then(res => {
+      if (res.error){
+        console.log(res.error);
+        this.warning('收藏失败');
+        return;
+      }
+      else {
+        if (favorite)
+          this.success('收藏成功');
+        else
+          this.success('取消收藏');
+      }
+    })
+    .catch(e => {
+      console.log(e);
+      this.warning('收藏失败');
+    })
   }
 
   handleDelete = (e) => {
@@ -157,9 +199,12 @@ class NoteProfile extends React.Component {
   }
 
   render(){
-    const {classes} = this.props;
+    const { classes, userId } = this.props;
     //const {loaded, heading, author } = this.state;
-    let { meetingId, userId } = this.props.match.params;
+    let { meetingId, ownerId } = this.props.match.params;
+    if (this.state.redirect){
+      return <Redirect to={this.state.redirect_url}/>
+    }
     return (
       <div>
       <GridContainer>
@@ -183,8 +228,8 @@ class NoteProfile extends React.Component {
                     <p className={classes.left} >{this.state.heading}</p>
                     <p className={classes.right} >
                     {
-                      this.state.author && 
-                      <IconButton onClick={() => { window.location.href = "/note/"+meetingId+"/"+userId+"/edit"}}>
+                      userId === ownerId && 
+                      <IconButton onClick={() => { this.setState({redirect: true, redirect_url: "/note/"+meetingId+"/"+ownerId+"/edit"})}}>
                         <Edit/>
                       </IconButton>
                     }
@@ -195,7 +240,7 @@ class NoteProfile extends React.Component {
                       <GetApp/>
                     </IconButton>
                     {
-                      this.state.author && 
+                      userId === ownerId && 
                       <IconButton onClick={this.handleDelete}>
                         <Delete/>
                       </IconButton>

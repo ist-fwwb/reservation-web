@@ -63,6 +63,20 @@ const timeToId = (time) => {
   return Number(li[0]) * 2 + (Number(li[1]) === 30 ? 1 : 0);
 }
 
+const notificationController = {
+  "getNotificationByUserId": (userId) => (server+"/message?userId="+userId),
+  "getNotificationByNotificationId": (notificationId) => (server+"/message/"+notificationId),
+  "putNotification": (notificationId, status) => (server+"/message/"+notificationId+"/messageStatus?status="+status),
+}
+
+const noteController = {
+  "getNote": (userId) => (server+"/meetingNote?userId="+userId+"&ownerId="+userId),
+  "getNoteByOwnerId": (userId, ownerId) => (server+"/meetingNote?userId="+userId+"&ownerId="+ownerId),
+  "getNoteByOwnerIdByMeetingId": (userId, ownerId, meetingId) => (server+"/meetingNote?userId="+userId+"&ownerId="+ownerId+"&meetingId="+meetingId),
+  "createNote": () => (server+"/meetingNote?fileName=string"),
+  "handleFavorite": (noteId) => (server+"/meetingNote/"+noteId+"/collectors"),
+}
+
 const roomController = {
   "searchRoomByLocationAndSizeAndUtils":(location, size, utils) => {
     let locationStr = location ? "location="+location+"&" : "";
@@ -119,7 +133,7 @@ const meetingController = {
   "deleteMeetingByMeetingId": (meetingId) => (server + "/meeting/" + meetingId),
   "cancelMeetingByMeetingId": (meetingId) => (server + "/meeting/" + meetingId + "/status/Cancelled"),
   //"attendMeetingByMeetingId": (meetingId, userId) => (server + "/meeting/" + meetingId + "/attendants?userId=" + userId),
-  "attendMeetingByAttendantNum": (attendantNum, userId) => (server + "/meeting/" + attendantNum + "/attendants?userId=" + userId),
+  "attendMeetingByAttendantNum": (attendantNum, userId) => (server + "/meeting/" + attendantNum + "/attendant?userId=" + userId),
   "exitMeetingByMeetingId": (meetingId , userId) => (server +"/meeting/" + meetingId + "/attendants/" + userId),
   "getMeetingByUserIdAndDate": (userId, date) => (server + "/user/" + userId + "/meeting?date=" + date),
   "getMeetingByUserIdAndStatus": (userId, status) => (server + "/user/" + userId + "/meeting?status=" + status),
@@ -631,6 +645,8 @@ module.exports = {
   userController,
   lexerController,
   queueNodeController,
+  notificationController,
+  noteController,
 
   ScheduleDataToRows,
   emptyTimeSlice,

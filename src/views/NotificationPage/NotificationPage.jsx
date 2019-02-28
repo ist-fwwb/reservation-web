@@ -8,8 +8,8 @@ import GridContainer from "components/Grid/GridContainer.jsx";
 import IconButton from '@material-ui/core/IconButton';
 import DeleteIcon from '@material-ui/icons/Delete';
 import FormatListNumbered from '@material-ui/icons/FormatListNumbered';
-import MailOutlined from '@material-ui/icons/MailOutlined';
-import DraftsOutlined from '@material-ui/icons/DraftsOutlined';
+import New from '@material-ui/icons/MailOutlined';
+import Read from '@material-ui/icons/DraftsOutlined';
 import Search from '@material-ui/icons/Search';
 
 import Paper from '@material-ui/core/Paper';
@@ -21,6 +21,7 @@ import TableFooter from '@material-ui/core/TableFooter';
 import TablePagination from '@material-ui/core/TablePagination';
 import TableRow from '@material-ui/core/TableRow';
 
+import { notificationController } from 'variables/general.jsx';
 import { Link, Redirect } from "react-router-dom";
 
 const styles = theme => ({
@@ -66,6 +67,25 @@ class NotificationPage extends React.Component {
 
 
   componentDidMount(){
+    let api = notificationController.getNotificationByUserId(this.props.userId);
+    fetch(api, {
+      method:'get',
+      credentials: 'include'
+    })
+    .then(res => res.json())
+    .then(res => {
+      if (res.error){
+        this.warning(res.error);
+        return;
+      }
+      else{
+        this.setState({
+          Notification: res
+        })
+      }
+    })
+
+    /*
     this.setState({
       Notification:[{
         id: "1111",
@@ -81,6 +101,7 @@ class NotificationPage extends React.Component {
         time: "2019-02-12",
       }]
     });
+    */
   }
 
   handleDelete = (e, id) => {
@@ -123,7 +144,6 @@ class NotificationPage extends React.Component {
                           <TableHead>
                             <TableRow>
                               <TableCell align="left">消息标题</TableCell>
-                              <TableCell align="left">发送者</TableCell>
                               <TableCell align="left">更新时间</TableCell>
                               <TableCell align="left">操作</TableCell>
                             </TableRow>
@@ -135,17 +155,14 @@ class NotificationPage extends React.Component {
                                   <TableCell align="left">
                                     <span>
                                     {
-                                      ele.read ? <DraftsOutlined className={classes.icon}/> 
-                                      : <MailOutlined className={classes.icon}/>
+                                      ele.messageStatus === "READ" ? <Read className={classes.icon}/> 
+                                      : <New className={classes.icon}/>
                                     }
                                     &nbsp;
                                     <Link className={classes.icon} to={"/notification/"+ele.id+"/profile"}>
-                                    {ele.heading}
+                                    {ele.title}
                                     </Link>
                                     </span>
-                                  </TableCell>
-                                  <TableCell align="left">
-                                    {ele.sender}
                                   </TableCell>
                                   <TableCell>
                                     {ele.time}

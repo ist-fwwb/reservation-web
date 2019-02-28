@@ -29,6 +29,7 @@ import TableRow from '@material-ui/core/TableRow';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 
+import { noteController } from 'variables/general.jsx';
 import { Link } from "react-router-dom";
 import * as jsPDF from "jspdf";
 import * as html2canvas from "html2canvas";
@@ -156,16 +157,37 @@ class NotePage extends React.Component {
   };
 
   componentDidMount(){
-    let notes = [{
-      id: "m31a",
-      meetingId: "5c6531e3c9e77c0013607eec",
-      userId:"5c504daec9e77c0013ef1793",
-      meetingHeading: "测试1",
-      noteHeading:"测试2",
-      name: "皮皮盘",
-      favorite: true,
-      time: "2019-02-10"
-    }];
+    let userId = this.props.userId;
+    let api = noteController.getNoteByOwnerId(this.props.userId, this.props.userId);
+    fetch(api, {
+      method: 'get',
+      credentials: 'include'
+    })
+    .then(res => res.json())
+    .then(res => {
+      if (res.error){
+        console.log(res.error);
+        return;
+      }
+      else{
+        let notes = [];
+        for (let i in res){
+          let cur = res[i];
+          let note = {
+            favorite: cur.collected,
+            id: cur.meetingNote.id,
+            meetingId: cur.meetingNote.meetingId,
+            meetingHeading: cur.meetingNote.meetingId,
+            content: cur.meetingNote.note,
+            ownerId: cur.meetingNote.ownerId,
+            name: cur.meetingNote.ownerId,
+            noteHeading: cur.meetingNote.title
+          };
+          notes.push(note);
+        }
+        this.setState({notes: notes, notes_show: notes});
+      }
+    })
     let othersNotes = [{
       id: "1112",
       meetingId: "5c6531e3c9e77c0013607eec",
@@ -187,8 +209,6 @@ class NotePage extends React.Component {
       time: "2019-02-10"
     }];
     this.setState({
-      notes,
-      notes_show: notes,
       othersNotes,
       othersNotes_show: othersNotes,
       favoriteNotes,
@@ -201,14 +221,7 @@ class NotePage extends React.Component {
 
   handleFavoriteFavorite = (e, id) => {
     e.preventDefault();
-    let { favoriteNotes } = this.state;
-    for (let i in favoriteNotes){
-      if (favoriteNotes[i].id === id){
-        favoriteNotes[i].favorite = !favoriteNotes[i].favorite;
-        this.setState({ favoriteNotes });
-        break;
-      }
-    }
+    
   }
 
   handleOthersFavorite = (e, id) => {
@@ -237,14 +250,48 @@ class NotePage extends React.Component {
 
   handleFavorite = (e, id) => {
     e.preventDefault();
+    let api = noteController.handleFavorite(id);
     let { notes } = this.state;
+    let favorite = false;
     for (let i in notes){
       if (notes[i].id === id){
-        notes[i].favorite = !notes[i].favorite;
-        this.setState({ notes });
+        favorite = !notes[i].favorite;
+        notes[i].favorite = favorite;
         break;
       }
     }
+    let method = favorite ? 'post' : 'delete';
+    let message = {
+      userId: this.props.userId
+    }
+    this.setState({ notes });
+    fetch(api, {
+      method: method,
+      credentials: 'include',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(message)
+    })
+    .then(res => res.json())
+    .then(res => {
+      if (res.error){
+        console.log(res.error);
+        this.warning('收藏失败');
+        return;
+      }
+      else {
+        if (favorite)
+          this.success('收藏成功');
+        else
+          this.success('取消收藏');
+      }
+    })
+    .catch(e => {
+      console.log(e);
+      this.warning('收藏失败');
+    })
   }
 
   handleDelete = (e, id) => {
@@ -290,19 +337,19 @@ class NotePage extends React.Component {
     let name;
     let source;
     let result = [];
-    if (target == "notes_show"){
+    if (target === "notes_show"){
       meetingHeading = this.state.meetingHeading;
       noteHeading = this.state.noteHeading;
       name = this.state.name;
       source = this.state.notes;
     }
-    else if (target == "othersNotes_show"){
+    else if (target === "othersNotes_show"){
       meetingHeading = this.state.othersMeetingHeading;
       noteHeading = this.state.othersNoteHeading;
       name = this.state.othersName;
       source = this.state.othersNotes;
     }
-    else if (target == "favoriteNotes_show"){
+    else if (target === "favoriteNotes_show"){
       meetingHeading = this.state.favoriteMeetingHeading;
       noteHeading = this.state.favoriteMeetingHeading;
       name = this.state.favoriteName;
@@ -398,7 +445,6 @@ class NotePage extends React.Component {
                               <TableCell align="left">会议名称</TableCell>
                               <TableCell align="left">笔记标题</TableCell>
                               <TableCell align="left">作者</TableCell>
-                              <TableCell align="left">更新时间</TableCell>
                               <TableCell align="left">操作</TableCell>
                             </TableRow>
                           </TableHead>
@@ -412,18 +458,15 @@ class NotePage extends React.Component {
                                     </Link>
                                   </TableCell>
                                   <TableCell align="left">
-                                    <Link to={"/note/"+ele.meetingId+"/"+ele.userId+"/profile"}>
+                                    <Link to={"/note/"+ele.meetingId+"/"+ele.ownerId+"/profile"}>
                                     {ele.noteHeading}
                                     </Link>
                                   </TableCell>
                                   <TableCell>
                                     {ele.name}
                                   </TableCell>
-                                  <TableCell>
-                                    {ele.time}
-                                  </TableCell>
                                   <TableCell align="left">
-                                      <IconButton className={classes.iconButton} onClick={() => { window.location.href="/note/"+ele.meetingId+"/"+ele.userId+"/edit";}}>
+                                      <IconButton className={classes.iconButton} onClick={() => { window.location.href="/note/"+ele.meetingId+"/"+ele.ownerId+"/edit";}}>
                                         <Edit/>
                                       </IconButton>
                                       <IconButton color={ele.favorite ? "secondary" : "default"} className={classes.iconButton} onClick={(e) => this.handleFavorite(e, ele.id)}>
@@ -548,7 +591,7 @@ class NotePage extends React.Component {
                                     </Link>
                                   </TableCell>
                                   <TableCell align="left">
-                                    <Link to={"/note/"+ele.meetingId+"/"+ele.userId+"/profile"}>
+                                    <Link to={"/note/"+ele.meetingId+"/"+ele.ownerId+"/profile"}>
                                     {ele.noteHeading}
                                     </Link>
                                   </TableCell>
@@ -559,7 +602,7 @@ class NotePage extends React.Component {
                                     {ele.time}
                                   </TableCell>
                                   <TableCell align="left">
-                                      <IconButton className={classes.iconButton} onClick={() => { window.location.href="/note/"+ele.meetingId+"/"+ele.userId+"/profile";}}>
+                                      <IconButton className={classes.iconButton} onClick={() => { window.location.href="/note/"+ele.meetingId+"/"+ele.ownerId+"/profile";}}>
                                         <Search/>
                                       </IconButton>
                                       <IconButton color={ele.favorite ? "secondary" : "default"} className={classes.iconButton} onClick={(e) => this.handleOthersFavorite(e, ele.id)}>
@@ -681,7 +724,7 @@ class NotePage extends React.Component {
                                     </Link>
                                   </TableCell>
                                   <TableCell align="left">
-                                    <Link to={"/note/"+ele.meetingId+"/"+ele.userId+"/profile"}>
+                                    <Link to={"/note/"+ele.meetingId+"/"+ele.ownerId+"/profile"}>
                                     {ele.noteHeading}
                                     </Link>
                                   </TableCell>

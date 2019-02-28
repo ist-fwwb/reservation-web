@@ -139,8 +139,6 @@ class RoomPage extends React.Component {
   render() {
     const { classes } = this.props;
     const rooms = this.state.rooms;
-    if (!rooms)
-      return null;
     return (
       <div>
         <GridContainer>
@@ -148,7 +146,7 @@ class RoomPage extends React.Component {
             <SearchBar handleSearchChange={this.handleSearchChange} handleError={this.warning}/>
           </GridItem>
           {
-            rooms.map((room) => {
+            !rooms ? null :rooms.map((room) => {
               return (
                 <GridItem xs={12} sm={6} md={4} key={room.id}>
                   <Card>

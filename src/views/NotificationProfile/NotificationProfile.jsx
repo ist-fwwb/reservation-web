@@ -10,6 +10,7 @@ import GridContainer from "components/Grid/GridContainer.jsx";
 
 import TextField from "@material-ui/core/TextField";
 
+import { notificationController } from "variables/general.jsx";
 import { Link } from "react-router-dom";
 
 const styles = theme => ({
@@ -37,9 +38,26 @@ class NotificationProfile extends React.Component {
 
   componentDidMount(){
 
-    //let {meetingId, userId} = this.props.match.params;
-    
-    // 获取笔记
+    let { notificationId } = this.props.match.params;
+    let api = notificationController.getNotificationByNotificationId(notificationId);
+    fetch(api, {
+      method:'get',
+      credentials: 'include'
+    })
+    .then(res => res.json())
+    .then(res => {
+      if (res.error){
+        this.warning(res.error);
+        return;
+      }
+      else{
+        this.setState({
+          loaded: true,
+          ...res
+        })
+      }
+    })
+    /*
     this.setState({
         loaded: true,
         id: "1111",
@@ -49,6 +67,7 @@ class NotificationProfile extends React.Component {
         time: "2019-02-10",
         content: "<span style=\"font-weight: bold;\">咋回事&nbsp;</span><pre><code>fmt.Print(\"Hello world\")</code></pre><p><br></p>"
       })
+      */
   }
 
   handleChange = (e) => {
@@ -59,7 +78,7 @@ class NotificationProfile extends React.Component {
   render(){
     const {classes} = this.props;
     //const {loaded, heading, author } = this.state;
-    let {meetingId, userId} = this.props.match.params;
+    let { meetingId, userId } = this.props.match.params;
     const { loaded } = this.state;
     return (
       <GridContainer>
@@ -81,20 +100,11 @@ class NotificationProfile extends React.Component {
                     label="标题"
                     disabled={true}
                     fullWidth
-                    value={loaded?this.state.heading:"NULL"}
+                    value={loaded?this.state.title:"NULL"}
                     margin="normal"
                   />
                 </GridItem>
-                <GridItem xs={12} sm={12} md={6}>
-                  <TextField
-                    label="发件人"
-                    disabled={true}
-                    fullWidth
-                    value={loaded?this.state.sender:"NULL"}
-                    margin="normal"
-                  />
-                </GridItem>
-                <GridItem xs={12} sm={12} md={5}>
+                <GridItem xs={12} sm={12} md={11}>
                   <TextField
                     label="日期"
                     disabled={true}

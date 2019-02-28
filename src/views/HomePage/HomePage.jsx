@@ -18,7 +18,7 @@ import Table from "components/Table/Table.jsx";
 
 import Snackbar from "components/Snackbar/Snackbar.jsx";
 import { meetingController, idToTime, today } from "variables/general.jsx";
-import { Link } from "react-router-dom";
+import { Link, Redirect } from "react-router-dom";
 
 const slidesSettings = {
   dots: true,
@@ -45,6 +45,8 @@ class HomePage extends React.Component{
 
       error: false,
       
+      redirect: false,
+      redirect_url: '/',
     }
   }
 
@@ -52,7 +54,10 @@ class HomePage extends React.Component{
   pasteFunction = (event) => {
     if(event.clipboardData){
       let text = event.clipboardData.getData('text/plain');
-      window.location.href = "/smart-reserve/"+text;
+      this.setState({
+        redirect: true,
+        redirect_url: "/smart-reserve/"+text,
+      })
     } 
   }
 
@@ -169,6 +174,10 @@ class HomePage extends React.Component{
   }
 
   render(){
+    if (this.state.redirect){
+      return <Redirect to={this.state.redirect_url}/>
+    }
+    
     if (this.state.error)
       return <h2>Network Error</h2>
     let { todayMeetings } = this.state;

@@ -9,7 +9,8 @@ import CardBody from "components/Card/CardBody.jsx";
 import GridItem from "components/Grid/GridItem.jsx";
 import GridContainer from "components/Grid/GridContainer.jsx";
 
-import { Link } from "react-router-dom";
+import { noteController } from 'variables/general.jsx';
+import { Link, Redirect } from "react-router-dom";
 import wangeditor from 'wangeditor';
 
 const styles = theme => ({
@@ -25,8 +26,13 @@ const styles = theme => ({
 class NoteEditPage extends React.Component {
   constructor(props){
     super(props);
+    const {userId} = this.props;
+    const {meetingId, ownerId} = this.props.match.params;
     this.state = {
       loaded: false,
+
+      redirect: userId !== ownerId ? true : false,
+      redirect_url: userId !== ownerId ? "/note/" + meetingId + "/" + ownerId + "/profile" : "/",
     };
   }
 
@@ -42,15 +48,36 @@ class NoteEditPage extends React.Component {
 
     //let {meetingId, userId} = this.props.match.params;
     // 获取笔记
-    let content = "<p><span style=\"font-weight: bold;\">咋回事</span></p>";
-    this.setState({
-      loaded: true,
-      meetingHeading:"会议标题",
-      heading:"笔记标题",
-      author: true,
-      content,
+    let { meetingId, ownerId } = this.props.match.params;
+    let { userId } = this.props;
+    let api = noteController.getNoteByOwnerIdByMeetingId(userId, ownerId, meetingId);
+    fetch(api, {
+      method: 'get',
+      credentials: 'include'
     })
-    this.editor.txt.html(content);
+    .then(res => res.json())
+    .then(res => res[0])
+    .then(res => {
+      if (res.error){
+        console.log(res.error);
+        return;
+      }
+      else {
+        console.log(res)
+        this.setState({
+          loaded: true,
+          id: res.meetingNote.id,
+          heading: res.meetingNote.title,
+          meetingHeading: meetingId,
+          name: ownerId,
+          content: res.meetingNote.note,
+          favorite: res.collected,
+        })
+        this.editor.txt.html(res.meetingNote.note);
+      }
+    })
+    
+    
   }
 
   handleChange = (e) => {
@@ -64,12 +91,11 @@ class NoteEditPage extends React.Component {
   }
 
   render(){
-    const {classes} = this.props;
-    const {loaded, heading, author } = this.state;
-    let {meetingId, userId} = this.props.match.params;
-    if (author === false){
-        window.location.href = "/note/" + meetingId + "/" + userId + "/profile";
-        return null;
+    const {classes, userId} = this.props;
+    const {loaded, heading, redirect, redirect_url } = this.state;
+    let {meetingId, ownerId} = this.props.match.params;
+    if (redirect){
+        return <Redirect to={redirect_url}/>;
     }
     return (
       <GridContainer>
@@ -107,6 +133,9 @@ class NoteEditPage extends React.Component {
           </GridItem>
           <GridItem xs={12} sm={12} md={2}>
             <Button variant="contained" color="primary" onClick={this.handleSubmit}>确认修改</Button>
+          </GridItem>
+          <GridItem xs={12} sm={12} md={2}>
+            <Button variant="contained" color="secondary" onClick={() => { this.setState({ redirect: true, redirect_url: "/note/" + meetingId + "/" + ownerId + "/profile"})}}>取消修改</Button>
           </GridItem>
         </GridContainer>
       

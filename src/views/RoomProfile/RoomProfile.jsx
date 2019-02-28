@@ -187,6 +187,7 @@ class RoomProfile extends React.Component {
       "startTime": start,
       "type": "COMMON",
       "tags": [],
+      "foreignGuestList": null,
     }
     meeting = JSON.stringify(meeting);
     let api = meetingController.createMeeting();
@@ -210,7 +211,8 @@ class RoomProfile extends React.Component {
       }
     })
     .catch(error => {
-      this.warning(error);
+      this.warning("预定失败");
+      console.log(error);
     })
   }
 

@@ -98,11 +98,11 @@ let routesNotInSideBar = [
     component: UserProfilePage
   },
   {
-    path: "/note/:meetingId/:userId/profile",
+    path: "/note/:meetingId/:ownerId/profile",
     component: NoteProfile,
   },
   {
-    path: "/note/:meetingId/:userId/edit",
+    path: "/note/:meetingId/:ownerId/edit",
     component: NoteEditPage,
   },
   {
