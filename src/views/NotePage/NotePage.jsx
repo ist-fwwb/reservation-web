@@ -4,6 +4,7 @@ import withStyles from "@material-ui/core/styles/withStyles";
 import CustomTabs from "components/CustomTabs/CustomTabs.jsx";
 import GridItem from "components/Grid/GridItem.jsx";
 import GridContainer from "components/Grid/GridContainer.jsx";
+import Snackbar from "components/Snackbar/Snackbar.jsx";
 
 import IconButton from '@material-ui/core/IconButton';
 import DeleteIcon from '@material-ui/icons/Delete';
@@ -13,6 +14,9 @@ import FavoriteIcon from '@material-ui/icons/Favorite';
 import FormatListNumbered from '@material-ui/icons/FormatListNumbered';
 import InsertDriveFile from '@material-ui/icons/InsertDriveFile';
 import Bookmark from '@material-ui/icons/Bookmark';
+import GetApp from '@material-ui/icons/GetApp';
+import ErrorOutline from "@material-ui/icons/ErrorOutline";
+import Done from "@material-ui/icons/Done";
 
 import Paper from '@material-ui/core/Paper';
 import Table from '@material-ui/core/Table';
@@ -26,6 +30,8 @@ import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 
 import { Link } from "react-router-dom";
+import * as jsPDF from "jspdf";
+import * as html2canvas from "html2canvas";
 
 const styles = theme => ({
   root: {
@@ -50,8 +56,25 @@ class NotePage extends React.Component {
   constructor(props){
     super(props);
     this.state = {
+      br: false,
+      notificationMessage: "null",
+      notificationType: null,
+
+      notes_show: [],
+      othersNotes_show: [],
+      favoriteNotes_show: [],
+
       meetingHeading: '',
       noteHeading: '',
+      name: '',
+
+      othersMeetingHeading: '',
+      othersNoteHeading: '',
+      othersName: '',
+
+      favoriteMeetingHeading: '',
+      favoriteNoteHeading: '',
+      favoriteName: '',
 
       notesPage: 0,
       notesRowsPerPage: 5,
@@ -62,6 +85,50 @@ class NotePage extends React.Component {
       favoriteNotesPage: 0,
       favoriteNotesRowsPerPage: 5,
     };
+  }
+
+  componentWillUnmount() {
+    var id = window.setTimeout(null, 0);
+    while (id--) {
+      window.clearTimeout(id);
+    }
+  }
+
+  showNotification = (place) => {
+    let x = [];
+    x[place] = true;
+    this.setState(x);
+    this.alertTimeout = setTimeout(
+      function() {
+        x[place] = false;
+        this.setState(x);
+      }.bind(this),
+      6000
+    );
+  }
+
+  typeToIcon = (type) => {
+    if (type === "success")
+      return Done;
+    if (type === "danger")
+      return ErrorOutline;
+    return null;
+  }
+
+  success = (msg) => {
+    this.setState({
+      notificationType: "success",
+      notificationMessage: msg
+    })
+    this.showNotification("br");
+  }
+
+  warning = (msg) => {
+    this.setState({
+      notificationType: "danger",
+      notificationMessage: msg
+    });
+    this.showNotification("br");
   }
 
   handleChangeNotesPage = (event, page) => {
@@ -89,37 +156,43 @@ class NotePage extends React.Component {
   };
 
   componentDidMount(){
+    let notes = [{
+      id: "m31a",
+      meetingId: "5c6531e3c9e77c0013607eec",
+      userId:"5c504daec9e77c0013ef1793",
+      meetingHeading: "测试1",
+      noteHeading:"测试2",
+      name: "皮皮盘",
+      favorite: true,
+      time: "2019-02-10"
+    }];
+    let othersNotes = [{
+      id: "1112",
+      meetingId: "5c6531e3c9e77c0013607eec",
+      userId:"5c504daec9e77c0013ef1794",
+      meetingHeading: "测试a",
+      noteHeading:"测试b",
+      name: "皮皮盼",
+      favorite: false,
+      time: "2019-02-10"
+    }];
+    let favoriteNotes = [{
+      id: "m31a",
+      meetingId: "5c6531e3c9e77c0013607eec",
+      userId:"5c504daec9e77c0013ef1793",
+      meetingHeading: "测试1",
+      noteHeading:"测试2",
+      name: "皮皮盘",
+      favorite: true,
+      time: "2019-02-10"
+    }];
     this.setState({
-      notes:[{
-        id: "1111",
-        meetingId: "5c6531e3c9e77c0013607eec",
-        userId:"5c504daec9e77c0013ef1793",
-        meetingHeading: "测试1",
-        heading:"测试2",
-        name: "皮皮盘",
-        favorite: true,
-        time: "2019-02-10"
-      }],
-      othersNotes:[{
-        id: "1112",
-        meetingId: "5c6531e3c9e77c0013607eec",
-        userId:"5c504daec9e77c0013ef1794",
-        meetingHeading: "测试a",
-        heading:"测试b",
-        name: "皮皮盼",
-        favorite: false,
-        time: "2019-02-10"
-      }],
-      favoriteNotes:[{
-        id: "1111",
-        meetingId: "5c6531e3c9e77c0013607eec",
-        userId:"5c504daec9e77c0013ef1793",
-        meetingHeading: "测试1",
-        heading:"测试2",
-        name: "皮皮盘",
-        favorite: true,
-        time: "2019-02-10"
-      }]
+      notes,
+      notes_show: notes,
+      othersNotes,
+      othersNotes_show: othersNotes,
+      favoriteNotes,
+      favoriteNotes_show: favoriteNotes,
     })
     // 获取自己的笔记
     // 获取他人的笔记
@@ -186,17 +259,76 @@ class NotePage extends React.Component {
     }
   }
 
+  exportPDF = (e, content, id) => {
+    e.preventDefault();
+    var iframe=document.createElement('iframe');
+    document.body.appendChild(iframe);
+    var iframedoc = iframe.contentDocument||iframe.contentWindow.document;
+    iframedoc.body.innerHTML = content;
+    html2canvas(iframedoc.body)
+    .then((canvas) => {
+      var pageData = canvas.toDataURL('image/jpeg', 1.0);
+
+      //方向默认竖直，尺寸ponits，格式a4[595.28,841.89]
+      var pdf = new jsPDF('', 'pt', 'a4');
+
+      //addImage后两个参数控制添加图片的尺寸，此处将页面高度按照a4纸宽高比列进行压缩
+      pdf.addImage(pageData, 'JPEG', 0, 0, 595.28, 592.28/canvas.width * canvas.height );
+      pdf.save(id+'.pdf');
+      this.success("开始下载");
+    })
+  }
+
   handleChange = (e) => {
     this.setState({[e.target.name]:e.target.value})
   }
 
+  handleSearch = (e, target) => {
+    e.preventDefault();
+    let meetingHeading;
+    let noteHeading;
+    let name;
+    let source;
+    let result = [];
+    if (target == "notes_show"){
+      meetingHeading = this.state.meetingHeading;
+      noteHeading = this.state.noteHeading;
+      name = this.state.name;
+      source = this.state.notes;
+    }
+    else if (target == "othersNotes_show"){
+      meetingHeading = this.state.othersMeetingHeading;
+      noteHeading = this.state.othersNoteHeading;
+      name = this.state.othersName;
+      source = this.state.othersNotes;
+    }
+    else if (target == "favoriteNotes_show"){
+      meetingHeading = this.state.favoriteMeetingHeading;
+      noteHeading = this.state.favoriteMeetingHeading;
+      name = this.state.favoriteName;
+      source = this.state.favoriteNotes;
+    }
+    else {
+      this.warning("Error");
+      return;
+    }
+    for ( let i in source ){
+      let cur = source[i];
+      if (cur.meetingHeading.includes(meetingHeading) && cur.noteHeading.includes(noteHeading) && cur.name.includes(name)){
+        result.push(cur);
+      }
+    }
+    this.setState({[target]: result});
+  }
+
   render(){
-    let { notes, othersNotes, favoriteNotes } = this.state;
+    let { notes_show, othersNotes_show, favoriteNotes_show } = this.state;
     const { classes } = this.props;
     const { notesRowsPerPage, notesPage  } = this.state;
     const { othersNotesRowsPerPage, othersNotesPage  } = this.state;
     const { favoriteNotesRowsPerPage, favoriteNotesPage  } = this.state;
     return (
+      <div>
       <GridContainer>
           <GridItem xs={12} sm={12} md={12}>
             <CustomTabs
@@ -252,7 +384,7 @@ class NotePage extends React.Component {
                             </td>
                             <td>&nbsp;&nbsp;</td>
                             <td>
-                              <Button color="primary" variant="contained">搜索</Button>
+                              <Button color="primary" variant="contained" onClick={(e) => this.handleSearch(e, "notes_show")}>搜索</Button>
                             </td>
                           </tr>
                         </tbody>
@@ -260,7 +392,6 @@ class NotePage extends React.Component {
                       <br></br>
                       <Paper className={classes.root}>
                       <div className={classes.tableWrapper}>
-                      {! notes ? null : 
                         <Table className={classes.table} fixedHeader={false}>
                           <TableHead>
                             <TableRow>
@@ -272,7 +403,7 @@ class NotePage extends React.Component {
                             </TableRow>
                           </TableHead>
                           <TableBody>
-                            { notes.slice(notesPage * notesRowsPerPage, notesPage * notesRowsPerPage + notesRowsPerPage).map(ele => {
+                            { ! notes_show ? null : notes_show.slice(notesPage * notesRowsPerPage, notesPage * notesRowsPerPage + notesRowsPerPage).map(ele => {
                               return (
                                 <TableRow key={ele.id}>
                                   <TableCell align="left">
@@ -282,7 +413,7 @@ class NotePage extends React.Component {
                                   </TableCell>
                                   <TableCell align="left">
                                     <Link to={"/note/"+ele.meetingId+"/"+ele.userId+"/profile"}>
-                                    {ele.heading}
+                                    {ele.noteHeading}
                                     </Link>
                                   </TableCell>
                                   <TableCell>
@@ -298,6 +429,9 @@ class NotePage extends React.Component {
                                       <IconButton color={ele.favorite ? "secondary" : "default"} className={classes.iconButton} onClick={(e) => this.handleFavorite(e, ele.id)}>
                                         <FavoriteIcon/>
                                       </IconButton>
+                                      <IconButton onClick={(e) => this.exportPDF(e, ele.content, ele.id)}>
+                                        <GetApp/>
+                                      </IconButton>
                                       <IconButton className={classes.iconButton} onClick={(e) => this.handleDelete(e, ele.id)}>
                                         <DeleteIcon/>
                                       </IconButton>
@@ -307,7 +441,7 @@ class NotePage extends React.Component {
                             })}
                             {
                               () => {
-                                const notesEmptyRows = notesRowsPerPage - Math.min(notesRowsPerPage, notes.length - notesPage * notesRowsPerPage);
+                                const notesEmptyRows = notesRowsPerPage - Math.min(notesRowsPerPage, notes_show.length - notesPage * notesRowsPerPage);
                                 return notesEmptyRows > 0 && (
                                   <TableRow style={{ height: 48 * notesEmptyRows }}>
                                     <TableCell colSpan={6} />
@@ -321,7 +455,7 @@ class NotePage extends React.Component {
                               <TablePagination
                                 rowsPerPageOptions={[5, 10, 25]}
                                 colSpan={3}
-                                count={notes.length}
+                                count={notes_show.length}
                                 rowsPerPage={notesRowsPerPage}
                                 page={notesPage}
                                 SelectProps={{
@@ -333,7 +467,6 @@ class NotePage extends React.Component {
                             </TableRow>
                           </TableFooter>
                         </Table>
-                      }
                       </div>
                     </Paper>
                     </div>
@@ -387,7 +520,7 @@ class NotePage extends React.Component {
                             </td>
                             <td>&nbsp;&nbsp;</td>
                             <td>
-                              <Button color="primary" variant="contained">搜索</Button>
+                              <Button color="primary" variant="contained" onClick={(e) => this.handleSearch(e, "othersNotes_show")}>搜索</Button>
                             </td>
                           </tr>
                         </tbody>
@@ -395,7 +528,6 @@ class NotePage extends React.Component {
                       <br></br>
                     <Paper className={classes.root}>
                       <div className={classes.tableWrapper}>
-                      {! notes ? null : 
                         <Table className={classes.table} fixedHeader={false}>
                           <TableHead>
                             <TableRow>
@@ -407,7 +539,7 @@ class NotePage extends React.Component {
                             </TableRow>
                           </TableHead>
                           <TableBody>
-                            { othersNotes.slice(othersNotesPage * othersNotesRowsPerPage, othersNotesPage * othersNotesRowsPerPage + othersNotesRowsPerPage).map(ele => {
+                            { ! othersNotes_show ? null : othersNotes_show.slice(othersNotesPage * othersNotesRowsPerPage, othersNotesPage * othersNotesRowsPerPage + othersNotesRowsPerPage).map(ele => {
                               return (
                                 <TableRow key={ele.id}>
                                   <TableCell align="left">
@@ -417,7 +549,7 @@ class NotePage extends React.Component {
                                   </TableCell>
                                   <TableCell align="left">
                                     <Link to={"/note/"+ele.meetingId+"/"+ele.userId+"/profile"}>
-                                    {ele.heading}
+                                    {ele.noteHeading}
                                     </Link>
                                   </TableCell>
                                   <TableCell>
@@ -433,17 +565,30 @@ class NotePage extends React.Component {
                                       <IconButton color={ele.favorite ? "secondary" : "default"} className={classes.iconButton} onClick={(e) => this.handleOthersFavorite(e, ele.id)}>
                                         <FavoriteIcon/>
                                       </IconButton>
+                                      <IconButton onClick={(e) => this.exportPDF(e, ele.content, ele.id)}>
+                                        <GetApp/>
+                                      </IconButton>
                                   </TableCell>
                                 </TableRow>
                               )
                             })}
+                            {
+                              () => {
+                                const notesEmptyRows = notesRowsPerPage - Math.min(notesRowsPerPage, othersNotes_show.length - notesPage * notesRowsPerPage);
+                                return notesEmptyRows > 0 && (
+                                  <TableRow style={{ height: 48 * notesEmptyRows }}>
+                                    <TableCell colSpan={6} />
+                                  </TableRow>
+                                )
+                              }
+                            }
                           </TableBody>
                           <TableFooter>
                             <TableRow>
                               <TablePagination
                                 rowsPerPageOptions={[5, 10, 25]}
                                 colSpan={3}
-                                count={othersNotes.length}
+                                count={othersNotes_show.length}
                                 rowsPerPage={othersNotesRowsPerPage}
                                 page={othersNotesPage}
                                 SelectProps={{
@@ -455,7 +600,6 @@ class NotePage extends React.Component {
                             </TableRow>
                           </TableFooter>
                         </Table>
-                      }
                       </div>
                     </Paper>
                     </div>
@@ -509,7 +653,7 @@ class NotePage extends React.Component {
                             </td>
                             <td>&nbsp;&nbsp;</td>
                             <td>
-                              <Button color="primary" variant="contained">搜索</Button>
+                              <Button color="primary" variant="contained" onClick={(e) => this.handleSearch(e, "favoriteNotes_show")}>搜索</Button>
                             </td>
                           </tr>
                         </tbody>
@@ -517,7 +661,6 @@ class NotePage extends React.Component {
                       <br></br>
                     <Paper className={classes.root}>
                       <div className={classes.tableWrapper}>
-                      {! notes ? null : 
                         <Table className={classes.table} fixedHeader={false}>
                           <TableHead>
                             <TableRow>
@@ -529,7 +672,7 @@ class NotePage extends React.Component {
                             </TableRow>
                           </TableHead>
                           <TableBody>
-                            { favoriteNotes.slice(favoriteNotesPage * favoriteNotesRowsPerPage, favoriteNotesPage * favoriteNotesRowsPerPage + favoriteNotesRowsPerPage).map(ele => {
+                            { ! favoriteNotes_show ? null : favoriteNotes_show.slice(favoriteNotesPage * favoriteNotesRowsPerPage, favoriteNotesPage * favoriteNotesRowsPerPage + favoriteNotesRowsPerPage).map(ele => {
                               return (
                                 <TableRow key={ele.id}>
                                   <TableCell align="left">
@@ -539,7 +682,7 @@ class NotePage extends React.Component {
                                   </TableCell>
                                   <TableCell align="left">
                                     <Link to={"/note/"+ele.meetingId+"/"+ele.userId+"/profile"}>
-                                    {ele.heading}
+                                    {ele.noteHeading}
                                     </Link>
                                   </TableCell>
                                   <TableCell>
@@ -552,13 +695,16 @@ class NotePage extends React.Component {
                                     <IconButton color={ele.favorite ? "secondary" : "default"} className={classes.iconButton} onClick={(e) => this.handleFavoriteFavorite(e, ele.id)}>
                                       <FavoriteIcon/>
                                     </IconButton>
+                                    <IconButton onClick={(e) => this.exportPDF(e, ele.content, ele.id)}>
+                                      <GetApp/>
+                                    </IconButton>
                                   </TableCell>
                                 </TableRow>
                               )
                             })}
                             {
                               () => {
-                                const favoriteNotesEmptyRows = favoriteNotesRowsPerPage - Math.min(favoriteNotesRowsPerPage, favoriteNotes.length - favoriteNotesPage * favoriteNotesRowsPerPage);
+                                const favoriteNotesEmptyRows = favoriteNotesRowsPerPage - Math.min(favoriteNotesRowsPerPage, favoriteNotes_show.length - favoriteNotesPage * favoriteNotesRowsPerPage);
                                 return favoriteNotesEmptyRows > 0 && (
                                   <TableRow style={{ height: 48 * favoriteNotesEmptyRows }}>
                                     <TableCell colSpan={6} />
@@ -572,7 +718,7 @@ class NotePage extends React.Component {
                               <TablePagination
                                 rowsPerPageOptions={[5, 10, 25]}
                                 colSpan={3}
-                                count={favoriteNotes.length}
+                                count={favoriteNotes_show.length}
                                 rowsPerPage={favoriteNotesRowsPerPage}
                                 page={favoriteNotesPage}
                                 SelectProps={{
@@ -584,7 +730,6 @@ class NotePage extends React.Component {
                             </TableRow>
                           </TableFooter>
                         </Table>
-                      }
                       </div>
                     </Paper>
                     </div>
@@ -594,6 +739,16 @@ class NotePage extends React.Component {
             />
           </GridItem>
         </GridContainer>
+        <Snackbar
+          place="br"
+          color={this.state.notificationType}
+          icon={this.typeToIcon(this.state.notificationType)}
+          message={this.state.notificationMessage}
+          open={this.state.br}
+          closeNotification={() => this.setState({ br: false })}
+          close
+        />
+        </div>
     )
   }
 }
