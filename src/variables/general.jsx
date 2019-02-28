@@ -66,6 +66,8 @@ const timeToId = (time) => {
 const notificationController = {
   "getNotificationByUserId": (userId) => (server+"/message?userId="+userId),
   "getNotificationByNotificationId": (notificationId) => (server+"/message/"+notificationId),
+  "readNotifiaction": (notificationId) => (server+"/message/"+notificationId+"/messageStatus?status=READ"),
+  "deleteNotifiaction": (notificationId) => (server+"/message/"+notificationId+"/messageStatus?status=DELETE"),
   "putNotification": (notificationId, status) => (server+"/message/"+notificationId+"/messageStatus?status="+status),
 }
 

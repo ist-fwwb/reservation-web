@@ -47,7 +47,7 @@ class NotificationProfile extends React.Component {
     .then(res => res.json())
     .then(res => {
       if (res.error){
-        this.warning(res.error);
+        console.log(res.error);
         return;
       }
       else{
@@ -55,13 +55,21 @@ class NotificationProfile extends React.Component {
           loaded: true,
           ...res
         })
+        if (res.messageStatus === "NEW"){
+          let api2 = notificationController.readNotifiaction(notificationId);
+          fetch(api2, {
+            method: 'put',
+            credentials: 'include'
+          });
+        }
       }
+      
     })
     /*
     this.setState({
         loaded: true,
         id: "1111",
-        heading: "系统消息",
+        title: "系统消息",
         sender: "系统",
         read: false,
         time: "2019-02-10",
@@ -77,9 +85,8 @@ class NotificationProfile extends React.Component {
 
   render(){
     const {classes} = this.props;
-    //const {loaded, heading, author } = this.state;
+    const { loaded, title, time, content } = this.state;
     let { meetingId, userId } = this.props.match.params;
-    const { loaded } = this.state;
     return (
       <GridContainer>
           <GridItem xs={12} sm={12} md={12}>
@@ -95,28 +102,34 @@ class NotificationProfile extends React.Component {
               <CardBody>
                 <table></table>
                 <GridContainer>
-                <GridItem xs={12} sm={12} md={11}>
+                <GridItem xs={12} sm={12} md={6}>
                   <TextField
                     label="标题"
                     disabled={true}
                     fullWidth
-                    value={loaded?this.state.title:"NULL"}
+                    value={loaded? title:"NULL"}
                     margin="normal"
                   />
                 </GridItem>
-                <GridItem xs={12} sm={12} md={11}>
+                <GridItem xs={12} sm={12} md={5}>
                   <TextField
                     label="日期"
                     disabled={true}
                     fullWidth
-                    value={loaded?this.state.time:"NULL"}
+                    value={loaded? time:"NULL"}
                     margin="normal"
                   />
                 </GridItem>
                   <GridItem xs={12} sm={12} md={11}>
-                    <br/>
-                    <div className={classes.content} dangerouslySetInnerHTML={{ __html: this.state.content }}>
-                    </div>
+                    <TextField
+                      label="内容"
+                      multiline
+                      rows="10"
+                      disabled={true}
+                      fullWidth
+                      value={loaded? content:"NULL"}
+                      margin="normal"
+                    />
                   </GridItem>
                 </GridContainer>
               </CardBody>
