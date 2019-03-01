@@ -11,7 +11,7 @@ import GridContainer from "components/Grid/GridContainer.jsx";
 import TextField from "@material-ui/core/TextField";
 
 import { notificationController } from "variables/general.jsx";
-import { Link } from "react-router-dom";
+import { Redirect } from "react-router-dom";
 
 const styles = theme => ({
   link: {
@@ -29,6 +29,9 @@ class NotificationProfile extends React.Component {
     super(props);
     this.state = {
       loaded: false,
+
+      redirect: false,
+      redirect_url: "/",
     };
   }
 
@@ -37,7 +40,6 @@ class NotificationProfile extends React.Component {
   }
 
   componentDidMount(){
-
     let { notificationId } = this.props.match.params;
     let api = notificationController.getNotificationByNotificationId(notificationId);
     fetch(api, {
@@ -63,19 +65,7 @@ class NotificationProfile extends React.Component {
           });
         }
       }
-      
     })
-    /*
-    this.setState({
-        loaded: true,
-        id: "1111",
-        title: "系统消息",
-        sender: "系统",
-        read: false,
-        time: "2019-02-10",
-        content: "<span style=\"font-weight: bold;\">咋回事&nbsp;</span><pre><code>fmt.Print(\"Hello world\")</code></pre><p><br></p>"
-      })
-      */
   }
 
   handleChange = (e) => {
@@ -83,7 +73,26 @@ class NotificationProfile extends React.Component {
     this.setState({[e.target.name]:e.target.value});
   }
 
+  handleDelete = (e) => {
+    e.preventDefault();
+    let notificationId = this.state.id;
+    let api2 = notificationController.deleteNotifiaction(notificationId);
+    fetch(api2, {
+      method: 'put',
+      credentials: 'include'
+    })
+    .then(res => {
+      this.setState({
+        redirect: true,
+        redirect_url: "/notification"
+      })
+    })
+  }
+
   render(){
+    if (this.state.redirect){
+      return <Redirect to={this.state.redirect_url}/>
+    }
     const {classes} = this.props;
     const { loaded, title, time, content } = this.state;
     let { meetingId, userId } = this.props.match.params;
@@ -136,9 +145,9 @@ class NotificationProfile extends React.Component {
             </Card>
           </GridItem>
           <GridItem xs={12} sm={12} md={2}>
-            <Button variant="contained" color="primary" onClick={() => { window.location.href = "/notification"; }}>返回</Button>
+            <Button variant="contained" color="primary" onClick={() => { this.setState({redirect: true, redirect_url:"/notification" }); }}>返回</Button>
             &nbsp;
-            <Button variant="contained" color="secondary" onClick={() => {}}>删除</Button>
+            <Button variant="contained" color="secondary" onClick={this.handleDelete}>删除</Button>
           </GridItem>
         </GridContainer>
       

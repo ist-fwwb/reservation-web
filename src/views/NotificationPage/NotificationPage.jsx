@@ -4,6 +4,7 @@ import withStyles from "@material-ui/core/styles/withStyles";
 import CustomTabs from "components/CustomTabs/CustomTabs.jsx";
 import GridItem from "components/Grid/GridItem.jsx";
 import GridContainer from "components/Grid/GridContainer.jsx";
+import Snackbar from "components/Snackbar/Snackbar.jsx";
 
 import IconButton from '@material-ui/core/IconButton';
 import DeleteIcon from '@material-ui/icons/Delete';
@@ -11,6 +12,8 @@ import FormatListNumbered from '@material-ui/icons/FormatListNumbered';
 import New from '@material-ui/icons/MailOutlined';
 import Read from '@material-ui/icons/DraftsOutlined';
 import Search from '@material-ui/icons/Search';
+import Done from '@material-ui/icons/Done';
+import ErrorOutline from "@material-ui/icons/ErrorOutline";
 
 import Paper from '@material-ui/core/Paper';
 import Table from '@material-ui/core/Table';
@@ -20,6 +23,11 @@ import TableCell from '@material-ui/core/TableCell';
 import TableFooter from '@material-ui/core/TableFooter';
 import TablePagination from '@material-ui/core/TablePagination';
 import TableRow from '@material-ui/core/TableRow';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import Slide from '@material-ui/core/Slide';
+import Button from '@material-ui/core/Button';
 
 import { notificationController } from 'variables/general.jsx';
 import { Link, Redirect } from "react-router-dom";
@@ -43,10 +51,20 @@ const styles = theme => ({
   },
 });
 
+function Transition(props) {
+  return <Slide direction="up" {...props} />;
+}
+
 class NotificationPage extends React.Component {
   constructor(props){
     super(props);
     this.state = {
+      loaded: false,
+      deleteOpen: false,
+
+      br: false,
+      notificationMessage: "null",
+      notificationType: null,
 
       redirect: false,
       redirect_url: "/",
@@ -55,6 +73,50 @@ class NotificationPage extends React.Component {
       NotificationRowsPerPage: 5,
 
     };
+  }
+
+  componentWillUnmount() {
+    var id = window.setTimeout(null, 0);
+    while (id--) {
+      window.clearTimeout(id);
+    }
+  }
+
+  showNotification = (place) => {
+    let x = [];
+    x[place] = true;
+    this.setState(x);
+    this.alertTimeout = setTimeout(
+      function() {
+        x[place] = false;
+        this.setState(x);
+      }.bind(this),
+      6000
+    );
+  }
+
+  typeToIcon = (type) => {
+    if (type === "success")
+      return Done;
+    if (type === "danger")
+      return ErrorOutline;
+    return null;
+  }
+
+  warning = (msg) => {
+    this.setState({
+      notificationType: "danger",
+      notificationMessage: msg
+    });
+    this.showNotification("br");
+  }
+
+  success = (msg) => {
+    this.setState({
+      notificationType: "success",
+      notificationMessage: msg
+    })
+    this.showNotification("br");
   }
 
   handleChangeNotificationPage = (event, page) => {
@@ -80,40 +142,36 @@ class NotificationPage extends React.Component {
       }
       else{
         this.setState({
+          loaded: true,
           Notification: res
         })
       }
     })
-
-    /*
-    this.setState({
-      Notification:[{
-        id: "1111",
-        heading: "系统消息",
-        sender: "系统",
-        read: false,
-        time: "2019-02-10",
-      },{
-        id: "1112",
-        heading: "已读消息",
-        sender: "系统",
-        read: true,
-        time: "2019-02-12",
-      }]
-    });
-    */
   }
 
-  handleDelete = (e, id) => {
+  handleDelete = (e) => {
     e.preventDefault();
+    let notificationId = this.state.deleteId;
+    let api2 = notificationController.deleteNotifiaction(notificationId);
+    fetch(api2, {
+      method: 'put',
+      credentials: 'include'
+    })
+    
     let { Notification } = this.state;
     for (let i in Notification){
-      if (Notification[i].id === id){
+      if (Notification[i].id === notificationId){
         Notification.splice(i, 1);
-        this.setState({ Notification });
         break;
       }
     }
+    this.setState({ Notification, deleteOpen: false });
+    this.success("删除成功");
+  }
+
+  setDeleteId = (e, deleteId) => {
+    e.preventDefault();
+    this.setState({ deleteId, deleteOpen: true })
   }
 
 
@@ -125,6 +183,7 @@ class NotificationPage extends React.Component {
     const { classes } = this.props;
     const { NotificationRowsPerPage, NotificationPage  } = this.state;
     return (
+      <div>
       <GridContainer>
           <GridItem xs={12} sm={12} md={12}>
             <CustomTabs
@@ -171,7 +230,7 @@ class NotificationPage extends React.Component {
                                     <IconButton className={classes.iconButton} onClick={() => { this.setState({redirect: true, redirect_url:"/notification/"+ele.id+"/profile"});}}>
                                       <Search/>
                                     </IconButton>
-                                    <IconButton className={classes.iconButton} onClick={(e) => this.handleDelete(e, ele.id)}>
+                                    <IconButton className={classes.iconButton} onClick={(e) => this.setDeleteId(e, ele.id)}>
                                       <DeleteIcon/>
                                     </IconButton>
                                   </TableCell>
@@ -216,6 +275,36 @@ class NotificationPage extends React.Component {
             />
           </GridItem>
         </GridContainer>
+        <Dialog
+          open={this.state.deleteOpen}
+          TransitionComponent={Transition}
+          keepMounted
+          onClose={() => { this.setState({ deleteOpen: false});}}
+          aria-labelledby="alert-dialog-slide-title"
+          aria-describedby="alert-dialog-slide-description"
+        >
+          <DialogTitle id="alert-dialog-slide-title">
+            {"确认删除?"}
+          </DialogTitle>
+          <DialogActions>
+            <Button onClick={() => { this.setState({ deleteOpen: false});}} color="primary">
+              取消
+            </Button>
+            <Button onClick={this.handleDelete} color="primary">
+              确定
+            </Button>
+          </DialogActions>
+        </Dialog>
+        <Snackbar
+          place="br"
+          color={this.state.notificationType}
+          icon={this.typeToIcon(this.state.notificationType)}
+          message={this.state.notificationMessage}
+          open={this.state.br}
+          closeNotification={() => this.setState({ br: false })}
+          close
+        />
+        </div>
     )
   }
 }
