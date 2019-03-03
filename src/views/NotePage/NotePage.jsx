@@ -157,7 +157,6 @@ class NotePage extends React.Component {
   };
 
   componentDidMount(){
-    let userId = this.props.userId;
     let api = noteController.getNoteByOwnerId(this.props.userId, this.props.userId);
     fetch(api, {
       method: 'get',

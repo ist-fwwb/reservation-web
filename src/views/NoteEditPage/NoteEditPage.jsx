@@ -150,7 +150,8 @@ class NoteEditPage extends React.Component {
   handleSubmit = (e) => {
     e.preventDefault();
     let { meetingId, ownerId } = this.props.match.params;
-    console.log(this.editor.txt.html());
+    //console.log(this.editor.txt.html());
+
     if (this.state.status === "new"){
       let api = noteController.createNote();
       let msg = {
@@ -188,7 +189,7 @@ class NoteEditPage extends React.Component {
   }
 
   render(){
-    const {classes, userId} = this.props;
+    const {classes} = this.props;
     const { loaded, heading, redirect, redirect_url } = this.state;
     let {meetingId, ownerId} = this.props.match.params;
     if (redirect){

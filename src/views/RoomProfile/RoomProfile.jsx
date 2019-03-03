@@ -3,7 +3,6 @@ import React from "react";
 import GridItem from "components/Grid/GridItem.jsx";
 import GridContainer from "components/Grid/GridContainer.jsx";
 import withStyles from "@material-ui/core/styles/withStyles";
-import meetingRoomImage from "assets/img/meetingroom.jpeg";
 
 import Card from "components/Card/Card.jsx";
 import CardHeader from "components/Card/CardHeader.jsx";

@@ -95,7 +95,7 @@ class NotificationProfile extends React.Component {
     }
     const {classes} = this.props;
     const { loaded, title, time, content } = this.state;
-    let { meetingId, userId } = this.props.match.params;
+    //let { meetingId, userId } = this.props.match.params;
     return (
       <GridContainer>
           <GridItem xs={12} sm={12} md={12}>
