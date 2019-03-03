@@ -110,6 +110,13 @@ class NoteProfile extends React.Component {
     .then(res => res.json())
     .then(res => res[0])
     .then(res => {
+      if (!res){
+        this.setState({ 
+          redirect: true, 
+          redirect_url: "/note/"+meetingId+"/"+ownerId+"/edit"
+        });
+        return;
+      }
       if (res.error){
         console.log(res.error);
         return;
@@ -160,9 +167,6 @@ class NoteProfile extends React.Component {
     this.setState({ favorite });
     let api = noteController.handleFavorite(this.state.id);
     let method = favorite ? 'post' : 'delete';
-    let message = {
-      userId: this.props.userId
-    }
     
     fetch(api, {
       method: method,
@@ -171,7 +175,7 @@ class NoteProfile extends React.Component {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(message)
+      body: this.props.userId
     })
     .then(res => res.json())
     .then(res => {
@@ -215,10 +219,10 @@ class NoteProfile extends React.Component {
                 color="danger"
               >
                 <h3 className={classes.cardTitleWhite}>
-                  {"会议名称："}<Link to={"/meeting/"+this.state.meetingId} className={classes.link}>{this.state.meetingHeading}</Link>
+                  {"会议名称："}<Link to={"/meeting/"+meetingId+"/profile"} className={classes.link}>{this.state.meetingHeading}</Link>
                 </h3>
                 <h4>
-                  {"作者："+this.state.name}
+                  {"作者："}<Link to={"/user/"+ownerId+"/profile"} className={classes.link}>{this.state.name}</Link>
                 </h4>
               </CardHeader>
               <CardBody>

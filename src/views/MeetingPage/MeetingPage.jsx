@@ -297,7 +297,7 @@ class MeetingPage extends React.Component {
             break;
           }
         }
-        this.setState({meetings})
+        this.setState({meetings});
         this.success("解散成功");
       }
       else

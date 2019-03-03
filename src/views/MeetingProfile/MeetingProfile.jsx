@@ -47,12 +47,11 @@ import Snackbar from "components/Snackbar/Snackbar.jsx";
 import RoomSchedule from "components/RoomSchedule/RoomSchedule.jsx";
 import { Link } from "react-router-dom";
 import { filepath } from 'variables/oss.jsx';
-import { ScheduleDataToRows, timeSliceController, meetingController, idToTime, userController } from "variables/general.jsx";
+import { ScheduleDataToRows, timeSliceController, meetingController, idToTime, userController, noteController } from "variables/general.jsx";
 
 const styles = theme => ({
   root: {
     width: '100%',
-    maxWidth: 360,
     minWidth: 230,
     backgroundColor: theme.palette.background.paper,
   }
@@ -74,14 +73,15 @@ class NotesDialog extends React.Component {
     const { classes, onClose, open, notes, ...other } = this.props;
     return (
       <Dialog 
-       maxWidth="md"
-       fullWidth={true}
-       onClose={this.props.onClose} 
-       scroll={"paper"} 
-       aria-labelledby="simple-dialog-title" 
-       open={open} 
-       {...other}
-       >
+        keepMounted
+        maxWidth="md"
+        fullWidth={true}
+        onClose={this.props.onClose} 
+        scroll={"paper"} 
+        aria-labelledby="simple-dialog-title" 
+        open={open} 
+        {...other}
+      >
         <DialogTitle id="simple-dialog-title">会议笔记</DialogTitle>
         <DialogContent>
           <Table className={classes.table}>
@@ -90,7 +90,6 @@ class NotesDialog extends React.Component {
                   <TableCell align="left">会议名称</TableCell>
                   <TableCell align="left">笔记标题</TableCell>
                   <TableCell align="left">作者</TableCell>
-                  <TableCell align="left">更新时间</TableCell>
                   <TableCell align="left">操作</TableCell>
                 </TableRow>
               </TableHead>
@@ -104,18 +103,15 @@ class NotesDialog extends React.Component {
                     </Link>
                   </TableCell>
                   <TableCell align="left">
-                    <Link to={"/note/"+ele.meetingId+"/"+ele.userId+"/profile"}>
+                    <Link to={"/note/"+ele.meetingId+"/"+ele.ownerId+"/profile"}>
                     {ele.heading}
                     </Link>
                   </TableCell>
                   <TableCell>
-                    {ele.name}
-                  </TableCell>
-                  <TableCell>
-                    {ele.time}
+                    <Link to={"/user/"+ele.ownerId+"/profile"}>{ele.name}</Link>
                   </TableCell>
                   <TableCell align="left">
-                      <IconButton className={classes.iconButton} onClick={() => { window.location.href="/note/"+ele.meetingId+"/"+ele.userId+"/profile";}}>
+                      <IconButton className={classes.iconButton} onClick={() => { window.location.href="/note/"+ele.meetingId+"/"+ele.ownerId+"/profile";}}>
                         <Search/>
                       </IconButton>
                       <IconButton color={ele.favorite ? "secondary" : "default"} className={classes.iconButton} onClick={(e) => this.props.handleFavorite(e, ele.id)}>
@@ -180,7 +176,14 @@ class AttendantsDialog extends React.Component {
     const { classes, onClose, open, ...other } = this.props;
     const { addattendants } = this.state;
     return (
-      <Dialog onClose={this.props.onClose} scroll={"paper"} aria-labelledby="simple-dialog-title" open={open} {...other}>
+      <Dialog
+        keepMounted 
+        onClose={this.props.onClose} 
+        scroll={"paper"} 
+        aria-labelledby="simple-dialog-title" 
+        open={open} 
+        {...other}
+      >
         <DialogTitle id="simple-dialog-title">邀请用户加入会议</DialogTitle>
         <DialogContent>
           <FormControl component="fieldset" className={classes.formControl}>
@@ -273,26 +276,76 @@ class MeetingProfile extends React.Component {
   handleFavorite = (e, id) => {
     e.preventDefault();
     let { notes } = this.state;
+    let favorite = true;
     for (let i in notes){
       if (notes[i].id === id){
-        notes[i].favorite = !notes[i].favorite;
+        favorite = !notes[i].favorite;
+        notes[i].favorite = favorite;
         this.setState({ notes });
         break;
       }
     }
+
+    let api = noteController.handleFavorite(id);
+    let method = favorite ? 'post' : 'delete';
+    
+    fetch(api, {
+      method: method,
+      credentials: 'include',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: this.props.userId
+    })
+    .then(res => res.json())
+    .then(res => {
+      if (res.error){
+        console.log(res.error);
+        this.warning('收藏失败');
+        return;
+      }
+      else {
+        if (favorite)
+          this.success('收藏成功');
+        else
+          this.success('取消收藏');
+      }
+    })
+    .catch(e => {
+      console.log(e);
+      this.warning('收藏失败');
+    })
   }
 
   componentDidMount() {
-    this.setState({notes: [{
-      id: "1111",
-      meetingId: "5c6531e3c9e77c0013607eec",
-      userId:"5c504daec9e77c0013ef1793",
-      meetingHeading: "测试1",
-      heading:"测试2",
-      name: "皮皮盘",
-      favorite: true,
-      time: "2019-02-10"
-    }]})
+    let notesApi = noteController.getNoteByMeetingId(this.props.userId, this.props.match.params.meetingId);
+    fetch(notesApi, {
+      method: 'get',
+      credentials: 'include'
+    })
+    .then(res => res.json())
+    .then(res => {
+      if (res.error){
+        console.log(res.error);
+        return;
+      }
+
+      let notes = [];
+      for (let i in res){
+        let cur = res[i].meetingNote;
+        let ele = {};
+        ele.id = cur.id;
+        ele.meetingId = cur.meetingId;
+        ele.ownerId = cur.ownerId;
+        ele.meetingHeading = cur.meetingId;
+        ele.heading = cur.title;
+        ele.name = cur.ownerId;
+        ele.favorite = res[i].collected;
+        notes.push(ele);
+      }
+      this.setState({notes});
+    })
 
     let meetingApi = meetingController.getMeetingByMeetingId(this.props.match.params.meetingId);
     fetch(meetingApi,{
@@ -306,7 +359,6 @@ class MeetingProfile extends React.Component {
       }
       else{
         this.setState({...data1})
-        console.log(data1)
         // get all user could be invited to this meeting
         let userApi = userController.getUser();
         let attendantsArray = this.dicToArray(data1.attendants);
@@ -384,14 +436,6 @@ class MeetingProfile extends React.Component {
     })
   }
 
-  warning = (msg) => {
-    this.setState({
-      notificationType: "danger",
-      notificationMessage: msg
-    });
-    this.showNotification("br");
-  }
-
   handleChange = (e) => {
     e.preventDefault();
     this.setState({[e.target.name]:e.target.value});
@@ -423,6 +467,14 @@ class MeetingProfile extends React.Component {
     if (type === "danger")
       return ErrorOutline;
     return null;
+  }
+
+  warning = (msg) => {
+    this.setState({
+      notificationType: "danger",
+      notificationMessage: msg
+    });
+    this.showNotification("br");
   }
 
   success = (msg) => {
@@ -667,7 +719,10 @@ class MeetingProfile extends React.Component {
 
   handleAttendantsSuccess = (value) => {
     let { addAttendants, attendantsWithName } = this.state;
+    let api = meetingController.addAttendants(this.props.match.params.meetingId);
+    let userIds = [];
     for (let i in value){
+      userIds.push(value[i].id);
       for (let j in addAttendants){
         if (addAttendants[j].id === value[i].id){
           addAttendants.splice(j, 1);
@@ -675,6 +730,32 @@ class MeetingProfile extends React.Component {
         }
       }
     }
+
+    fetch(api, {
+      method: 'post',
+      credentials: 'include',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(userIds)
+    })
+    .then(res => res.json())
+    .then(res => {
+      if (res.error){
+        this.warning("添加失败");
+        console.log(res.error);
+        return;
+      }
+      else {
+        this.success("添加成功");
+      }
+    })
+    .catch(e => {
+      this.warning("添加失败");
+        console.log(e);
+    })
+
     attendantsWithName = attendantsWithName.concat(value);
     let attendants = {};
     for (let i in attendantsWithName){
@@ -686,6 +767,32 @@ class MeetingProfile extends React.Component {
 
   handleDeleteAttendant = (e, id) => {
     e.preventDefault();
+    let api = meetingController.deleteAttendants(this.props.match.params.meetingId);
+    fetch(api, {
+      method: 'delete',
+      credentials: 'include',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify([id])
+    })
+    .then(res => res.json())
+    .then(res => {
+      if (res.error){
+        this.warning("删除失败");
+        console.log(res.error);
+        return;
+      }
+      else {
+        this.success("删除成功");
+      }
+    })
+    .catch(e => {
+      this.warning("删除失败");
+        console.log(e);
+    })
+
     let {addAttendants, attendantsWithName} = this.state;
     for (let i in attendantsWithName){
       if (attendantsWithName[i].id === id){
@@ -956,11 +1063,11 @@ class MeetingProfile extends React.Component {
                             if (local_hostFlag)
                               return (
                                 <Chip
-                                    key={key}
-                                    icon={ hostIcon }
-                                    label={data.name}
-                                    className={classes.chip}
-                                  />
+                                  key={key}
+                                  icon={ hostIcon }
+                                  label={data.name}
+                                  className={classes.chip}
+                                />
                               )
                             else{
                               if (local_disabled)
@@ -983,21 +1090,17 @@ class MeetingProfile extends React.Component {
                             }
                           })
                           }
+                          <IconButton color="primary" className={classes.button} component="span" onClick={this.handleOpenAttendants}>
+                            <Add/>
+                          </IconButton>
                           {
-                            disabled?null:
-                              <IconButton color="primary" className={classes.button} component="span" onClick={this.handleOpenAttendants}>
-                                <Add/>
-                              </IconButton>
-                          }
-                          {
-                            disabled?null:
-                              <AttendantsDialogWrapped
-                                key
-                                addattendants={addAttendants}
-                                open={this.state.openAttendants}
-                                handleAttendantsSuccess={this.handleAttendantsSuccess}
-                                onClose={this.handleCloseAttendants}
-                              />
+                            addAttendants && <AttendantsDialogWrapped
+                              key
+                              addattendants={addAttendants}
+                              open={this.state.openAttendants}
+                              handleAttendantsSuccess={this.handleAttendantsSuccess}
+                              onClose={this.handleCloseAttendants}
+                            />
                           }
                       </CardBody>
                     </Card>

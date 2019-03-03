@@ -75,6 +75,7 @@ const noteController = {
   "getNote": (userId) => (server+"/meetingNote?userId="+userId+"&ownerId="+userId),
   "getNoteByOwnerId": (userId, ownerId) => (server+"/meetingNote?userId="+userId+"&ownerId="+ownerId),
   "getNoteByOwnerIdByMeetingId": (userId, ownerId, meetingId) => (server+"/meetingNote?userId="+userId+"&ownerId="+ownerId+"&meetingId="+meetingId),
+  "getNoteByMeetingId": (userId, meetingId) => (server+"/meetingNote?userId="+userId+"&meetingId="+meetingId),
   "createNote": () => (server+"/meetingNote?fileName=string"),
   "handleFavorite": (noteId) => (server+"/meetingNote/"+noteId+"/collectors"),
 }
@@ -140,6 +141,8 @@ const meetingController = {
   "getMeetingByUserIdAndDate": (userId, date) => (server + "/user/" + userId + "/meeting?date=" + date),
   "getMeetingByUserIdAndStatus": (userId, status) => (server + "/user/" + userId + "/meeting?status=" + status),
   "getMeetingByUserIdAndDateAndStatus": (userId, date, status) => (server + "/user/" + userId + "/meeting?status=" + status + "&date=" + date),
+  "addAttendants": (meetingId) => (server +"/meeting/"+meetingId+"/attendants"),
+  "deleteAttendants": (meetingId) => (server +"/meeting/"+meetingId+"/attendants"),
 };
 
 const userController = {

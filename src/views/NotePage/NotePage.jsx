@@ -261,9 +261,7 @@ class NotePage extends React.Component {
       }
     }
     let method = favorite ? 'post' : 'delete';
-    let message = {
-      userId: this.props.userId
-    }
+
     this.setState({ notes });
     fetch(api, {
       method: method,
@@ -272,7 +270,7 @@ class NotePage extends React.Component {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(message)
+      body: this.props.userId
     })
     .then(res => res.json())
     .then(res => {
