@@ -41,10 +41,22 @@ import tvIcon from "assets/icon/tv.svg";
 import tvIcon0 from "assets/icon/tv0.svg";
 
 import { roomController } from "variables/general.jsx";
-
+import { roomImagePath } from "variables/oss.jsx";
 import RoomSchedule from "components/RoomSchedule/RoomSchedule.jsx";
 
+import Slider from "react-slick";
+
 import { ScheduleDataToRows, timeSliceController, meetingController, idToTime } from "variables/general.jsx";
+
+const slidesSettings = {
+  dots: true,
+  fade: true,
+  infinite: true,
+  autoplay: true,
+  speed: 2000,
+  slidesToShow: 1,
+  slidesToScroll: 1
+};
 
 function roomCategory(eng){
   if (eng === "SMALL")
@@ -274,6 +286,7 @@ class RoomProfile extends React.Component {
     else if (firstChosen && !secondChosen){
       timeChosen = this.state.chosenDate + " " + idToTime(firstChosen[0]) + " ~ " + idToTime(firstChosen[0]+1);
     }
+    console.log(room)
     return (
       <div>
         <GridContainer>
@@ -289,7 +302,37 @@ class RoomProfile extends React.Component {
                 }
               
               <GridContainer>
-                <GridItem xs={12} sm={6} md={4}>
+                <GridItem xs={12} sm={6} md={11}>
+                  <br/>
+                  <div style={{minHeight:"50px"}}>
+                    <Slider {...slidesSettings}>
+                    {
+                      room && room.images && room.images.map((image, key) => {
+                        return (
+                          <div 
+                            style={{
+                              maxWidth: "100%",
+                              height: "30%",
+                              paddingBottom: "40%",
+                              overflow: "hidden"
+                            }}
+                            key={key}
+                          >
+                            <img 
+                              width="100%"
+                              style={{height:"350px"}} 
+                              alt="img" 
+                              src={roomImagePath+'/'+image} 
+                            />
+                          </div>
+                        )
+                      })
+                    }
+                    </Slider>
+                    <br/>
+                  </div>
+                </GridItem>
+                <GridItem xs={12} sm={6} md={6}>
                   <Card>
                     <CardHeader color="warning" stats icon>
                       <CardIcon color="warning">
@@ -384,7 +427,7 @@ class RoomProfile extends React.Component {
                     </CardFooter>
                   </Card>
                 </GridItem>
-                <GridItem xs={12} sm={6} md={3}>
+                <GridItem xs={12} sm={6} md={5}>
                   <Card>
                     <CardHeader color="info" stats icon>
                       <CardIcon color="info">
@@ -403,10 +446,6 @@ class RoomProfile extends React.Component {
                         </div>
                     </CardFooter>
                   </Card>
-                </GridItem>
-                <GridItem xs={12} sm={6} md={4}>
-                  <br/>
-                  <img src={meetingRoomImage} width={"110%"} alt="meetingroom"/>
                 </GridItem>
                 <Divider variant="middle"/>
                 <GridItem xs={12} sm={12} md={12}>
