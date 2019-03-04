@@ -46,6 +46,7 @@ import RoomSchedule from "components/RoomSchedule/RoomSchedule.jsx";
 import Slider from "react-slick";
 
 import { ScheduleDataToRows, timeSliceController, meetingController, idToTime } from "variables/general.jsx";
+import { Redirect } from "react-router-dom";
 
 const slidesSettings = {
   dots: true,
@@ -67,6 +68,9 @@ function roomCategory(eng){
 
 class RoomProfile extends React.Component {
   state = {
+    redirect: false,
+    redirect_url: "/",
+    
     br: false,
     notificationMessage: "null",
     notificationType: null,
@@ -218,7 +222,10 @@ class RoomProfile extends React.Component {
       }
       else {
         this.success("预约成功");
-        window.location.href="/meeting/"+data.id+"/profile";
+        this.setState({ 
+          redirect: true, 
+          redirect_url: "/meeting/"+data.id+"/profile"
+        });
       }
     })
     .catch(error => {
@@ -234,6 +241,9 @@ class RoomProfile extends React.Component {
   }
 
   render(){
+    if (this.state.redirect){
+      return <Redirect to={this.state.redirect_url}/>
+    }
     if (this.state.error){
       return <h2>404 Not Found</h2>
     }
@@ -285,7 +295,6 @@ class RoomProfile extends React.Component {
     else if (firstChosen && !secondChosen){
       timeChosen = this.state.chosenDate + " " + idToTime(firstChosen[0]) + " ~ " + idToTime(firstChosen[0]+1);
     }
-    console.log(room)
     return (
       <div>
         <GridContainer>

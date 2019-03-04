@@ -142,7 +142,7 @@ class RoomPage extends React.Component {
     return (
       <div>
         <GridContainer>
-          <GridItem xs={12} sm={12} md={10}>
+          <GridItem xs={12} sm={12} md={12}>
             <SearchBar handleSearchChange={this.handleSearchChange} handleError={this.warning}/>
           </GridItem>
           {

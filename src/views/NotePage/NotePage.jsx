@@ -466,7 +466,9 @@ class NotePage extends React.Component {
                                     </Link>
                                   </TableCell>
                                   <TableCell>
+                                    <Link to={"/user/"+ele.ownerId+"/profile"}>
                                     {ele.name}
+                                    </Link>
                                   </TableCell>
                                   <TableCell align="left">
                                       <IconButton className={classes.iconButton} onClick={() => { this.setState({redirect: true, redirect_url: "/note/"+ele.meetingId+"/"+ele.ownerId+"/edit"});}}>

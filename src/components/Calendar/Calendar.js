@@ -72,19 +72,19 @@ class Calendar extends Component {
 
     var selected = "";
     var selectedStyle = {};
-    if (opts.selectedDay) {
+    if( opts.selected ) {
       selected = "selected";
       selectedStyle = {
-        backgroundColor: this.props.accentColor2
+        backgroundColor: this.props.accentColor
       }
       containerStyle = {
         color: '#ffffff'
       }
     }
-    else if( opts.selected ) {
+    else if (opts.selectedDay) {
       selected = "selected";
       selectedStyle = {
-        backgroundColor: this.props.accentColor
+        backgroundColor: this.props.accentColor2
       }
       containerStyle = {
         color: '#ffffff'

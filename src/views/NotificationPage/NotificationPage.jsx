@@ -15,6 +15,7 @@ import Search from '@material-ui/icons/Search';
 import Done from '@material-ui/icons/Done';
 import ErrorOutline from "@material-ui/icons/ErrorOutline";
 
+import Badge from '@material-ui/core/Badge';
 import Paper from '@material-ui/core/Paper';
 import Table from '@material-ui/core/Table';
 import TableHead from '@material-ui/core/TableHead';
@@ -49,6 +50,9 @@ const styles = theme => ({
   iconButton: {
     margin: theme.spacing.unit,
   },
+  margin: {
+    margin: theme.spacing.unit * 2,
+  },
 });
 
 function Transition(props) {
@@ -80,7 +84,7 @@ class NotificationPage extends React.Component {
       redirect_url: "/",
 
       NotificationPage: 0,
-      NotificationRowsPerPage: 5,
+      NotificationRowsPerPage: 10,
 
     };
   }
@@ -197,6 +201,14 @@ class NotificationPage extends React.Component {
     this.setState({ deleteId, deleteOpen: true })
   }
 
+  handleCheckNotification = (e, status, id) => {
+    e.preventDefault();
+    if (status === "NEW"){
+      this.setRead(id);
+      this.props.updateNotificationNumber();
+    }
+    this.setState({redirect: true, redirect_url:"/notification/"+id+"/profile"});
+  }
 
   render(){
     if (this.state.redirect){
@@ -237,19 +249,23 @@ class NotificationPage extends React.Component {
                                   <TableCell align="left">
                                     <span>
                                     {
-                                      ele.messageStatus === "READ" ? <Read className={classes.icon}/> 
-                                      : <New className={classes.icon}/>
+                                      ele.messageStatus === "READ" ? 
+                                      <Badge className={classes.margin} color="secondary" variant="dot" invisible={true}>
+                                        <Read className={classes.icon}/> 
+                                      </Badge>
+                                      : 
+                                      <Badge className={classes.margin} color="secondary" variant="dot">
+                                        <New className={classes.icon}/>
+                                      </Badge>
                                     }
                                     &nbsp;
-                                    <span 
+                                    <a 
                                       className={classes.icon} 
-                                      onClick={() => {
-                                          this.setState({ redirect: true, redirect_url: "/notification/"+ele.id+"/profile" });
-                                          this.props.updateNotificationNumber();
-                                        }
-                                      }>
+                                      onClick={(e) => this.handleCheckNotification(e, ele.messageStatus, ele.id)}
+                                      href={null}
+                                      >
                                     {ele.title}
-                                    </span>
+                                    </a>
                                     </span>
                                   </TableCell>
                                   <TableCell>
@@ -258,11 +274,7 @@ class NotificationPage extends React.Component {
                                   <TableCell align="left">
                                     <IconButton 
                                       className={classes.iconButton} 
-                                      onClick={() => { 
-                                        this.setRead(ele.id);
-                                        this.setState({redirect: true, redirect_url:"/notification/"+ele.id+"/profile"});
-                                        ele.messageStatus === "NEW" && this.props.updateNotificationNumber();
-                                      }}
+                                      onClick={(e) => this.handleCheckNotification(e, ele.messageStatus, ele.id)}
                                     >
                                       <Search/>
                                     </IconButton>

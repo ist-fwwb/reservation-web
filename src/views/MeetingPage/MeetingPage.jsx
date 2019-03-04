@@ -60,13 +60,13 @@ class MeetingPage extends React.Component {
 
 
       meetingsPage: 0,
-      meetingsRowsPerPage: 5,
+      meetingsRowsPerPage: 10,
 
       attendMeetingsPage: 0,
-      attendMeetingsRowsPerPage: 5,
+      attendMeetingsRowsPerPage: 10,
 
       historyMeetingsPage: 0,
-      historyMeetingsRowsPerPage: 5,
+      historyMeetingsRowsPerPage: 10,
     }
   }
 
