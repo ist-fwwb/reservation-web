@@ -30,7 +30,7 @@ import Slide from '@material-ui/core/Slide';
 import Button from '@material-ui/core/Button';
 
 import { notificationController } from 'variables/general.jsx';
-import { Link, Redirect } from "react-router-dom";
+import { Redirect } from "react-router-dom";
 
 const styles = theme => ({
   root: {
@@ -53,6 +53,16 @@ const styles = theme => ({
 
 function Transition(props) {
   return <Slide direction="up" {...props} />;
+}
+
+function NotificationSort(notification){
+  notification.sort((a, b) => {
+    if (a.messageStatus === "NEW")
+      return -1;
+    else
+      return 1;
+  })
+  return notification;
 }
 
 class NotificationPage extends React.Component {
@@ -143,7 +153,7 @@ class NotificationPage extends React.Component {
       else{
         this.setState({
           loaded: true,
-          Notification: res
+          Notification: NotificationSort(res)
         })
       }
     })
