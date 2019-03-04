@@ -30,7 +30,7 @@ import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 
 import { noteController } from 'variables/general.jsx';
-import { Link } from "react-router-dom";
+import { Link, Redirect } from "react-router-dom";
 import * as jsPDF from "jspdf";
 import * as html2canvas from "html2canvas";
 
@@ -57,6 +57,9 @@ class NotePage extends React.Component {
   constructor(props){
     super(props);
     this.state = {
+      redirect: false,
+      redirect_url : '/',
+
       br: false,
       notificationMessage: "null",
       notificationType: null,
@@ -366,6 +369,9 @@ class NotePage extends React.Component {
   }
 
   render(){
+    if (this.state.redirect){
+      return <Redirect to={this.state.redirect_url}/>
+    }
     let { notes_show, othersNotes_show, favoriteNotes_show } = this.state;
     const { classes } = this.props;
     const { notesRowsPerPage, notesPage  } = this.state;
@@ -451,19 +457,19 @@ class NotePage extends React.Component {
                                 <TableRow key={ele.id}>
                                   <TableCell align="left">
                                     <Link to={"/meeting/"+ele.meetingId+"/profile"}>
-                                    {ele.meetingHeading}
+                                    {ele.meetingHeading ? ele.meetingHeading : "null"}
                                     </Link>
                                   </TableCell>
                                   <TableCell align="left">
                                     <Link to={"/note/"+ele.meetingId+"/"+ele.ownerId+"/profile"}>
-                                    {ele.noteHeading}
+                                    {ele.noteHeading ? ele.noteHeading : "null"}
                                     </Link>
                                   </TableCell>
                                   <TableCell>
                                     {ele.name}
                                   </TableCell>
                                   <TableCell align="left">
-                                      <IconButton className={classes.iconButton} onClick={() => { window.location.href="/note/"+ele.meetingId+"/"+ele.ownerId+"/edit";}}>
+                                      <IconButton className={classes.iconButton} onClick={() => { this.setState({redirect: true, redirect_url: "/note/"+ele.meetingId+"/"+ele.ownerId+"/edit"});}}>
                                         <Edit/>
                                       </IconButton>
                                       <IconButton color={ele.favorite ? "secondary" : "default"} className={classes.iconButton} onClick={(e) => this.handleFavorite(e, ele.id)}>
