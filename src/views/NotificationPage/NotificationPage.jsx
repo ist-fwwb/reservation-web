@@ -85,6 +85,19 @@ class NotificationPage extends React.Component {
     };
   }
 
+  setRead = (id) => {
+    let {Notification} = this.state;
+    for (let i in Notification){
+      if (Notification[i].id === id){
+        Notification[i].messageStatus = "READ";
+        Notification = NotificationSort(Notification);
+        break;
+      }
+    }
+
+    this.setState({ Notification });
+  }
+
   componentWillUnmount() {
     var id = window.setTimeout(null, 0);
     while (id--) {
@@ -246,8 +259,9 @@ class NotificationPage extends React.Component {
                                     <IconButton 
                                       className={classes.iconButton} 
                                       onClick={() => { 
+                                        this.setRead(ele.id);
                                         this.setState({redirect: true, redirect_url:"/notification/"+ele.id+"/profile"});
-                                        this.props.updateNotificationNumber();
+                                        ele.messageStatus === "NEW" && this.props.updateNotificationNumber();
                                       }}
                                     >
                                       <Search/>
