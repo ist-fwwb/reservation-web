@@ -16,6 +16,9 @@ import { dashboardRoutes, deepRoutes } from "routes/dashboard.jsx";
 
 import dashboardStyle from "assets/jss/material-dashboard-react/layouts/dashboardStyle.jsx";
 
+import { notificationController } from "variables/general.jsx";
+import NotificationPage from "views/NotificationPage/NotificationPage.jsx";
+
 import image from "assets/img/sidebar-2.jpg";
 import logo from "assets/img/reactlogo.png";
 import LoginPage from "views/LoginPage/LoginPage.jsx";
@@ -30,7 +33,39 @@ class App extends React.Component {
       mobileOpen: false,
       login: cookies.get("login"),
       userId: cookies.get("userId"),
+
+      notificationNumber : 0,
     };
+  }
+
+  componentDidMount(){
+    window.addEventListener("resize", this.resizeFunction);
+    let api = notificationController.getNotificationByUserId(this.state.userId);
+    fetch(api, {
+      method: 'get',
+      credentials: 'include',
+    })
+    .then(res => res.json())
+    .then(res => {
+      if (res.error){
+        console.log(res.error);
+        return;
+      }
+      else {
+        let notificationNumber = 0;
+        for (let i in res){
+          if (res[i].messageStatus==="NEW")
+            notificationNumber++;
+        }
+        this.setState({notificationNumber});
+      }
+    })
+  }
+
+  updateNotificationNumber = () => {
+    let { notificationNumber } = this.state;
+    notificationNumber--;
+    this.setState({ notificationNumber });
   }
 
   handleDrawerToggle = () => {
@@ -41,10 +76,6 @@ class App extends React.Component {
     if (window.innerWidth >= 960) {
       this.setState({ mobileOpen: false });
     }
-  }
-
-  componentDidMount() {
-    window.addEventListener("resize", this.resizeFunction);
   }
 
   componentDidUpdate(e) {
@@ -74,7 +105,7 @@ class App extends React.Component {
 
   render() {
     const { classes, ...rest } = this.props;
-    const { userId, login, recommendMessage } = this.state;
+    const { userId, login, notificationNumber } = this.state;
     if (!login){
       return <LoginPage handleLogin={this.handleLogin}/>;
     }
@@ -96,6 +127,7 @@ class App extends React.Component {
             routes={dashboardRoutes}
             handleDrawerToggle={this.handleDrawerToggle}
             userId={userId}
+            notificationNumber={this.state.notificationNumber}
             {...rest}
           />
             <div className={classes.content}>
@@ -106,7 +138,21 @@ class App extends React.Component {
                     if (prop.redirect)
                       return <Redirect from={prop.path} to={prop.to} key={key} />;
                     else
-                      return <Route exact path={prop.path} key={key} render={ (props) => <prop.component userId={userId} {...props}/> } />
+                      return <Route 
+                        exact path={prop.path} 
+                        key={key} 
+                        render={ (props) => {
+                          if (prop.component === NotificationPage){
+                            return (
+                              <prop.component userId={userId} updateNotificationNumber={this.updateNotificationNumber} {...props}/>
+                            )
+                          }
+                          else
+                            return (
+                              <prop.component userId={userId} {...props}/>
+                            )
+                        }} 
+                      />
 
                   })
                 }

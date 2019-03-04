@@ -26,10 +26,11 @@ function Header({ ...props }) {
     });
     return name;
   }
-  const { classes, color, userId } = props;
+  const { classes, color, userId, notificationNumber } = props;
   const appBarClasses = classNames({
     [" " + classes[color]]: color
   });
+  console.log(notificationNumber)
   return (
     <AppBar className={classes.appBar + appBarClasses}>
       <Toolbar className={classes.container}>
@@ -40,7 +41,7 @@ function Header({ ...props }) {
           </Button>
         </div>
         <Hidden smDown implementation="css">
-          <HeaderLinks userId={userId}/>
+          <HeaderLinks userId={userId} notificationNumber={notificationNumber}/>
         </Hidden>
         <Hidden mdUp implementation="css">
           <IconButton

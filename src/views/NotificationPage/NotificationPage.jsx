@@ -218,16 +218,28 @@ class NotificationPage extends React.Component {
                                       : <New className={classes.icon}/>
                                     }
                                     &nbsp;
-                                    <Link className={classes.icon} to={"/notification/"+ele.id+"/profile"}>
+                                    <span 
+                                      className={classes.icon} 
+                                      onClick={() => {
+                                          this.setState({ redirect: true, redirect_url: "/notification/"+ele.id+"/profile" });
+                                          this.props.updateNotificationNumber();
+                                        }
+                                      }>
                                     {ele.title}
-                                    </Link>
+                                    </span>
                                     </span>
                                   </TableCell>
                                   <TableCell>
                                     {ele.time}
                                   </TableCell>
                                   <TableCell align="left">
-                                    <IconButton className={classes.iconButton} onClick={() => { this.setState({redirect: true, redirect_url:"/notification/"+ele.id+"/profile"});}}>
+                                    <IconButton 
+                                      className={classes.iconButton} 
+                                      onClick={() => { 
+                                        this.setState({redirect: true, redirect_url:"/notification/"+ele.id+"/profile"});
+                                        this.props.updateNotificationNumber();
+                                      }}
+                                    >
                                       <Search/>
                                     </IconButton>
                                     <IconButton className={classes.iconButton} onClick={(e) => this.setDeleteId(e, ele.id)}>
