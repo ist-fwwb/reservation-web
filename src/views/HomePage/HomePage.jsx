@@ -6,17 +6,18 @@ import CustomTabs from "components/CustomTabs/CustomTabs.jsx";
 import Assignment from "@material-ui/icons/Assignment";
 import LibraryAdd from "@material-ui/icons/LibraryAdd";
 import FiberNew from "@material-ui/icons/FiberNew";
-import Note from "@material-ui/icons/Note";
 import ErrorOutline from "@material-ui/icons/ErrorOutline";
 import Done from "@material-ui/icons/Done";
+import DateRange from "@material-ui/icons/DateRange";
 
 import Slider from "react-slick";
 import TextField from '@material-ui/core/TextField';
 import Button from "@material-ui/core/Button";
 
 import Table from "components/Table/Table.jsx";
-
 import Snackbar from "components/Snackbar/Snackbar.jsx";
+import Calendar from "components/Calendar/Calendar";
+
 import { meetingController, idToTime, today } from "variables/general.jsx";
 import { Link, Redirect } from "react-router-dom";
 
@@ -30,15 +31,12 @@ const slidesSettings = {
   slidesToScroll: 1
 };
 
-const notes = [
-  ["Meeting a", "whatever"],
-  ["Meeting b", "whatever"]
-]
-
 class HomePage extends React.Component{
   constructor(props){
     super(props);
     this.state = {
+      dates: [],
+
       br: false,
       notificationMessage: "null",
       notificationType: null,
@@ -82,20 +80,27 @@ class HomePage extends React.Component{
   componentDidMount(){
     window.addEventListener("paste", this.pasteFunction);
 
-    let todayApi = meetingController.getMeetingByUserIdAndDateAndStatus(this.props.userId, today, "Pending");
-    fetch(todayApi, {
+    let api = meetingController.getMeetingByUserIdAndStatus(this.props.userId, "Pending");
+    fetch(api, {
       credentials: 'include',
       method: 'get'
     })
     .then(res => res.json())
     .then((data) => {
-      if (data.error)
-        this.setState({error: true});
-      else
-        this.setState({
-          todayMeetings: data,
-        });
-        
+      let todayMeetings = [];
+      let dates = [];
+      for (let i in data){
+        let date = data[i].date;
+        if (date === today)
+          todayMeetings.push(date);
+        if (!dates.includes(date))
+          dates.push(date);
+      }
+
+      this.setState({
+        todayMeetings,
+        dates,
+      })
     })
     .catch(e => console.log(e))
   }
@@ -221,12 +226,26 @@ class HomePage extends React.Component{
               ]}
             />
           </GridItem>
-          <GridItem xs={12} sm={12} md={6}>
+          <GridItem xs={12} sm={12} md={12}>
             <CustomTabs
               title={null}
               style={{background:"#000"}}
               headerColor="danger"
               tabs={[
+                {
+                  tabName: "会议日程",
+                  tabIcon: DateRange,
+                  tabContent: (
+                    <div style={{backgroundColor: null}}>
+                    <Calendar 
+                      selected={this.state.dates} 
+                      showHeader={false}
+                      accentColor='#00C1A6'
+                      accentColor2='#f48fb1'
+                    />
+                    </div>
+                  )
+                },
                 {
                   tabName: "今日会议",
                   tabIcon: Assignment,
@@ -240,10 +259,11 @@ class HomePage extends React.Component{
                   )
                 },
                 {
-                  tabName: "加入会议",
+                  tabName: "快速加入",
                   tabIcon: LibraryAdd,
                   tabContent: (
                     <div>
+                      
                       <TextField
                         fullWidth
                         label="四位数字"
@@ -259,26 +279,6 @@ class HomePage extends React.Component{
                 },
               ]}
             />
-          </GridItem>
-          <GridItem xs={12} sm={12} md={6}>
-            <CustomTabs
-                title={null}
-                style={{background:"#000"}}
-                headerColor="danger"
-                tabs={[
-                  {
-                    tabName: "会议笔记",
-                    tabIcon: Note,
-                    tabContent: (
-                      <Table
-                      tableHeaderColor="primary"
-                      tableHead={["会议名称", "笔记内容"]}
-                      tableData={notes}
-                    />
-                    )
-                  }
-                ]}
-              />
           </GridItem>
         </GridContainer>
         <Snackbar
