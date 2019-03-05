@@ -1,6 +1,6 @@
 pipeline:
   build: 
-    image: registry.cn-shenzhen.aliyuncs.com/pipipan/node:1.0
+    image: registry.cn-hangzhou.aliyuncs.com/aliyun-node/alinode:4.7.1
     commands:
       - npm install
       - CI=false npm run-script build
