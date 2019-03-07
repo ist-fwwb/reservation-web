@@ -22,8 +22,6 @@ import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import ListItemText from '@material-ui/core/ListItemText';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import FormControl from '@material-ui/core/FormControl';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Switch from '@material-ui/core/Switch';
 import Avatar from '@material-ui/core/Avatar';
 import Table from '@material-ui/core/Table';
 import TableHead from '@material-ui/core/TableHead';
@@ -835,7 +833,8 @@ class MeetingProfile extends React.Component {
       tags,
       attendantNum,
       notes,
-      needSignIn
+      needSignIn,
+      foreignGuestList
     } = this.state;
     const pending = (status === "Pending");
     const disabled = !hostFlag || !pending;
@@ -989,64 +988,6 @@ class MeetingProfile extends React.Component {
                         </MenuItem>
                       </TextField>
                     </GridItem>
-                  <GridItem xs={12} sm={12} md={11}>
-                    <Card>
-                      <CardBody>
-                        <Typography className={classes.title} color="textSecondary" gutterBottom>
-                          标签分类
-                        </Typography>
-                          {!loaded || !tags? null :
-                          tags.map((data, key) => {
-                            if (!data)
-                              return null;
-                            let local_disabled = !(this.props.userId ===this.state.hostId) || disabled;
-                            if (local_disabled)
-                              return (
-                                <Chip
-                                  key={key}
-                                  label={data}
-                                  className={classes.chip}
-                                />
-                              )
-                            else
-                              return (
-                                  <Chip
-                                    key={key}
-                                    label={data}
-                                    className={classes.chip}
-                                    onDelete={(e) => this.handleDeleteTag(e, data)}
-                                  />
-                              );
-                          })
-                          }
-                          {
-                            !this.state.newTag ? null :
-                              <Chip
-                                label={
-                                  <TextField
-                                  name="newTagValue"
-                                  className={classes.textField}
-                                  value={this.state.newTagValue}
-                                  onChange={this.handleChange}
-                                  margin="normal"
-                                  />
-                                }
-                                className={classes.chip}
-                              />
-                          }
-                          {
-                            disabled ? null : (! this.state.newTag ? 
-                              <IconButton color="primary" className={classes.button} component="span" onClick={this.handleNewTag}>
-                                <Add/>
-                              </IconButton> :
-                              <IconButton color="primary" className={classes.button} component="span" onClick={this.handleAddTag}>
-                                <Done/>
-                              </IconButton>
-                              )
-                          }
-                      </CardBody>
-                    </Card>
-                  </GridItem>
                 </GridContainer>
                 <GridContainer>
                   <GridItem xs={12} sm={12} md={11}>
@@ -1092,9 +1033,12 @@ class MeetingProfile extends React.Component {
                             }
                           })
                           }
-                          <IconButton color="primary" className={classes.button} component="span" onClick={this.handleOpenAttendants}>
-                            <Add/>
-                          </IconButton>
+                          {
+                            pending &&  
+                            <IconButton color="primary" className={classes.button} component="span" onClick={this.handleOpenAttendants}>
+                              <Add/>
+                            </IconButton>
+                          }
                           {
                             addAttendants && <AttendantsDialogWrapped
                               key
@@ -1107,6 +1051,89 @@ class MeetingProfile extends React.Component {
                       </CardBody>
                     </Card>
                     
+                  </GridItem>
+                  <GridItem xs={12} sm={12} md={5}>
+                    <Card>
+                      <CardBody>
+                        <Typography className={classes.title} color="textSecondary" gutterBottom>
+                          外宾人员
+                        </Typography>
+                          {
+                            loaded && (foreignGuestList === [] ? 
+                              <Chip label={"无"} className={classes.chip}/> :
+                            foreignGuestList.map((data, key) => {
+                              if (!data)
+                                return null;
+                              return(
+                                  <Chip
+                                    key={key}
+                                    label={data.name}
+                                    className={classes.chip}
+                                  />
+                                )
+                            }))
+                          }
+                      </CardBody>
+                    </Card>
+                  </GridItem>
+                  <GridItem xs={12} sm={12} md={6}>
+                    <Card>
+                      <CardBody>
+                        <Typography className={classes.title} color="textSecondary" gutterBottom>
+                          标签分类
+                        </Typography>
+                          { loaded && (!tags? 
+                            <Chip label={"无"} className={classes.chip}/> :
+                          tags.map((data, key) => {
+                            if (!data)
+                              return null;
+                            let local_disabled = !(this.props.userId ===this.state.hostId) || disabled;
+                            if (local_disabled)
+                              return (
+                                <Chip
+                                  key={key}
+                                  label={data}
+                                  className={classes.chip}
+                                />
+                              )
+                            else
+                              return (
+                                  <Chip
+                                    key={key}
+                                    label={data}
+                                    className={classes.chip}
+                                    onDelete={(e) => this.handleDeleteTag(e, data)}
+                                  />
+                              );
+                          }))
+                          }
+                          {
+                            !this.state.newTag ? null :
+                              <Chip
+                                label={
+                                  <TextField
+                                  name="newTagValue"
+                                  className={classes.textField}
+                                  value={this.state.newTagValue}
+                                  onChange={this.handleChange}
+                                  margin="normal"
+                                  />
+                                }
+                                className={classes.chip}
+                              />
+                          }
+                          {
+                            disabled ? null : (! this.state.newTag ? 
+                              <IconButton color="primary" className={classes.button} component="span" onClick={this.handleNewTag}>
+                                <Add/>
+                              </IconButton> :
+                              <IconButton color="primary" className={classes.button} component="span" onClick={this.handleAddTag}>
+                                <Done/>
+                              </IconButton>
+                              )
+                          }
+                      </CardBody>
+                    </Card>
                   </GridItem>
                 </GridContainer>
                 <GridContainer>
