@@ -54,11 +54,13 @@ class HeaderLinks extends React.Component {
             inputProps={{
               placeholder: "Search",
               inputProps: {
-                "aria-label": "Search"
+                "aria-label": "Search",
+                "onChange": (e) => {this.setState({content: e.target.value});},
               }
             }}
+            
           />
-          <Button color="white" aria-label="edit" justIcon round>
+          <Button color="white" aria-label="edit" justIcon round onClick={() => { window.location.href = "/search/"+this.state.content}}>
             <Search />
           </Button>
         </div>

@@ -4,7 +4,6 @@ import Work from "@material-ui/icons/Work";
 import Home from "@material-ui/icons/Home";
 import Book from "@material-ui/icons/Book";
 import CloudQueue from "@material-ui/icons/CloudQueue";
-import ClearAll from "@material-ui/icons/ClearAll";
 import Note from "@material-ui/icons/Note";
 
 // core components/views
@@ -16,12 +15,12 @@ import HomePage from "views/HomePage/HomePage.jsx";
 import MeetingProfile from "views/MeetingProfile/MeetingProfile.jsx";
 import AddressBook from "views/AddressBook/AddressBook.jsx";
 import SmartReservationPage from "views/SmartReservationPage/SmartReservationPage.jsx";
-import QueueNodePage from "views/QueueNodePage/QueueNodePage.jsx";
 import NotePage from "views/NotePage/NotePage.jsx";
 import NoteProfile from "views/NoteProfile/NoteProfile.jsx";
 import NoteEditPage from "views/NoteEditPage/NoteEditPage.jsx";
 import NotificationPage from 'views/NotificationPage/NotificationPage.jsx';
 import NotificationProfile from "views/NotificationProfile/NotificationProfile.jsx";
+import SearchPage from "views/SearchPage/SearchPage.jsx";
 
 export const dashboardRoutes = [
   {
@@ -66,13 +65,6 @@ export const dashboardRoutes = [
     icon: Note,
     component: NotePage,
   },
-  {
-    path: "/queue",
-    sidebarName: "排队情况",
-    navbarName: "排队情况",
-    icon: ClearAll,
-    component: QueueNodePage,
-  },
   { redirect: true, path: "/", to: "/home", navbarName: "Redirect" }
 ];
 
@@ -112,6 +104,10 @@ let routesNotInSideBar = [
   {
     path: "/notification/:notificationId/profile",
     component: NotificationProfile
+  },
+  {
+    path: "/search/:content",
+    component: SearchPage
   }
 ];
 

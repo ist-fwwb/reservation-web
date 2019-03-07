@@ -63,6 +63,10 @@ const timeToId = (time) => {
   return Number(li[0]) * 2 + (Number(li[1]) === 30 ? 1 : 0);
 }
 
+const searchController = {
+  "search":(content)=>(server +"/search?request=" + content)
+};
+
 const notificationController = {
   "getNotificationByUserId": (userId) => (server+"/message?userId="+userId),
   "getNotificationByNotificationId": (notificationId) => (server+"/message/"+notificationId),
@@ -639,11 +643,13 @@ module.exports = {
   timeToId,
   
   formatTimeCeiling,
+  dateToString,
 
   today,
   nowTime,
   nextDay,
   
+  searchController,
   roomController,
   timeSliceController,
   meetingController,
