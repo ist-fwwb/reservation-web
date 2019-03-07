@@ -810,10 +810,6 @@ class MeetingProfile extends React.Component {
     this.setState({ attendantsWithName, addAttendants, attendants });
   }
 
-  handleChangeSwitch = event => {
-    this.setState({ [event.target.name]: event.target.checked });
-  };  
-
   render(){
     if (this.state.error){
       return <h2>404 Not Found</h2>
@@ -838,7 +834,8 @@ class MeetingProfile extends React.Component {
       heading,
       tags,
       attendantNum,
-      notes
+      notes,
+      needSignIn
     } = this.state;
     const pending = (status === "Pending");
     const disabled = !hostFlag || !pending;
@@ -967,27 +964,32 @@ class MeetingProfile extends React.Component {
                 </GridContainer>
                 <GridContainer>
                   <GridItem xs={12} sm={12} md={2}>
-                      <Card>
-                        <CardBody>
-                          <Typography className={classes.title} color="textSecondary" gutterBottom>
-                            签到
-                          </Typography>
-                          <FormControlLabel
-                            control={
-                              <Switch
-                                checked={loaded ? this.state.needSignIn : false}
-                                onChange={this.handleChangeSwitch}
-                                disabled={disabled}
-                                name="needSignIn"
-                                value="needSignIn"
-                                color="primary"
-                              />
-                            }
-                          />
-                        </CardBody>
-                      </Card>
+                    <TextField
+                      select
+                      disabled={disabled}
+                      fullWidth
+                      name="needSignIn"
+                      label="是否签到"
+                      className={classes.textField}
+                      value={loaded?needSignIn:false}
+                      onChange={this.handleChange}
+                      SelectProps={{
+                        MenuProps: {
+                          className: classes.menu,
+                        },
+                      }}
+                      margin="normal"
+                      variant="outlined"
+                      >
+                        <MenuItem key={true} value={true}>
+                          是
+                        </MenuItem>
+                        <MenuItem key={false} value={false}>
+                          否
+                        </MenuItem>
+                      </TextField>
                     </GridItem>
-                  <GridItem xs={12} sm={12} md={9}>
+                  <GridItem xs={12} sm={12} md={11}>
                     <Card>
                       <CardBody>
                         <Typography className={classes.title} color="textSecondary" gutterBottom>

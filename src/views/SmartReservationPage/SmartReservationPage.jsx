@@ -318,7 +318,7 @@ class SmartReservationPage extends React.Component{
 
   render(){
     const { classes } = this.props;
-    const { loading, utils, heading, type, date, startTime, endTime, needSignIn, description } = this.state;
+    const { loading, utils, heading, type, date, startTime, endTime, description } = this.state;
     return(
       <div>
       <Dialog
@@ -396,7 +396,7 @@ class SmartReservationPage extends React.Component{
                       onClick={this.confirmTimeChangeClickOpen}
                     />
                   </GridItem>
-                  <GridItem xs={12} sm={12} md={3}>
+                  <GridItem xs={12} sm={12} md={2}>
                     <TextField
                       label="时间"
                       disabled
@@ -408,6 +408,31 @@ class SmartReservationPage extends React.Component{
                       onClick={this.confirmTimeChangeClickOpen}
                     />
                   </GridItem>
+                  <GridItem xs={12} sm={12} md={2}>
+                      <TextField
+                        select
+                        fullWidth
+                        name="needSignIn"
+                        label="是否签到"
+                        className={classes.textField}
+                        value={false}
+                        onChange={this.handleChange}
+                        SelectProps={{
+                          MenuProps: {
+                            className: classes.menu,
+                          },
+                        }}
+                        margin="normal"
+                        variant="outlined"
+                        >
+                        <MenuItem key={true} value={true}>
+                          是
+                        </MenuItem>
+                        <MenuItem key={false} value={false}>
+                          否
+                        </MenuItem>
+                      </TextField>
+                    </GridItem>
                   <Dialog
                     fullScreen
                     open={this.state.confirmTimeChangeOpen}
@@ -454,7 +479,7 @@ class SmartReservationPage extends React.Component{
                   </Dialog>
                 </GridContainer>
                 <GridContainer>
-                    <GridItem xs={12} sm={12} md={8}>
+                    <GridItem xs={12} sm={12} md={11}>
                       <Card>
                         <CardBody>
                           <Typography>
@@ -559,26 +584,7 @@ class SmartReservationPage extends React.Component{
                         </CardBody>
                       </Card>
                     </GridItem>
-                    <GridItem xs={12} sm={12} md={2}>
-                      <Card>
-                        <CardBody>
-                          <Typography className={classes.title} color="textSecondary" gutterBottom>
-                            签到
-                          </Typography>
-                          <FormControlLabel
-                            control={
-                              <Switch
-                                checked={needSignIn}
-                                onChange={this.handleChangeSwitch}
-                                name="needSignIn"
-                                value="needSignIn"
-                                color="primary"
-                              />
-                            }
-                          />
-                        </CardBody>
-                      </Card>
-                    </GridItem>
+                    
                 </GridContainer>
                 <GridContainer>
                   <GridItem xs={12} sm={12} md={11}>
