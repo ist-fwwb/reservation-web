@@ -850,6 +850,7 @@ class MeetingProfile extends React.Component {
     }
     else
       inMeeting = true;
+
     return (
       <div>
         <GridContainer>
@@ -859,7 +860,7 @@ class MeetingProfile extends React.Component {
                 style={{background:"#000"}}
                 color="danger"
               >
-                <h4 className={classes.cardTitleWhite}>{this.state.heading}</h4>
+                <h3 className={classes.cardTitleWhite}>{this.state.heading}</h3>
                 {
                   pending ? <p className={classes.cardCategoryWhite}>{"快速加入: " + attendantNum}</p>
                   : null
@@ -1059,7 +1060,7 @@ class MeetingProfile extends React.Component {
                           外宾人员
                         </Typography>
                           {
-                            loaded && (foreignGuestList === [] ? 
+                            loaded && (!foreignGuestList || foreignGuestList.length === 0 ? 
                               <Chip label={"无"} className={classes.chip}/> :
                             foreignGuestList.map((data, key) => {
                               if (!data)
@@ -1082,7 +1083,7 @@ class MeetingProfile extends React.Component {
                         <Typography className={classes.title} color="textSecondary" gutterBottom>
                           标签分类
                         </Typography>
-                          { loaded && (!tags? 
+                          { loaded && (!tags || tags.length===0? 
                             <Chip label={"无"} className={classes.chip}/> :
                           tags.map((data, key) => {
                             if (!data)

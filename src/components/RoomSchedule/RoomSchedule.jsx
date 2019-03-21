@@ -381,7 +381,7 @@ class RoomSchedule extends React.Component{
         <TableBody>
           {! scheduleData ? null : scheduleData.map((row, x) => {
             // only display 8:00 ~ 18:00
-            if (x < 16 || x >= 36){
+            if (x < 16 || x >= 44){
               return null;
             }
 
@@ -395,8 +395,10 @@ class RoomSchedule extends React.Component{
                     let bgcolor = null;
                     if (cell["occupied"]){
                       let currentid = cell.meetingid;
+                      console.log(currentid)
                       if (!colorMap[currentid]){
                         colorMap[currentid] = colorList[colorCount];
+                        console.log(colorCount)
                         colorCount += 1;
                         colorCount %= colorList.length;
                       }

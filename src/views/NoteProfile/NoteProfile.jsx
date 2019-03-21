@@ -219,10 +219,10 @@ class NoteProfile extends React.Component {
                 color="danger"
               >
                 <h3 className={classes.cardTitleWhite}>
-                  {"会议名称："}<Link to={"/meeting/"+meetingId+"/profile"} className={classes.link}>{this.state.meetingHeading}</Link>
+                  {"会议名称："}<Link to={"/meeting/"+meetingId+"/profile"} className={classes.link}>什么都不队第三次会议</Link>
                 </h3>
                 <h4>
-                  {"作者："}<Link to={"/user/"+ownerId+"/profile"} className={classes.link}>{this.state.name}</Link>
+                  {"作者："}<Link to={"/user/"+ownerId+"/profile"} className={classes.link}>潘子奕</Link>
                 </h4>
               </CardHeader>
               <CardBody>

@@ -1,12 +1,14 @@
 import React from "react";
 import { withStyles } from '@material-ui/core/styles';
-import {searchController, idToTime} from "variables/general.jsx";
-import {filepath} from "variables/oss.jsx";
+import {searchController, idToTime, face_path} from "variables/general.jsx";
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import Divider from '@material-ui/core/Divider';
 import IconButton from "@material-ui/core/IconButton";
 import Collapse from '@material-ui/core/Collapse';
+import Card from "components/Card/Card.jsx";
+import CardHeader from "components/Card/CardHeader.jsx";
+import CardBody from "components/Card/CardBody.jsx";
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import ExpandLess from '@material-ui/icons/ExpandLess';
 import Label from '@material-ui/icons/Label';
@@ -18,6 +20,7 @@ import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Button from "@material-ui/core/Button";
+import TextField from "@material-ui/core/TextField";
 import Description from "@material-ui/icons/Description";
 import Dialog from '@material-ui/core/Dialog';
 import DialogContent from "@material-ui/core/DialogContent";
@@ -49,6 +52,7 @@ const styles = theme => ({
     transform: 'translateZ(0)',
   },
 });
+
 
 const CustomTableCell = withStyles(theme => ({
   root: {
@@ -129,6 +133,7 @@ class SearchPage extends React.Component {
       noteDetail: false,
       roomDetail: false,
       userDetail: false,
+      noteDialog: false,
       totalCount: 0,
 
       heading:"",
@@ -141,6 +146,9 @@ class SearchPage extends React.Component {
       hostname:"",
       attendantNum:"",
       foreignGuestList:[],
+
+      title:"",
+      content:"",
     };
   }
 
@@ -149,20 +157,17 @@ class SearchPage extends React.Component {
       credentials: 'include',
       method: 'get',
     })
-        .then(response => {
-          console.log('Request successful', response);
-          return response.json()
-              .then(result => {
-                console.log("totalCount:", result.totalCount);
-                this.setState({
-                  totalCount: result.totalCount,
-                  meetingNotes: result.meetingNotes,
-                  meetingRooms: result.meetingRooms,
-                  meetings: result.meetings,
-                  users: result.users,
-                });
-              });
-        })
+    .then(response => response.json())
+    .then(result => {
+      console.log("totalCount:", result.totalCount);
+      this.setState({
+        totalCount: result.totalCount,
+        meetingNotes: result.meetingNotes,
+        meetingRooms: result.meetingRooms,
+        meetings: result.meetings,
+        users: result.users,
+      });
+    });
   }
 
     Transition(props) {
@@ -200,6 +205,15 @@ class SearchPage extends React.Component {
       return results;
     };
 
+    handleNoteDetail=(key)=>{
+      let note = this.state.meetingNotes[key];
+      this.setState({
+        noteDialog: true,
+        key: key,
+        title: note.title,
+        content: note.note,
+      })
+    };
 
     handleClickNotes=()=>{
       this.setState({
@@ -228,8 +242,8 @@ class SearchPage extends React.Component {
     };
 
     handleMeetingDetail=(key)=>{
-      console.log(key);
-      console.log(this.state.meetings[key].heading);
+      //console.log(key);
+      //console.log(this.state.meetings[key].heading);
       let meeting = this.state.meetings[key];
       let meetingType = "普通";
       if(meeting.type !== "COMMON")
@@ -259,12 +273,13 @@ class SearchPage extends React.Component {
         userDetail: false,
         noteDetail: false,
         roomDetail: false,
+        noteDialog: false,
       })
     };
 
     render(){
       const { classes } = this.props;
-      const{meetingNotes, meetingRooms, meetings, users } = this.state;
+      const{meetingNotes, meetingRooms, meetings, users, totalCount, key} = this.state;
 
       return(
           <div>
@@ -286,6 +301,30 @@ class SearchPage extends React.Component {
                 {meetingNotes.length > 0 ?
                     <div>
                       <Collapse in={this.state.notesOpen} timeout="auto" unmountOnExit>
+                        <Table style={{marginLeft:"5%", width:"90%"}}>
+                          <TableHead>
+                            <TableRow >
+                              <CustomTableCell style={{width:"20%", fontSize:"18px",  color:"#9e9e9e", textAlign:"center"}}>笔记标题</CustomTableCell>
+                              <CustomTableCell style={{width:"20%", fontSize:"18px",  color:"#9e9e9e", textAlign:"center"}}>作者</CustomTableCell>
+                              <CustomTableCell style={{width:"40%", fontSize:"18px",  color:"#9e9e9e", textAlign:"center"}}>会议标题</CustomTableCell>
+                              <CustomTableCell style={{width:"20%", fontSize:"18px",  color:"#9e9e9e", textAlign:"center"}}>内容</CustomTableCell>
+                            </TableRow>
+                          </TableHead>
+                          <TableBody>
+                            {meetingNotes.map((row,key) => {
+                              return (
+                                  <TableRow  key={row.id}>
+                                    <CustomTableCell style={{width:"20%", fontSize:"18px", textAlign:"center"}}>{row.title}</CustomTableCell>
+                                    <CustomTableCell style={{width:"20%", fontSize:"18px", textAlign:"center"}}>{"潘子奕"}</CustomTableCell>
+                                    <CustomTableCell style={{width:"20%", fontSize:"18px", textAlign:"center"}}>{"第二次会议"}</CustomTableCell>
+                                    <CustomTableCell style={{width:"40%", fontSize:"18px", textAlign:"center"}}>
+                                      <Button style={{background:"#303f9f", color:"white"}} onClick={()=>{this.handleNoteDetail(key)}}>查看详情</Button>
+                                    </CustomTableCell>
+                                  </TableRow>
+                              )})}
+                          </TableBody>
+                        </Table>
+
                       </Collapse>
                       <br/>
                     </div>
@@ -411,7 +450,7 @@ class SearchPage extends React.Component {
                             </TableRow>
                           </TableHead>
                           <TableBody>
-                            {users.map((row) => {
+                            {users.map((row,key) => {
                               return (
                                   <TableRow  key={row.id}>
                                     <CustomTableCell style={{width:"20%", fontSize:"18px", textAlign:"center"}}>{row.enterpriceId}</CustomTableCell>
@@ -419,7 +458,7 @@ class SearchPage extends React.Component {
                                     <CustomTableCell style={{width:"20%", fontSize:"18px", textAlign:"center"}}>{row.phone}</CustomTableCell>
                                     <CustomTableCell style={{width:"20%", fontSize:"18px", textAlign:"center"}}>{changeTypeToChinese(row.type)}</CustomTableCell>
                                     <CustomTableCell style={{width:"20%", fontSize:"18px", textAlign:"center"}}>
-                                      <img alt="avatar" style={{width:"60%", height:"100px"}} src={filepath + "/" + row.faceFile}/>
+                                      <img style={{width:"60%", height:"100px"}} src={face_path + row.faceFile}/>
                                     </CustomTableCell>
                                   </TableRow>
                               )})}
@@ -450,6 +489,73 @@ class SearchPage extends React.Component {
                              type={this.state.type} foreignGuestList={this.state.foreignGuestList}
                              needSignIn={this.state.needSignIn} hostname={this.state.hostname}
                              attendantNum={this.state.attendantNum} status={this.state.status}/>
+              </DialogContent>
+              <DialogActions>
+                &nbsp;&nbsp;
+                <Button onClick={this.handleDetailClose} style={{width: "15%", fontSize: "16px", background: "#a1887f", color:"white"}}>
+                  取消
+                </Button>
+              </DialogActions>
+            </Dialog>
+            <Dialog
+                open={this.state.noteDialog}
+                TransitionComponent={this.Transition}
+                keepMounted
+                onClose={this.handleDetailClose}
+                maxWidth="md"
+                fullWidth={true}
+            >
+              <DialogTitle style={{fontSize:"40px"}}>
+                {"会议详细信息"}
+              </DialogTitle>
+              <DialogContent>
+                <TextField
+                    label="笔记标题"
+                    name="noteTitle"
+                    fullWidth
+                    InputProps={{
+                      readOnly: true,
+                    }}
+                    className={classes.textField}
+                    value={this.state.title}
+                    margin="normal"
+                    variant="outlined"
+                    style={{width:"25%"}}
+                />
+                <TextField
+                    label="会议标题"
+                    name="meetingTitle"
+                    fullWidth
+                    InputProps={{
+                      readOnly: true,
+                    }}
+                    className={classes.textField}
+                    value=" "
+                    margin="normal"
+                    variant="outlined"
+                    style={{width:"25%", marginLeft:"5%"}}
+                />
+                <TextField
+                    label="作者"
+                    name="author"
+                    fullWidth
+                    InputProps={{
+                      readOnly: true,
+                    }}
+                    className={classes.textField}
+                    value= {"王见思"}
+                    margin="normal"
+                    variant="outlined"
+                    style={{width:"30%", marginLeft:"5%"}}
+                />
+                <Card>
+                  <CardHeader style={{fontSize:"20px", color:"#616161"}}>
+                    笔记内容
+                  </CardHeader>
+                  <CardBody>
+                    <div dangerouslySetInnerHTML={{ __html: this.state.content }}/>
+                  </CardBody>
+                </Card>
               </DialogContent>
               <DialogActions>
                 &nbsp;&nbsp;

@@ -204,8 +204,11 @@ class NoteEditPage extends React.Component {
                 style={{background:"#000"}}
                 color="danger"
               >
-                <h4 className={classes.cardTitleWhite}>
-                  {"会议标题:"}<Link className={classes.link} to={"/meeting/"+this.state.meetingId}>{this.state.meetingHeading}</Link>
+                <h3 className={classes.cardTitleWhite}>
+                  {"会议标题："}<Link className={classes.link} to={"/meeting/"+this.state.meetingId}>什么都不队第三次会议</Link>
+                </h3>
+                <h4>
+                  {"作者："}<Link to={"/user/"+ownerId+"/profile"} className={classes.link}>潘子奕</Link>
                 </h4>
               </CardHeader>
               <CardBody>

@@ -194,7 +194,7 @@ class RoomProfile extends React.Component {
       "date": chosenDate,
       "description": discription ? discription : "无",
       "endTime": end,
-      "heading": "Meeting-" + chosenDate + "-" + start + "-" + end ,
+      "heading": chosenDate + "-" + start + "-" + end ,
       "hostId": this.props.userId,
       "location": null,
       "needSignIn": false,
